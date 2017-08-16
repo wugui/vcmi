@@ -3,4 +3,4 @@ cd build_%VCMI_BUILD_PLATFORM%
 
 cmake --build . --config %VCMI_BUILD_CONFIGURATION% -- /maxcpucount:2
 
-cpack
+cpack -V
