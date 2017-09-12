@@ -10,6 +10,7 @@
 #pragma once
 
 #include <boost/mpl/for_each.hpp>
+#include <boost/type_index.hpp>
 
 #include "CTypeList.h"
 #include "../mapObjects/CGHeroInstance.h"
@@ -178,6 +179,7 @@ public:
 	template<class T>
 	BinaryDeserializer & operator&(T & t)
 	{
+		logGlobal->info("\t\tReading %s", boost::typeindex::type_id<T>().pretty_name());
 		this->load(t);
 		return * this;
 	}
