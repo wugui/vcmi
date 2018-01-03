@@ -16,7 +16,7 @@ namespace vstd
 typedef std::function<int64_t()> TRandI64;
 typedef std::function<double()> TRand;
 
-class RNG
+class DLL_LINKAGE RNG
 {
 public:
 
@@ -27,8 +27,7 @@ public:
 	virtual TRand getDoubleRange(double lower, double upper) = 0;
 };
 
-} // namespace vstd
-
+}
 
 namespace RandomGeneratorUtil
 {

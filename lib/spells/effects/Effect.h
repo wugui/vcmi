@@ -12,7 +12,7 @@
 
 #include "../Magic.h"
 
-class BattleHex;
+struct BattleHex;
 class CBattleInfoCallback;
 class JsonSerializeFormat;
 class IBattleState;
@@ -64,7 +64,7 @@ private:
 class Effect
 {
 public:
-	bool automatic;
+	bool indirect;
 	bool optional;
 
 	std::string name;

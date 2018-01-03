@@ -17,7 +17,6 @@
 #include "../../NetPacks.h"
 #include "../../battle/IBattleState.h"
 #include "../../battle/CBattleInfoCallback.h"
-#include "../../battle/CObstacleInstance.h"
 #include "../../serializer/JsonSerializeFormat.h"
 
 static const std::string EFFECT_NAME = "core:obstacle";
@@ -42,6 +41,8 @@ void ObstacleSideOptions::serializeJson(JsonSerializeFormat & handler)
 
 	handler.serializeString("appearAnimation", appearAnimation);
 	handler.serializeString("animation", animation);
+
+	handler.serializeInt("offsetY", offsetY);
 }
 
 void ObstacleSideOptions::serializeRelativeShape(JsonSerializeFormat & handler, const std::string & fieldName, RelativeShape & value)
@@ -101,6 +102,7 @@ Obstacle::Obstacle(const int level)
 	passable(false),
 	trigger(false),
 	trap(false),
+	removeOnTrigger(false),
 	patchCount(1),
 	turnsRemaining(-1)
 {
@@ -170,11 +172,7 @@ EffectTarget Obstacle::transformTarget(const Mechanics * m, const Target & aimPo
 
 	EffectTarget ret;
 
-	if(m->isMassive())
-	{
-		return ret;
-	}
-	else
+	if(!m->isMassive())
 	{
 		for(auto & spellDestination : spellTarget)
 		{
@@ -190,7 +188,7 @@ EffectTarget Obstacle::transformTarget(const Mechanics * m, const Target & aimPo
 		}
 	}
 
-	return LocationEffect::transformTarget(m, aimPoint, spellTarget);
+	return ret;
 }
 
 void Obstacle::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
@@ -313,6 +311,8 @@ void Obstacle::placeObstacles(BattleStateProxy * battleState, const Mechanics * 
 
 		obstacle.appearAnimation = options.appearAnimation;
 		obstacle.animation = options.animation;
+
+		obstacle.animationYOffset = options.offsetY;
 
 		obstacle.customSize.clear();
 		obstacle.customSize.reserve(options.shape.size());

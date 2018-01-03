@@ -75,31 +75,46 @@ bool CObstacleInstance::visibleForSide(ui8 side, bool hasNativeStack) const
 	return true;
 }
 
+int CObstacleInstance::getAnimationYOffset(int imageHeight) const
+{
+	int offset = imageHeight % 42;
+	if(obstacleType == CObstacleInstance::USUAL)
+	{
+		if(getInfo().blockedTiles.front() < 0 || offset > 37) //second or part is for holy ground ID=62,65,63
+			offset -= 42;
+	}
+	return offset;
+}
+
 bool CObstacleInstance::stopsMovement() const
 {
-	return obstacleType == QUICKSAND || obstacleType == MOAT;
+	return obstacleType == MOAT;
 }
 
 bool CObstacleInstance::blocksTiles() const
 {
-	return obstacleType == USUAL || obstacleType == ABSOLUTE_OBSTACLE || obstacleType == FORCE_FIELD;
+	return obstacleType == USUAL || obstacleType == ABSOLUTE_OBSTACLE ;
 }
 
 bool CObstacleInstance::triggersEffects() const
 {
-	return obstacleType == FIRE_WALL || obstacleType == LAND_MINE;
+	return false;
 }
 
 SpellCreatedObstacle::SpellCreatedObstacle()
+	: turnsRemaining(-1),
+	casterSpellPower(0),
+	spellLevel(0),
+	casterSide(0),
+	hidden(false),
+	passable(false),
+	trigger(false),
+	trap(false),
+	removeOnTrigger(false),
+	revealed(false),
+	animationYOffset(0)
 {
-	casterSide = 0;
-	spellLevel = 0;
-	casterSpellPower = 0;
-	turnsRemaining = -1;
-	hidden = false;
-	passable = false;
-	trigger = false;
-	trap = false;
+	obstacleType = SPELL_CREATED;
 }
 
 bool SpellCreatedObstacle::visibleForSide(ui8 side, bool hasNativeStack) const
@@ -108,31 +123,22 @@ bool SpellCreatedObstacle::visibleForSide(ui8 side, bool hasNativeStack) const
 	//quicksands are visible to the caster or if owned unit stepped into that particular patch
 	//additionally if side has a native unit, mines/quicksands will be visible
 
-	return casterSide == side || !hidden || hasNativeStack;
+	return casterSide == side || !hidden || revealed || hasNativeStack;
 }
 
 bool SpellCreatedObstacle::blocksTiles() const
 {
-	if(obstacleType == SPELL_CREATED)
-		return !passable;
-	else
-		return CObstacleInstance::blocksTiles();
+	return !passable;
 }
 
 bool SpellCreatedObstacle::stopsMovement() const
 {
-	if(obstacleType == SPELL_CREATED)
-		return trap;
-	else
-		return CObstacleInstance::stopsMovement();
+	return trap;
 }
 
 bool SpellCreatedObstacle::triggersEffects() const
 {
-	if(obstacleType == SPELL_CREATED)
-		return trigger;
-	else
-		return CObstacleInstance::triggersEffects();
+	return trigger;
 }
 
 void SpellCreatedObstacle::toInfo(ObstacleChanges & info)
@@ -148,7 +154,6 @@ void SpellCreatedObstacle::toInfo(ObstacleChanges & info)
 void SpellCreatedObstacle::fromInfo(const ObstacleChanges & info)
 {
 	uniqueID = info.id;
-	obstacleType = SPELL_CREATED;
 
 	if(info.operation != ObstacleChanges::EOperation::ADD)
 		logGlobal->error("ADD operation expected");
@@ -160,6 +165,7 @@ void SpellCreatedObstacle::fromInfo(const ObstacleChanges & info)
 void SpellCreatedObstacle::serializeJson(JsonSerializeFormat & handler)
 {
 	handler.serializeInt("spell", ID);
+	handler.serializeInt("position", pos);
 
 	handler.serializeInt("turnsRemaining", turnsRemaining);
 	handler.serializeInt("casterSpellPower", casterSpellPower);
@@ -174,6 +180,8 @@ void SpellCreatedObstacle::serializeJson(JsonSerializeFormat & handler)
 
 	handler.serializeString("appearAnimation", appearAnimation);
 	handler.serializeString("animation", animation);
+
+	handler.serializeInt("animationYOffset", animationYOffset);
 
 	{
 		JsonArraySerializer customSizeJson = handler.enterArray("customSize");
@@ -193,6 +201,18 @@ void SpellCreatedObstacle::battleTurnPassed()
 {
 	if(turnsRemaining > 0)
 		turnsRemaining--;
+}
+
+int SpellCreatedObstacle::getAnimationYOffset(int imageHeight) const
+{
+	int offset = imageHeight % 42;
+
+	if(obstacleType == CObstacleInstance::SPELL_CREATED)
+	{
+		offset += animationYOffset;
+	}
+
+	return offset;
 }
 
 std::vector<BattleHex> MoatObstacle::getAffectedTiles() const

@@ -10,105 +10,57 @@
 
 #pragma once
 
-#include "CDefaultSpellMechanics.h"
+#include "ISpellMechanics.h"
 
-class CObstacleInstance;
-class SpellCreatedObstacle;
+#include "effects/Effects.h"
+
+struct BattleSpellCast;
 
 namespace spells
 {
-class DLL_LINKAGE SpecialSpellMechanics : public DefaultSpellMechanics
+
+class BattleSpellMechanics : public BaseMechanics
 {
 public:
-	SpecialSpellMechanics(const IBattleCast * event);
+	BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> e);
+	virtual ~BattleSpellMechanics();
 
-	void applyEffects(const SpellCastEnvironment * env, const Target & targets) const override;
-
-	void applyIndirectEffects(const SpellCastEnvironment * env, const Target & targets) const override {};
-
-	void applyEffectsForced(const SpellCastEnvironment * env, const Target & targets) const override;
+	void applyEffects(const PacketSender * server, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const override;
 
 	bool canBeCast(Problem & problem) const override;
 	bool canBeCastAt(BattleHex destination) const override;
 
-	void beforeCast(vstd::RNG & rng, const Target & target, std::vector <const CStack*> & reflected) override;
-
-	void cast(IBattleState * battleState, vstd::RNG & rng, const Target & target) override;
-
-	virtual bool requiresCreatureTarget() const = 0;
-
-	std::vector<Destination> getPossibleDestinations(size_t index, AimType aimType, const Target & current) const override;
-
-protected:
-	virtual int defaultDamageEffect(const SpellCastEnvironment * env, StacksInjured & si, const std::vector<const battle::Unit *> & target) const;
+	void cast(const PacketSender * server, vstd::RNG & rng, const Target & target) override final;
+	void cast(IBattleState * battleState, vstd::RNG & rng, const Target & target) override final;
 
 	std::vector<const CStack *> getAffectedStacks(BattleHex destination) const override final;
-};
 
-class DLL_LINKAGE ObstacleMechanics : public SpecialSpellMechanics
-{
-public:
-	ObstacleMechanics(const IBattleCast * event);
-	bool canBeCastAt(BattleHex destination) const override;
-protected:
-	static bool isHexAviable(const CBattleInfoCallback * cb, const BattleHex & hex, const bool mustBeClear);
-	void placeObstacle(const SpellCastEnvironment * env, const BattleHex & pos) const;
-	virtual void setupObstacle(SpellCreatedObstacle * obstacle) const = 0;
-};
+	std::vector<AimType> getTargetTypes() const override final;
+	std::vector<Destination> getPossibleDestinations(size_t index, AimType aimType, const Target & current) const override final;
 
-class DLL_LINKAGE PatchObstacleMechanics : public ObstacleMechanics
-{
-public:
-	PatchObstacleMechanics(const IBattleCast * event);
-protected:
-	void applyCastEffects(const SpellCastEnvironment * env, const Target & target) const override;
-};
+	std::vector<BattleHex> rangeInHexes(BattleHex centralHex, bool * outDroppedHexes = nullptr) const override;
 
-class DLL_LINKAGE LandMineMechanics : public PatchObstacleMechanics
-{
-public:
-	LandMineMechanics(const IBattleCast * event);
-	bool canBeCast(Problem & problem) const override;
-	bool requiresCreatureTarget() const	override;
-protected:
-	int defaultDamageEffect(const SpellCastEnvironment * env, StacksInjured & si, const std::vector<const battle::Unit *> & target) const override;
-	void setupObstacle(SpellCreatedObstacle * obstacle) const override;
-};
+	bool counteringSelector(const Bonus * bonus) const;
 
-class DLL_LINKAGE QuicksandMechanics : public PatchObstacleMechanics
-{
-public:
-	QuicksandMechanics(const IBattleCast * event);
-	bool requiresCreatureTarget() const	override;
-protected:
-	void setupObstacle(SpellCreatedObstacle * obstacle) const override;
-};
+private:
 
-class DLL_LINKAGE WallMechanics : public ObstacleMechanics
-{
-public:
-	WallMechanics(const IBattleCast * event);
-	std::vector<BattleHex> rangeInHexes(BattleHex centralHex, bool *outDroppedHexes = nullptr) const override;
-};
+	std::vector<const battle::Unit *> affectedUnits;
 
-class DLL_LINKAGE FireWallMechanics : public WallMechanics
-{
-public:
-	FireWallMechanics(const IBattleCast * event);
-	bool requiresCreatureTarget() const	override;
-protected:
-	void applyCastEffects(const SpellCastEnvironment * env, const Target & target) const override;
-	void setupObstacle(SpellCreatedObstacle * obstacle) const override;
-};
+	effects::Effects::EffectsToApply effectsToApply;
 
-class DLL_LINKAGE ForceFieldMechanics : public WallMechanics
-{
-public:
-	ForceFieldMechanics(const IBattleCast * event);
-	bool requiresCreatureTarget() const	override;
-protected:
-	void applyCastEffects(const SpellCastEnvironment * env, const Target & target) const override;
-	void setupObstacle(SpellCreatedObstacle * obstacle) const override;
+	std::shared_ptr<effects::Effects> effects;
+
+	void beforeCast(BattleSpellCast & sc, vstd::RNG & rng, const Target & target);
+
+	void addCustomEffect(BattleSpellCast & sc, const battle::Unit * target, ui32 effect);
+
+	std::set<const battle::Unit *> collectTargets() const;
+
+	static void doRemoveEffects(const PacketSender * server, const std::vector<const battle::Unit *> & targets, const CSelector & selector);
+
+	std::set<BattleHex> spellRangeInHexes(BattleHex centralHex) const;
+
+	Target transformSpellTarget(const Target & aimPoint) const;
 };
 
 } // namespace spells

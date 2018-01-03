@@ -16,8 +16,6 @@
 #include "../battle/CBattleInfoCallback.h"
 #include "../battle/IBattleState.h"
 
-#include "../NetPacks.h"
-
 #include "../serializer/JsonDeserializer.h"
 #include "../serializer/JsonSerializer.h"
 
@@ -26,7 +24,6 @@
 
 #include "AdventureSpellMechanics.h"
 #include "BattleSpellMechanics.h"
-#include "CustomSpellMechanics.h"
 
 #include "effects/Effects.h"
 #include "effects/Damage.h"
@@ -74,7 +71,7 @@ class CustomMechanicsFactory : public ISpellMechanicsFactory
 public:
 	std::unique_ptr<Mechanics> create(const IBattleCast * event) const override
 	{
-		CustomSpellMechanics * ret = new CustomSpellMechanics(event, effects);
+		BattleSpellMechanics * ret = new BattleSpellMechanics(event, effects);
 		ret->targetCondition = targetCondition;
 		return std::unique_ptr<Mechanics>(ret);
 	}
@@ -274,22 +271,10 @@ void BattleCast::aimToUnit(const battle::Unit * destination)
 		target.push_back(Destination(destination));
 }
 
-void BattleCast::applyEffects(const SpellCastEnvironment * env) const
+void BattleCast::applyEffects(const SpellCastEnvironment * env, bool indirect, bool ignoreImmunity) const
 {
 	auto m = spell->battleMechanics(this);
-	m->applyEffects(env, target);
-}
-
-void BattleCast::applyIndirectEffects(const SpellCastEnvironment * env) const
-{
-	auto m = spell->battleMechanics(this);
-	m->applyIndirectEffects(env, target);
-}
-
-void BattleCast::applyEffectsForced(const SpellCastEnvironment * env) const
-{
-	auto m = spell->battleMechanics(this);
-	m->applyEffectsForced(env, target);
+	m->applyEffects(env, env->getRandomGenerator(), target, indirect, ignoreImmunity);
 }
 
 void BattleCast::cast(const SpellCastEnvironment * env)
@@ -298,32 +283,52 @@ void BattleCast::cast(const SpellCastEnvironment * env)
 		aimToHex(BattleHex::INVALID);
 	auto m = spell->battleMechanics(this);
 
-	std::vector <const CStack*> reflected;//for magic mirror
+	const battle::Unit * mainTarget = nullptr;
 
-	m->cast(env, target, reflected);
+	if(target.front().unitValue)
+	{
+		mainTarget = target.front().unitValue;
+	}
+	else if(target.front().hexValue.isValid())
+	{
+		mainTarget = cb->battleGetUnitByPos(target.front().hexValue, true);
+	}
+
+	bool tryMagicMirror = (mainTarget != nullptr) && (mode == Mode::HERO || mode == Mode::CREATURE_ACTIVE);//TODO: recheck
+	tryMagicMirror = tryMagicMirror && (mainTarget->unitOwner() != caster->getOwner()) && !spell->isPositive();//TODO: recheck
+
+	m->cast(env, env->getRandomGenerator(), target);
 
 	//Magic Mirror effect
-	for(auto & attackedCre : reflected)
+	if(tryMagicMirror)
 	{
-		if(mode == Mode::MAGIC_MIRROR)
-		{
-			logGlobal->error("Magic mirror recurrence!");
-			return;
-		}
+		const std::string magicMirrorCacheStr = "type_MAGIC_MIRROR";
+		static const auto magicMirrorSelector = Selector::type(Bonus::MAGIC_MIRROR);
 
-		TStacks mirrorTargets = cb->battleGetStacksIf([this](const CStack * battleStack)
-		{
-			//Get all caster stacks. Magic mirror can reflect to immune creature (with no effect)
-			return battleStack->owner == caster->getOwner() && battleStack->isValidTarget(false);
-		});
+		auto rangeGen = env->getRandomGenerator().getInt64Range(0, 99);
 
-		if(!mirrorTargets.empty())
-		{
-			int targetHex = (*RandomGeneratorUtil::nextItem(mirrorTargets, env->getRandomGenerator()))->getPosition();
+		const int mirrorChance = mainTarget->valOfBonuses(magicMirrorSelector, magicMirrorCacheStr);
 
-			BattleCast mirror(*this, attackedCre);
-			mirror.aimToHex(targetHex);
-			mirror.cast(env);
+		if(rangeGen() < mirrorChance)
+		{
+			//TODO: make battle::Unit Caster descendant
+			const CStack * mirrorCaster = cb->battleGetStackByID(mainTarget->unitId(), false);
+
+			auto mirrorTargets = cb->battleGetUnitsIf([this](const battle::Unit * unit)
+			{
+				//Get all caster stacks. Magic mirror can reflect to immune creature (with no effect)
+				return unit->unitOwner() == caster->getOwner() && unit->isValidTarget(true);
+			});
+
+
+			if(!mirrorTargets.empty())
+			{
+				auto mirrorTarget = (*RandomGeneratorUtil::nextItem(mirrorTargets, env->getRandomGenerator()));
+
+				BattleCast mirror(*this, mirrorCaster);
+				mirror.aimToUnit(mirrorTarget);
+				mirror.cast(env);
+			}
 		}
 	}
 }
@@ -424,25 +429,10 @@ ISpellMechanicsFactory::~ISpellMechanicsFactory()
 
 std::unique_ptr<ISpellMechanicsFactory> ISpellMechanicsFactory::get(const CSpell * s)
 {
-	//ignore spell id if there are special effects
 	if(s->hasBattleEffects())
 		return make_unique<ConfigurableMechanicsFactory>(s);
-
-	//to be converted
-	switch(s->id)
-	{
-
-	case SpellID::FIRE_WALL:
-		return make_unique<SpellMechanicsFactory<FireWallMechanics>>(s);
-	case SpellID::FORCE_FIELD:
-		return make_unique<SpellMechanicsFactory<ForceFieldMechanics>>(s);
-	case SpellID::LAND_MINE:
-		return make_unique<SpellMechanicsFactory<LandMineMechanics>>(s);
-	case SpellID::QUICKSAND:
-		return make_unique<SpellMechanicsFactory<QuicksandMechanics>>(s);
-	default:
+	else
 		return make_unique<FallbackMechanicsFactory>(s);
-	}
 }
 
 ///Mechanics
@@ -722,7 +712,6 @@ std::vector<AimType> BaseMechanics::getTargetTypes() const
 
 	return ret;
 }
-
 
 } //namespace spells
 

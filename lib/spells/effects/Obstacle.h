@@ -12,6 +12,7 @@
 
 #include "LocationEffect.h"
 #include "../../battle/BattleHex.h"
+#include "../../battle/CObstacleInstance.h"
 
 namespace spells
 {
@@ -28,6 +29,8 @@ public:
 
 	std::string appearAnimation;
 	std::string animation;
+
+	int offsetY;
 
 	ObstacleSideOptions();
 

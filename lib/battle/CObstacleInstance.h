@@ -24,11 +24,8 @@ struct DLL_LINKAGE CObstacleInstance
 	enum EObstacleType
 	{
 		//ABSOLUTE needs an underscore because it's a Win
-		USUAL, ABSOLUTE_OBSTACLE, SPELL_CREATED, QUICKSAND, LAND_MINE, FORCE_FIELD, FIRE_WALL, MOAT
+		USUAL, ABSOLUTE_OBSTACLE, SPELL_CREATED, MOAT
 	};
-
-
-	//used only for spell-created obstacles
 
 	CObstacleInstance();
 	virtual ~CObstacleInstance();
@@ -49,6 +46,8 @@ struct DLL_LINKAGE CObstacleInstance
 
 	virtual void battleTurnPassed(){};
 
+	virtual int getAnimationYOffset(int imageHeight) const;
+
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
 		h & ID;
@@ -60,7 +59,7 @@ struct DLL_LINKAGE CObstacleInstance
 
 struct DLL_LINKAGE MoatObstacle : CObstacleInstance
 {
-	virtual std::vector<BattleHex> getAffectedTiles() const override; //for special effects (not blocking)
+	std::vector<BattleHex> getAffectedTiles() const override; //for special effects (not blocking)
 };
 
 struct DLL_LINKAGE SpellCreatedObstacle : CObstacleInstance
@@ -76,21 +75,27 @@ struct DLL_LINKAGE SpellCreatedObstacle : CObstacleInstance
 	bool trap;
 	bool removeOnTrigger;
 
+	bool revealed;
+
 	std::string appearAnimation;
 	std::string animation;
+
+	int animationYOffset;
 
 	std::vector<BattleHex> customSize;
 
 	SpellCreatedObstacle();
 
-	std::vector<BattleHex> getAffectedTiles() const override; //for special effects (not blocking)
-	bool visibleForSide(ui8 side, bool hasNativeStack) const override; //0 attacker
+	std::vector<BattleHex> getAffectedTiles() const override;
+	bool visibleForSide(ui8 side, bool hasNativeStack) const override;
 
 	bool blocksTiles() const override;
 	bool stopsMovement() const override;
 	bool triggersEffects() const override;
 
 	void battleTurnPassed() override;
+
+	int getAnimationYOffset(int imageHeight) const override;
 
 	void toInfo(ObstacleChanges & info);
 	void fromInfo(const ObstacleChanges & info);

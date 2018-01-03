@@ -19,7 +19,6 @@ namespace spells
 namespace effects
 {
 
-///Direct (if automatic) or indirect damage
 class Damage : public UnitEffect
 {
 public:
@@ -37,6 +36,8 @@ protected:
 
 	virtual void describeEffect(std::vector<MetaString> & log, const Mechanics * m, const battle::Unit * firstTarget, uint32_t kills, int64_t damage, bool multiple) const;
 private:
+	int32_t customEffectId;
+
 	void prepareEffects(StacksInjured & stacksInjured, RNG & rng, const Mechanics * m, const EffectTarget & target, bool describe) const;
 };
 
