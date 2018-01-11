@@ -96,6 +96,5 @@ protected:
 	virtual void serializeJsonEffect(JsonSerializeFormat & handler) = 0;
 };
 
-
-} // namespace effects
-} // namespace spells
+}
+}

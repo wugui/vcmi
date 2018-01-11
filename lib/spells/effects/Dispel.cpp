@@ -142,5 +142,5 @@ void Dispel::prepareEffects(SetStackEffect & pack, RNG & rng, const Mechanics * 
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

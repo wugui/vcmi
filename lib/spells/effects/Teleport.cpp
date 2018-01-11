@@ -137,5 +137,5 @@ EffectTarget Teleport::transformTarget(const Mechanics * m, const Target & aimPo
 	return ret;
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

@@ -37,7 +37,11 @@ public:
     bool getStackFilter(const Mechanics * m, bool alwaysSmart, const battle::Unit * s) const;
 
     virtual bool eraseByImmunityFilter(const Mechanics * m, const battle::Unit * s) const;
+
 protected:
+	int32_t chainLength;
+	double chainFactor;
+
 	virtual bool isReceptive(const Mechanics * m, const battle::Unit * unit) const;
 	virtual bool isSmartTarget(const Mechanics * m, const battle::Unit * unit, bool alwaysSmart) const;
 	virtual bool isValidTarget(const Mechanics * m, const battle::Unit * unit) const;
@@ -47,7 +51,10 @@ protected:
 
 private:
 	bool ignoreImmunity;
+
+	EffectTarget transformTargetByRange(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const;
+	EffectTarget transformTargetByChain(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

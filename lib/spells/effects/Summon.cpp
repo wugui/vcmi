@@ -141,5 +141,5 @@ EffectTarget Summon::transformTarget(const Mechanics * m, const Target & aimPoin
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

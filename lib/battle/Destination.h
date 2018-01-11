@@ -35,4 +35,4 @@ public:
 
 using Target = std::vector<Destination>;
 
-} // namespace battle
+}

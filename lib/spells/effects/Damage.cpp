@@ -76,8 +76,16 @@ void Damage::serializeJsonDamageEffect(JsonSerializeFormat & handler)
 
 int64_t Damage::damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const
 {
-	UNUSED(targetIndex);
-	return m->adjustEffectValue(target);
+	int64_t baseDamage = m->adjustEffectValue(target);
+
+	if(chainLength > 1 && targetIndex > 0)
+	{
+		double indexedFactor = std::pow(chainFactor, (double) targetIndex);
+
+		return (int64_t) (indexedFactor * baseDamage);
+	}
+
+	return baseDamage;
 }
 
 void Damage::describeEffect(std::vector<MetaString> & log, const Mechanics * m, const battle::Unit * firstTarget, uint32_t kills, int64_t damage, bool multiple) const
@@ -181,5 +189,5 @@ void Damage::prepareEffects(StacksInjured & stacksInjured, RNG & rng, const Mech
 		describeEffect(stacksInjured.battleLog, m, firstTarget, killed, damageToDisplay, multiple);
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

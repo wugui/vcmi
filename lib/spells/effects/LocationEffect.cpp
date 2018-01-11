@@ -51,5 +51,5 @@ EffectTarget LocationEffect::transformTarget(const Mechanics * m, const Target &
 	return EffectTarget(spellTarget);
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

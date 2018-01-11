@@ -252,5 +252,5 @@ void Timed::serializeJsonUnitEffect(JsonSerializeFormat & handler)
 	}
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

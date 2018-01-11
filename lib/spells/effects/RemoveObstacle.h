@@ -47,5 +47,5 @@ private:
 	std::set<const CObstacleInstance *> getTargets(const Mechanics * m, const EffectTarget & target, bool alwaysMassive) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

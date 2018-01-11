@@ -738,10 +738,10 @@ void CGHeroInstance::Updatespecialty() //TODO: calculate special value of bonuse
 						switch (b->subtype)
 						{
 							case PrimarySkill::ATTACK:
-								param = cre->Attack();
+								param = cre->getPrimSkillLevel(PrimarySkill::ATTACK);
 								break;
 							case PrimarySkill::DEFENSE:
-								param = cre->Defense();
+								param = cre->getPrimSkillLevel(PrimarySkill::DEFENSE);
 								break;
 							default:
 								continue;

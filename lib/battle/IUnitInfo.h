@@ -48,4 +48,4 @@ public:
 	virtual const CCreature * creatureType() const = 0;
 };
 
-} // namespace battle
+}

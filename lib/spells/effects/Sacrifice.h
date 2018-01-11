@@ -40,5 +40,5 @@ private:
 	int64_t calculateHealEffectValue(const Mechanics * m, const battle::Unit * victim ) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

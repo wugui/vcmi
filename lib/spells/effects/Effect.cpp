@@ -80,5 +80,5 @@ void Effect::serializeJson(JsonSerializeFormat & handler)
 	serializeJsonEffect(handler);
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

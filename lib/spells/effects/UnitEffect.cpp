@@ -114,6 +114,14 @@ EffectTarget UnitEffect::filterTarget(const Mechanics * m, const EffectTarget & 
 
 EffectTarget UnitEffect::transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const
 {
+	if(chainLength > 1)
+		return transformTargetByChain(m, aimPoint, spellTarget);
+	else
+		return transformTargetByRange(m, aimPoint, spellTarget);
+}
+
+EffectTarget UnitEffect::transformTargetByRange(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const
+{
 	auto mainFilter = std::bind(&UnitEffect::getStackFilter, this, m, false, _1);
 
 	Target spellTargetCopy(spellTarget);
@@ -197,6 +205,63 @@ EffectTarget UnitEffect::transformTarget(const Mechanics * m, const Target & aim
 	return effectTarget;
 }
 
+EffectTarget UnitEffect::transformTargetByChain(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const
+{
+	if(aimPoint.empty())
+	{
+		logGlobal->error("Chain effect with no target");
+		return EffectTarget();
+	}
+
+	const Destination & mainDestination = aimPoint.front();
+
+	if(!mainDestination.hexValue.isValid())
+	{
+		logGlobal->error("Chain effect with invalid target");
+		return EffectTarget();
+	}
+
+	std::set<BattleHex> possibleHexes;
+
+	auto possibleTargets = m->cb->battleGetUnitsIf([&](const battle::Unit * unit) -> bool
+	{
+		return unit->isValidTarget(true);
+	});
+
+	for(auto unit : possibleTargets)
+	{
+		for(auto hex : battle::Unit::getHexes(unit->getPosition(), unit->doubleWide(), unit->unitSide()))
+			possibleHexes.insert(hex);
+	}
+
+	BattleHex destHex = mainDestination.hexValue;
+	EffectTarget effectTarget;
+
+	for(int32_t targetIndex = 0; targetIndex < chainLength; ++targetIndex)
+	{
+		auto unit = m->cb->battleGetUnitByPos(destHex, true);
+
+		if(!unit)
+			break;
+		if(m->mode == Mode::SPELL_LIKE_ATTACK && targetIndex == 0)
+			effectTarget.emplace_back(unit);
+		else if(isReceptive(m, unit) && isValidTarget(m, unit))
+			effectTarget.emplace_back(unit);
+		else
+			effectTarget.emplace_back();
+
+		for(auto hex : battle::Unit::getHexes(unit->getPosition(), unit->doubleWide(), unit->unitSide()))
+			possibleHexes.erase(hex);
+
+		if(possibleHexes.empty())
+			break;
+
+		destHex = BattleHex::getClosestTile(unit->unitSide(), destHex, possibleHexes);
+	}
+
+	return effectTarget;
+}
+
 bool UnitEffect::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
 {
 	// TODO: override in rising effect
@@ -235,9 +300,11 @@ bool UnitEffect::isSmartTarget(const Mechanics * m, const battle::Unit * unit, b
 void UnitEffect::serializeJsonEffect(JsonSerializeFormat & handler)
 {
 	handler.serializeBool("ignoreImmunity", ignoreImmunity);
+	handler.serializeInt("chainLength", chainLength, 0);
+	handler.serializeFloat("chainFactor", chainFactor, 0);
 	serializeJsonUnitEffect(handler);
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

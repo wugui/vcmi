@@ -33,5 +33,5 @@ private:
 	int maxTier;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

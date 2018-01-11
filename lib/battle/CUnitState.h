@@ -295,4 +295,4 @@ private:
 	void reset();
 };
 
-} // namespace battle
+}

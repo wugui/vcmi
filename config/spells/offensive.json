@@ -145,9 +145,9 @@
 				"range" : "0",
 				"battleEffects" : {
 					"directDamage" : {
-						"type" : "core:chainDamage",
-						"factor" : 0.5,
-						"length" : 4
+						"type" : "core:damage",
+						"chainFactor" : 0.5,
+						"chainLength" : 4
 					}
 				},
 				"targetModifier":{"smart":true}
@@ -155,14 +155,14 @@
 			"advanced" : {
 				"battleEffects" : {
 					"directDamage" : {
-						"length" : 5
+						"chainLength" : 5
 					}
 				}
 			},
 			"expert" : {
 				"battleEffects" : {
 					"directDamage" : {
-						"length" : 5
+						"chainLength" : 5
 					}
 				}
 			}

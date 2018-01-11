@@ -42,5 +42,5 @@ private:
 	void prepareHealEffect(int64_t value, BattleUnitsChanged & pack, RNG & rng, const Mechanics * m, const EffectTarget & target) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

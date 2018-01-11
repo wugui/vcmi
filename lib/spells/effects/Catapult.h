@@ -31,5 +31,5 @@ protected:
 	void serializeJsonEffect(JsonSerializeFormat & handler) override;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

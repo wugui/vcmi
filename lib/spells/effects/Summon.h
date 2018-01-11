@@ -39,5 +39,5 @@ private:
 	bool exclusive;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

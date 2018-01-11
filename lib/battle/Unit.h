@@ -105,4 +105,4 @@ public:
 	void fromInfo(const UnitChanges & info);
 };
 
-} // namespace battle
+}

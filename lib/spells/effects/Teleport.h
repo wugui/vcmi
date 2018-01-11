@@ -37,5 +37,5 @@ private:
 	bool prepareEffects(std::string & errorMessage, BattleStackMoved & pack, const Mechanics * m, const EffectTarget & target) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

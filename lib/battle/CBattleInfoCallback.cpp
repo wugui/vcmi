@@ -794,7 +794,7 @@ TDmgRange CBattleInfoCallback::calculateDmgRange(const BattleAttackInfo & info) 
 	static const auto selectorForcedMaxDamage = Selector::type(Bonus::ALWAYS_MAXIMUM_DAMAGE);
 
 	TBonusListPtr curseEffects = attackerBonuses->getBonuses(selectorForcedMinDamage, cachingStrForcedMinDamage);
-	TBonusListPtr blessEffects = attackerBonuses->getBonuses(selectorForcedMaxDamage, selectorForcedMaxDamage);
+	TBonusListPtr blessEffects = attackerBonuses->getBonuses(selectorForcedMaxDamage, cachingStrForcedMaxDamage);
 
 	int curseBlessAdditiveModifier = blessEffects->totalValue() - curseEffects->totalValue();
 	double curseMultiplicativePenalty = curseEffects->size() ? (*std::max_element(curseEffects->begin(), curseEffects->end(), &Bonus::compareByAdditionalInfo<std::shared_ptr<Bonus>>))->additionalInfo : 0;
@@ -850,9 +850,15 @@ TDmgRange CBattleInfoCallback::calculateDmgRange(const BattleAttackInfo & info) 
 	maxDmg *= additiveBonus * multBonus;
 
 	if(curseEffects->size()) //curse handling (rest)
+	{
 		minDmg += curseBlessAdditiveModifier;
+		maxDmg = minDmg;
+	}
 	else if(blessEffects->size()) //bless handling
+	{
 		maxDmg += curseBlessAdditiveModifier;
+		minDmg = maxDmg;
+	}
 
 	TDmgRange returnedVal = std::make_pair(int64_t(minDmg), int64_t(maxDmg));
 
@@ -1572,9 +1578,11 @@ std::set<const battle::Unit *> CBattleInfoCallback::battleAdjacentUnits(const ba
 	std::set<const battle::Unit *> ret;
 	RETURN_IF_NOT_BATTLE(ret);
 
-	for (BattleHex hex : unit->getSurroundingHexes())
+	for(auto hex : unit->getSurroundingHexes())
+	{
 		if(auto neighbour = battleGetUnitByPos(hex, true))
 			ret.insert(neighbour);
+	}
 
 	return ret;
 }

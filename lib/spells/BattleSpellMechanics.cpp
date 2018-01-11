@@ -611,5 +611,5 @@ std::vector<BattleHex> BattleSpellMechanics::rangeInHexes(BattleHex centralHex, 
 	return ret;
 }
 
-} // namespace spells
+}
 

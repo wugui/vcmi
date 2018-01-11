@@ -399,8 +399,6 @@
 		<Unit filename="spells/ViewSpellInt.h" />
 		<Unit filename="spells/effects/Catapult.cpp" />
 		<Unit filename="spells/effects/Catapult.h" />
-		<Unit filename="spells/effects/ChainDamage.cpp" />
-		<Unit filename="spells/effects/ChainDamage.h" />
 		<Unit filename="spells/effects/Clone.cpp" />
 		<Unit filename="spells/effects/Clone.h" />
 		<Unit filename="spells/effects/Damage.cpp" />

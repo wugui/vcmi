@@ -132,5 +132,5 @@ void Heal::prepareHealEffect(int64_t value, BattleUnitsChanged & pack, RNG & rng
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

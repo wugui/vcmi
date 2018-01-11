@@ -60,8 +60,6 @@ std::vector<BattleHex> Unit::getSurroundingHexes(BattleHex position, bool twoHex
 
 		if(side == BattleSide::ATTACKER)
 		{
-			//position is equal to front hex
-
 			for(BattleHex::EDir dir = BattleHex::EDir(0); dir <= BattleHex::EDir(4); dir = BattleHex::EDir(dir+1))
 				BattleHex::checkAndPush(position.cloneInDirection(dir, false), hexes);
 
@@ -221,4 +219,4 @@ void NewUnitInfo::fromInfo(const UnitChanges & info)
     deser.serializeStruct("newUnitInfo", *this);
 }
 
-} // namespace battle
+}

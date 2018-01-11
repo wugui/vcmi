@@ -135,4 +135,4 @@ public:
 	virtual void spendMana(const Mode mode, const Spell * spell, const spells::PacketSender * server, const int spellCost) const = 0;
 };
 
-} // namespace spells
+}

@@ -128,5 +128,5 @@ void Clone::serializeJsonUnitEffect(JsonSerializeFormat & handler)
 	handler.serializeInt("maxTier", maxTier);
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

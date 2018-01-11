@@ -50,5 +50,5 @@ void ProblemImpl::getAll(std::vector<std::string> & target) const
 //}
 
 
-} // namespace detail
-} // namespace spells
+}
+}

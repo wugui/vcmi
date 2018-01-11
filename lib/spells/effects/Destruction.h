@@ -32,5 +32,5 @@ private:
 	bool killByPercentage;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

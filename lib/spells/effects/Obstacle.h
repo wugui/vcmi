@@ -74,5 +74,5 @@ private:
 	void placeObstacles(BattleStateProxy * battleState, const Mechanics * m, const EffectTarget & target) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

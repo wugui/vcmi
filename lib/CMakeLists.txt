@@ -106,7 +106,6 @@ set(lib_SRCS
 		spells/ViewSpellInt.cpp
 
 		spells/effects/Catapult.cpp
-		spells/effects/ChainDamage.cpp
 		spells/effects/Clone.cpp
 		spells/effects/Damage.cpp
 		spells/effects/Destruction.cpp
@@ -268,7 +267,6 @@ set(lib_HEADERS
 		spells/ViewSpellInt.h
 
 		spells/effects/Catapult.h
-		spells/effects/ChainDamage.h
 		spells/effects/Clone.h
 		spells/effects/Damage.h
 		spells/effects/Destruction.h

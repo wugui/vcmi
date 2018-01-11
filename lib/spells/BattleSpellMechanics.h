@@ -63,5 +63,5 @@ private:
 	Target transformSpellTarget(const Target & aimPoint) const;
 };
 
-} // namespace spells
+}
 

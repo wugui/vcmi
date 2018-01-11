@@ -32,7 +32,7 @@ protected:
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override final;
 	virtual void serializeJsonDamageEffect(JsonSerializeFormat & handler);
 
-	virtual int64_t damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const;
+	int64_t damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const;
 
 	virtual void describeEffect(std::vector<MetaString> & log, const Mechanics * m, const battle::Unit * firstTarget, uint32_t kills, int64_t damage, bool multiple) const;
 private:
@@ -41,5 +41,5 @@ private:
 	void prepareEffects(StacksInjured & stacksInjured, RNG & rng, const Mechanics * m, const EffectTarget & target, bool describe) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

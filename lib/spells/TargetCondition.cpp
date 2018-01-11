@@ -407,5 +407,4 @@ bool HealthValueCondition::check(const Mechanics * m, const battle::Unit * targe
 	return true;
 }
 
-
-} // namespace spells
+}

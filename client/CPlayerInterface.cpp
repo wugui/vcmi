@@ -762,7 +762,7 @@ void CPlayerInterface::battleObstaclesChanged(const std::vector<ObstacleChanges>
 
 	bool needUpdate = false;
 
-    for(auto & change : obstacles)
+	for(auto & change : obstacles)
 	{
 		if(change.operation == BattleChanges::EOperation::ADD)
 		{

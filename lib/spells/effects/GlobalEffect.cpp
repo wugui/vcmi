@@ -47,5 +47,5 @@ EffectTarget GlobalEffect::transformTarget(const Mechanics * m, const Target & a
 	return aimPoint;
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

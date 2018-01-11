@@ -336,5 +336,5 @@ void Obstacle::placeObstacles(BattleStateProxy * battleState, const Mechanics * 
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

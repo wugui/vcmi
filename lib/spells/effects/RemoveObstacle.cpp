@@ -110,5 +110,5 @@ std::set<const CObstacleInstance *> RemoveObstacle::getTargets(const Mechanics *
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

@@ -188,5 +188,5 @@ int64_t Sacrifice::calculateHealEffectValue(const Mechanics * m, const battle::U
 }
 
 
-} // namespace effects
-} // namespace spells
+}
+}

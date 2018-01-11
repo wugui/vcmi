@@ -60,4 +60,4 @@ private:
 	void loadConditions(const JsonNode & source, bool exclusive, bool inverted);
 };
 
-} // namespace spells
+}

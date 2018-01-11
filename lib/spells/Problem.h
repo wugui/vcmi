@@ -33,5 +33,6 @@ public:
 private:
 	std::vector<std::pair<MetaString, Severity>> data;
 };
-} // namespace detail
-} // namespace spells
+
+}
+}

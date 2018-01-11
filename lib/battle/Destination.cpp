@@ -54,4 +54,4 @@ Destination & Destination::operator=(const Destination & other)
 }
 
 
-} // namespace battle
+}

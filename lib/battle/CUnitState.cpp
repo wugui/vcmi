@@ -60,7 +60,7 @@ int CTotalsProxy::getMeleeValue() const
 	if(treeVersion != meleeCachedLast)
 	{
 		auto bonuses = target->getBonuses(selector, limit);
-		meleeValue = initialValue + bonuses->valOfBonuses(Selector::all);
+		meleeValue = initialValue + bonuses->totalValue();
 		meleeCachedLast = treeVersion;
 	}
 	return meleeValue;
@@ -75,7 +75,7 @@ int CTotalsProxy::getRangedValue() const
 	if(treeVersion != rangedCachedLast)
 	{
 		auto bonuses = target->getBonuses(selector, limit);
-		rangedValue = initialValue + bonuses->valOfBonuses(Selector::all);
+		rangedValue = initialValue + bonuses->totalValue();
 		rangedCachedLast = treeVersion;
 	}
 	return rangedValue;
@@ -948,4 +948,4 @@ void CUnitState::onRemoved()
 	ghost = true;
 }
 
-} // namespace battle
+}

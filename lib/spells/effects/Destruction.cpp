@@ -86,5 +86,5 @@ void Destruction::serializeJsonDamageEffect(JsonSerializeFormat & handler)
 	handler.serializeBool("killByPercentage", killByPercentage);
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

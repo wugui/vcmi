@@ -40,5 +40,5 @@ private:
 	void prepareEffects(SetStackEffect & sse, const Mechanics * m, const EffectTarget & target, bool describe) const;
 };
 
-} // namespace effects
-} // namespace spells
+}
+}

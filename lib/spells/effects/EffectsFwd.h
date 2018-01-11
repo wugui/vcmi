@@ -18,7 +18,6 @@ namespace effects
 class Effect;
 class Effects;
 
-
-} // namespace effects
-} // namespace spells
+}
+}
 

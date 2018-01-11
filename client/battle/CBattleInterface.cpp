@@ -2189,7 +2189,7 @@ void CBattleInterface::handleHex(BattleHex myNumber, int eventType)
 				break;
 			case RANDOM_GENIE_SPELL:
 			{
-				if(shere && ourStack && shere != activeStack) //only positive spells for other allied creatures
+				if(shere && ourStack && shere != activeStack && shere->alive()) //only positive spells for other allied creatures
 				{
 					int spellID = curInt->cb->battleGetRandomStackSpell(CRandomGenerator::getDefault(), shere, CBattleInfoCallback::RANDOM_GENIE);
 					if(spellID > -1)

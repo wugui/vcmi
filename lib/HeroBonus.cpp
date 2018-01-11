@@ -131,7 +131,7 @@ TBonusListPtr CBonusProxy::get() const
 	if(target->getTreeVersion() != cachedLast || !data)
 	{
 		//TODO: support limiters
-		data = target->getAllBonuses(selector, nullptr);
+		data = target->getAllBonuses(selector, Selector::all);
 		data->eliminateDuplicates();
 		cachedLast = target->getTreeVersion();
 	}
@@ -447,44 +447,6 @@ int IBonusBearer::LuckVal() const
 	return vstd::abetween(ret, -3, +3);
 }
 
-si32 IBonusBearer::Attack() const
-{
-	const std::string cachingStrSkill = "type_PRIMARY_SKILLs_ATTACK";
-	static const auto selectorSkill = Selector::typeSubtype(Bonus::PRIMARY_SKILL, PrimarySkill::ATTACK);
-
-	const std::string cachingStrFrenzy = "type_IN_FRENZY";
-	static const auto selectorFrenzy = Selector::type(Bonus::IN_FRENZY);
-
-	si32 ret = valOfBonuses(selectorSkill, cachingStrSkill);
-
-	if(si32 frenzyPower = valOfBonuses(selectorFrenzy, cachingStrFrenzy)) //frenzy for attacker
-	{
-		ret += ((double)frenzyPower/100) * (double)Defense(false);
-	}
-	vstd::amax(ret, 0);
-
-	return ret;
-}
-
-si32 IBonusBearer::Defense(bool withFrenzy) const
-{
-	const std::string cachingStrSkill = "type_PRIMARY_SKILLs_DEFENSE";
-	static const auto selectorSkill = Selector::typeSubtype(Bonus::PRIMARY_SKILL, PrimarySkill::DEFENSE);
-
-	const std::string cachingStrFrenzy = "type_IN_FRENZY";
-	static const auto selectorFrenzy = Selector::type(Bonus::IN_FRENZY);
-
-	si32 ret = valOfBonuses(selectorSkill, cachingStrSkill);
-
-	if(withFrenzy && hasBonus(selectorFrenzy, cachingStrFrenzy)) //frenzy for defender
-	{
-		return 0;
-	}
-	vstd::amax(ret, 0);
-
-	return ret;
-}
-
 ui32 IBonusBearer::MaxHealth() const
 {
 	const std::string cachingStr = "type_STACK_HEALTH";
@@ -495,12 +457,20 @@ ui32 IBonusBearer::MaxHealth() const
 
 int IBonusBearer::getAttack(bool ranged) const
 {
-	return Attack();
+	const std::string cachingStr = "type_PRIMARY_SKILLs_ATTACK";
+
+	static const auto selector = Selector::typeSubtype(Bonus::PRIMARY_SKILL, PrimarySkill::ATTACK);
+
+	return getBonuses(selector, nullptr, cachingStr)->totalValue();
 }
 
 int IBonusBearer::getDefence(bool ranged) const
 {
-	return Defense(true);
+	const std::string cachingStr = "type_PRIMARY_SKILLs_DEFENSE";
+
+	static const auto selector = Selector::typeSubtype(Bonus::PRIMARY_SKILL, PrimarySkill::DEFENSE);
+
+	return getBonuses(selector, nullptr, cachingStr)->totalValue();
 }
 
 int IBonusBearer::getMinDamage(bool ranged) const
@@ -526,13 +496,7 @@ si32 IBonusBearer::manaLimit() const
 
 int IBonusBearer::getPrimSkillLevel(PrimarySkill::PrimarySkill id) const
 {
-	int ret = 0;
-	if(id == PrimarySkill::ATTACK)
-		ret = Attack();
-	else if(id == PrimarySkill::DEFENSE)
-		ret = Defense();
-	else
-		ret = valOfBonuses(Bonus::PRIMARY_SKILL, id);
+	int ret = valOfBonuses(Bonus::PRIMARY_SKILL, id);
 
 	vstd::amax(ret, id/2); //minimal value is 0 for attack and defense and 1 for spell power and knowledge
 	return ret;

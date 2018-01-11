@@ -42,4 +42,4 @@ int32_t IUnitInfo::creatureCost() const
 }
 
 
-} // namespace battle
+}

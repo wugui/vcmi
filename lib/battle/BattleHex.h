@@ -76,7 +76,7 @@ struct DLL_LINKAGE BattleHex //TODO: decide if this should be changed to class f
 	}
 
     using NeighbouringTiles = std::array<BattleHex, 6>;
-    using NeighbouringTilesCache = std::array<NeighbouringTiles, GameConstants::BFIELD_SIZE>;
+    using NeighbouringTilesCache = std::vector<NeighbouringTiles>;
 
     static const NeighbouringTilesCache neighbouringTilesCache;
 };

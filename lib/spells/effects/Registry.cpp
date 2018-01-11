@@ -45,7 +45,7 @@ private:
 	std::map<std::string, DataPtr> data;
 };
 
-}//namespace detail
+}
 
 Registry::Registry() = default;
 
@@ -58,5 +58,5 @@ Registry * Registry::get()
 	return Instance.get();
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

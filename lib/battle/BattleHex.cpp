@@ -205,8 +205,9 @@ std::ostream & operator<<(std::ostream & os, const BattleHex & hex)
 static BattleHex::NeighbouringTilesCache calculateNeighbouringTiles()
 {
 	BattleHex::NeighbouringTilesCache ret;
+	ret.resize(GameConstants::BFIELD_SIZE);
 
-	for(si16 hex = 0; hex <  GameConstants::BFIELD_SIZE; hex++)
+	for(si16 hex = 0; hex < GameConstants::BFIELD_SIZE; hex++)
 	{
 		auto hexes = BattleHex(hex).neighbouringTiles();
 

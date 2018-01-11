@@ -157,5 +157,5 @@ void Effects::serializeJson(JsonSerializeFormat & handler, const int level)
 	}
 }
 
-} // namespace effects
-} // namespace spells
+}
+}

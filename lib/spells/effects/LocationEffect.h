@@ -36,5 +36,5 @@ protected:
 private:
 };
 
-} // namespace effects
-} // namespace spells
+}
+}
