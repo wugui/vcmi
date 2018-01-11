@@ -20,6 +20,7 @@ set(test_SRCS
  		battle/BattleHexTest.cpp
  		battle/CHealthTest.cpp
 		battle/CUnitStateTest.cpp
+		battle/battle_UnitTest.cpp
 
  		game/CGameStateTest.cpp
 

@@ -44,42 +44,46 @@ std::string Unit::getDescription() const
 	return fmt.str();
 }
 
-
 std::vector<BattleHex> Unit::getSurroundingHexes(BattleHex assumedPosition) const
 {
 	BattleHex hex = (assumedPosition != BattleHex::INVALID) ? assumedPosition : getPosition(); //use hypothetical position
+
+	return getSurroundingHexes(hex, doubleWide(), unitSide());
+}
+
+std::vector<BattleHex> Unit::getSurroundingHexes(BattleHex position, bool twoHex, ui8 side)
+{
 	std::vector<BattleHex> hexes;
-	if(doubleWide())
+	if(twoHex)
 	{
-		const int WN = GameConstants::BFIELD_WIDTH;
-		if(unitSide() == BattleSide::ATTACKER)
+		const BattleHex otherHex = occupiedHex(position, twoHex, side);
+
+		if(side == BattleSide::ATTACKER)
 		{
 			//position is equal to front hex
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN + 2 : WN + 1), hexes);
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN + 1 : WN), hexes);
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN : WN - 1), hexes);
-			BattleHex::checkAndPush(hex - 2, hexes);
-			BattleHex::checkAndPush(hex + 1, hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN - 2 : WN - 1), hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN - 1 : WN), hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN : WN + 1), hexes);
+
+			for(BattleHex::EDir dir = BattleHex::EDir(0); dir <= BattleHex::EDir(4); dir = BattleHex::EDir(dir+1))
+				BattleHex::checkAndPush(position.cloneInDirection(dir, false), hexes);
+
+			BattleHex::checkAndPush(otherHex.cloneInDirection(BattleHex::EDir::BOTTOM_LEFT), hexes);
+			BattleHex::checkAndPush(otherHex.cloneInDirection(BattleHex::EDir::LEFT), hexes);
+			BattleHex::checkAndPush(otherHex.cloneInDirection(BattleHex::EDir::TOP_LEFT), hexes);
 		}
 		else
 		{
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN + 1 : WN), hexes);
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN : WN - 1), hexes);
-			BattleHex::checkAndPush(hex - ((hex / WN) % 2 ? WN - 1 : WN - 2), hexes);
-			BattleHex::checkAndPush(hex + 2, hexes);
-			BattleHex::checkAndPush(hex - 1, hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN - 1 : WN), hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN : WN + 1), hexes);
-			BattleHex::checkAndPush(hex + ((hex / WN) % 2 ? WN + 1 : WN + 2), hexes);
+			BattleHex::checkAndPush(position.cloneInDirection(BattleHex::EDir::TOP_LEFT), hexes);
+
+			for(BattleHex::EDir dir = BattleHex::EDir(0); dir <= BattleHex::EDir(4); dir = BattleHex::EDir(dir+1))
+				BattleHex::checkAndPush(otherHex.cloneInDirection(dir, false), hexes);
+
+			BattleHex::checkAndPush(position.cloneInDirection(BattleHex::EDir::BOTTOM_LEFT), hexes);
+			BattleHex::checkAndPush(position.cloneInDirection(BattleHex::EDir::LEFT), hexes);
 		}
 		return hexes;
 	}
 	else
 	{
-		return hex.neighbouringTiles();
+		return position.neighbouringTiles();
 	}
 }
 

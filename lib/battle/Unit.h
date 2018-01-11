@@ -65,7 +65,9 @@ public:
 	virtual int battleQueuePhase(int turn) const = 0;
 
 	virtual std::string getDescription() const;
+
 	std::vector<BattleHex> getSurroundingHexes(BattleHex assumedPosition = BattleHex::INVALID) const; // get six or 8 surrounding hexes depending on creature size
+	static std::vector<BattleHex> getSurroundingHexes(BattleHex position, bool twoHex, ui8 side);
 
 	bool coversPos(BattleHex position) const; //checks also if unit is double-wide
 
@@ -82,7 +84,7 @@ public:
 	void addNameReplacement(MetaString & text, const boost::logic::tribool & plural = boost::logic::indeterminate) const;
 	std::string formatGeneralMessage(const int32_t baseTextId) const;
 
-    int getRawSurrenderCost() const;
+	int getRawSurrenderCost() const;
 };
 
 class DLL_LINKAGE NewUnitInfo

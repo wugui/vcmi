@@ -79,6 +79,7 @@
 		<Unit filename="battle/BattleHexTest.cpp" />
 		<Unit filename="battle/CHealthTest.cpp" />
 		<Unit filename="battle/CUnitStateTest.cpp" />
+		<Unit filename="battle/battle_UnitTest.cpp" />
 		<Unit filename="game/CGameStateTest.cpp" />
 		<Unit filename="googletest/googlemock/src/gmock-all.cc" />
 		<Unit filename="googletest/googletest/src/gtest-all.cc" />
