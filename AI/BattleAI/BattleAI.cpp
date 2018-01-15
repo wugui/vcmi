@@ -320,7 +320,7 @@ void CBattleAI::attemptCastingSpell()
 					AttackPossibility ap = pt.bestAction();
 
 					auto swb = state->getForUpdate(unit->unitId());
-					swb->state = *ap.attackerState;
+					*swb = *ap.attackerState;
 
 					if(ap.damageDealt > 0)
 						swb->removeUnitBonus(Bonus::UntilAttack);
@@ -330,7 +330,7 @@ void CBattleAI::attemptCastingSpell()
 					for(auto affected : ap.affectedUnits)
 					{
 						swb = state->getForUpdate(affected->unitId());
-						swb->state = *affected;
+						*swb = *affected;
 
 						if(ap.damageDealt > 0)
 							swb->removeUnitBonus(Bonus::UntilBeingAttacked);

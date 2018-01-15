@@ -13,9 +13,20 @@
 #include "../../lib/HeroBonus.h"
 
 
-class BonusBearerMock : public CBonusSystemNode
+class BonusBearerMock : public IBonusBearer
 {
 public:
-	BonusBearerMock(ENodeTypes newNodeType);
+	BonusBearerMock();
 	virtual ~BonusBearerMock();
+
+	void addNewBonus(const std::shared_ptr<Bonus> & b);
+
+	const TBonusListPtr getAllBonuses(const CSelector & selector, const CSelector & limit, const CBonusSystemNode * root = nullptr, const std::string & cachingStr = "") const override;
+
+	int64_t getTreeVersion() const override;
+private:
+	mutable BonusList bonuses;
+
+	mutable int64_t cachedLast;
+	int32_t treeVersion;
 };

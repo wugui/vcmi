@@ -43,15 +43,13 @@ set(test_HEADERS
  		mock/mock_IGameCallback.h
  		mock/mock_MapService.h
 		mock/mock_BonusBearer.h
-		mock/mock_UnitEnvironment.h
-		mock/mock_UnitHealthInfo.h
-		mock/mock_UnitInfo.h
 )
 
 assign_source_group(${test_SRCS} ${test_HEADERS})
 
 set(mock_HEADERS
-    mock/mock_UnitHealthInfo.h
+		mock/mock_UnitInfo.h
+		mock/mock_UnitEnvironment.h
 )
 
 add_subdirectory_with_folder("3rdparty" googletest EXCLUDE_FROM_ALL)

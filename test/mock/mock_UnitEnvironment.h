@@ -15,5 +15,6 @@
 class UnitEnvironmentMock : public battle::IUnitEnvironment
 {
 public:
-	MOCK_CONST_METHOD0(unitHasAmmoCart, bool());
+	MOCK_CONST_METHOD1(unitHasAmmoCart, bool(const battle::Unit *));
+	MOCK_CONST_METHOD1(unitEffectiveOwner, PlayerColor(const battle::Unit *));
 };

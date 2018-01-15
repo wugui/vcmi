@@ -9,7 +9,7 @@
  */
 
 #include "StdInc.h"
-#include "mock/mock_UnitHealthInfo.h"
+#include "mock/mock_UnitInfo.h"
 #include "../../lib/battle/CUnitState.h"
 
 using namespace testing;
@@ -21,7 +21,7 @@ static const int32_t UNIT_AMOUNT = 300;
 class HealthTest : public ::testing::Test
 {
 public:
-	UnitHealthInfoMock mock;
+	UnitInfoMock mock;
 	HealthTest() : health(&mock)
 	{}
 
@@ -33,12 +33,12 @@ public:
 	CHealth health;
 };
 
-static void checkTotal(const CHealth & health, const UnitHealthInfoMock & mock)
+static void checkTotal(const CHealth & health, const UnitInfoMock & mock)
 {
 	EXPECT_EQ(health.total(), mock.unitMaxHealth() * mock.unitBaseAmount());
 }
 
-static void checkEmptyHealth(const CHealth & health, const UnitHealthInfoMock & mock)
+static void checkEmptyHealth(const CHealth & health, const UnitInfoMock  & mock)
 {
 	checkTotal(health, mock);
 	EXPECT_EQ(health.getCount(), 0);
@@ -47,7 +47,7 @@ static void checkEmptyHealth(const CHealth & health, const UnitHealthInfoMock & 
 	EXPECT_EQ(health.available(), 0);
 }
 
-static void checkFullHealth(const CHealth & health, const UnitHealthInfoMock & mock)
+static void checkFullHealth(const CHealth & health, const UnitInfoMock  & mock)
 {
 	checkTotal(health, mock);
 	EXPECT_EQ(health.getCount(), mock.unitBaseAmount());

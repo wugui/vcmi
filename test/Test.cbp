@@ -95,7 +95,6 @@
 		<Unit filename="mock/mock_MapService.cpp" />
 		<Unit filename="mock/mock_MapService.h" />
 		<Unit filename="mock/mock_UnitEnvironment.h" />
-		<Unit filename="mock/mock_UnitHealthInfo.h" />
 		<Unit filename="mock/mock_UnitInfo.h" />
 		<Extensions>
 			<code_completion />

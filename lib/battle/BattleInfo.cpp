@@ -767,7 +767,7 @@ void BattleInfo::nextRound(int32_t roundNr)
 		// new turn effects
 		s->updateBonuses(Bonus::NTurns);
 
-		s->stackState.afterNewRound();
+		s->afterNewRound();
 	}
 
 	for(auto & obst : obstacles)
@@ -783,7 +783,7 @@ void BattleInfo::nextTurn(uint32_t unitId)
 	//remove bonuses that last until when stack gets new turn
 	st->popBonuses(Bonus::UntilGetsTurn);
 
-	st->stackState.afterGetsTurn();
+	st->afterGetsTurn();
 }
 
 void BattleInfo::addUnit(const UnitChanges & changes)
@@ -797,7 +797,7 @@ void BattleInfo::addUnit(const UnitChanges & changes)
 	auto ret = new CStack(&base, owner, info.id, info.side, SlotID::SUMMONED_SLOT_PLACEHOLDER);
 	ret->initialPosition = info.position;
 	stacks.push_back(ret);
-	ret->stackState.summoned = info.summoned;
+	ret->summoned = info.summoned;
 	ret->localInit(this);
 }
 
@@ -821,7 +821,7 @@ void BattleInfo::moveUnit(uint32_t id, BattleHex destination)
 				obstacle->revealed = true;
 		}
 	}
-	sta->stackState.position = destination;
+	sta->position = destination;
 }
 
 void BattleInfo::setUnitState(const UnitChanges & changes)
@@ -847,7 +847,7 @@ void BattleInfo::setUnitState(const UnitChanges & changes)
 	bool resurrected = !changedStack->alive() && changes.healthDelta > 0;
 
 	//applying changes
-	changedStack->stackState.fromInfo(changes);
+	changedStack->fromInfo(changes);
 
 
 	if(changes.healthDelta < 0)
@@ -859,14 +859,14 @@ void BattleInfo::setUnitState(const UnitChanges & changes)
 
 	if(killed)
 	{
-		if(changedStack->stackState.cloneID >= 0)
+		if(changedStack->cloneID >= 0)
 		{
 			//remove clone as well
-			CStack * clone = getStack(changedStack->stackState.cloneID);
+			CStack * clone = getStack(changedStack->cloneID);
 			if(clone)
-				clone->stackState.makeGhost();
+				clone->makeGhost();
 
-			changedStack->stackState.cloneID = -1;
+			changedStack->cloneID = -1;
 		}
 	}
 
@@ -889,8 +889,8 @@ void BattleInfo::setUnitState(const UnitChanges & changes)
 	{
 		for(CStack * s : stacks)
 		{
-			if(s->stackState.cloneID == changedStack->unitId())
-				s->stackState.cloneID = -1;
+			if(s->cloneID == changedStack->unitId())
+				s->cloneID = -1;
 		}
 	}
 }
@@ -911,24 +911,24 @@ void BattleInfo::removeUnit(uint32_t id)
 			return;
 		}
 
-		if(!toRemove->stackState.ghost)
+		if(!toRemove->ghost)
 		{
-			toRemove->stackState.onRemoved();
+			toRemove->onRemoved();
 			toRemove->detachFromAll();
 
 			//stack may be removed instantly (not being killed first)
 			//handle clone remove also here
-			if(toRemove->stackState.cloneID >= 0)
+			if(toRemove->cloneID >= 0)
 			{
-				ids.insert(toRemove->stackState.cloneID);
-				toRemove->stackState.cloneID = -1;
+				ids.insert(toRemove->cloneID);
+				toRemove->cloneID = -1;
 			}
 
 			//cleanup remaining clone links if any
 			for(auto s : stacks)
 			{
-				if(s->stackState.cloneID == toRemoveId)
-					s->stackState.cloneID = -1;
+				if(s->cloneID == toRemoveId)
+					s->cloneID = -1;
 			}
 		}
 

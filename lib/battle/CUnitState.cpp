@@ -180,9 +180,8 @@ void CAmmo::serializeJson(JsonSerializeFormat & handler)
 }
 
 ///CShots
-CShots::CShots(const battle::Unit * Owner, const IUnitEnvironment * Env)
+CShots::CShots(const battle::Unit * Owner)
 	: CAmmo(Owner, Selector::type(Bonus::SHOTS)),
-	env(Env),
 	shooter(Owner, Selector::type(Bonus::SHOOTER))
 {
 }
@@ -203,7 +202,12 @@ CShots & CShots::operator=(const CShots & other)
 
 bool CShots::isLimited() const
 {
-	return !env->unitHasAmmoCart() || !shooter.getHasBonus();
+	return !env->unitHasAmmoCart(owner) || !shooter.getHasBonus();
+}
+
+void CShots::setEnv(const IUnitEnvironment * env_)
+{
+	env = env_;
 }
 
 int32_t CShots::total() const
@@ -287,7 +291,7 @@ void CRetaliations::serializeJson(JsonSerializeFormat & handler)
 }
 
 ///CHealth
-CHealth::CHealth(const IUnitHealthInfo * Owner):
+CHealth::CHealth(const IUnitInfo * Owner):
 	owner(Owner)
 {
 	reset();
@@ -458,10 +462,8 @@ void CHealth::serializeJson(JsonSerializeFormat & handler)
 
 
 ///CUnitState
-CUnitState::CUnitState(const IUnitInfo * unit_, const IBonusBearer * bonus_, const IUnitEnvironment * env_)
-	: unit(unit_),
-	bonus(bonus_),
-	env(env_),
+CUnitState::CUnitState()
+	: env(nullptr),
 	cloned(false),
 	defending(false),
 	defendingAnim(false),
@@ -475,8 +477,8 @@ CUnitState::CUnitState(const IUnitInfo * unit_, const IBonusBearer * bonus_, con
 	waiting(false),
 	casts(this),
 	counterAttacks(this),
-	health(unit_),
-	shots(this, env_),
+	health(this),
+	shots(this),
 	totalAttacks(this, Selector::type(Bonus::ADDITIONAL_ATTACK), 1),
 	minDamage(this, Selector::typeSubtype(Bonus::CREATURE_DAMAGE, 0).Or(Selector::typeSubtype(Bonus::CREATURE_DAMAGE, 1)), 0),
 	maxDamage(this, Selector::typeSubtype(Bonus::CREATURE_DAMAGE, 0).Or(Selector::typeSubtype(Bonus::CREATURE_DAMAGE, 2)), 0),
@@ -486,38 +488,6 @@ CUnitState::CUnitState(const IUnitInfo * unit_, const IBonusBearer * bonus_, con
 	cloneLifetimeMarker(this, Selector::type(Bonus::NONE).And(Selector::source(Bonus::SPELL_EFFECT, SpellID::CLONE))),
 	cloneID(-1),
 	position()
-{
-
-}
-
-CUnitState::CUnitState(const CUnitState & other)
-	: unit(other.unit),
-	bonus(other.bonus),
-	env(other.env),
-	cloned(other.cloned),
-	defending(other.defending),
-	defendingAnim(other.defendingAnim),
-	drainedMana(other.drainedMana),
-	fear(other.fear),
-	hadMorale(other.hadMorale),
-	ghost(other.ghost),
-	ghostPending(other.ghostPending),
-	movedThisRound(other.movedThisRound),
-	summoned(other.summoned),
-	waiting(other.waiting),
-	casts(other.casts),
-	counterAttacks(other.counterAttacks),
-	health(other.health),
-	shots(other.shots),
-	totalAttacks(other.totalAttacks),
-	minDamage(other.minDamage),
-	maxDamage(other.maxDamage),
-	attack(other.attack),
-	defence(other.defence),
-	inFrenzy(other.inFrenzy),
-	cloneLifetimeMarker(other.cloneLifetimeMarker),
-	cloneID(other.cloneID),
-	position(other.position)
 {
 
 }
@@ -677,39 +647,9 @@ bool CUnitState::waited(int turn) const
 		return false;
 }
 
-uint32_t CUnitState::unitId() const
-{
-	return unit->unitId();
-}
-
-ui8 CUnitState::unitSide() const
-{
-	return unit->unitSide();
-}
-
-const CCreature * CUnitState::creatureType() const
-{
-	return unit->creatureType();
-}
-
-PlayerColor CUnitState::unitOwner() const
-{
-	return unit->unitOwner();
-}
-
-SlotID CUnitState::unitSlot() const
-{
-	return unit->unitSlot();
-}
-
 int32_t CUnitState::unitMaxHealth() const
 {
-	return unit->unitMaxHealth();
-}
-
-int32_t CUnitState::unitBaseAmount() const
-{
-	return unit->unitBaseAmount();
+	return MaxHealth();
 }
 
 int CUnitState::battleQueuePhase(int turn) const
@@ -772,7 +712,10 @@ int CUnitState::getDefence(bool ranged) const
 
 std::shared_ptr<CUnitState> CUnitState::asquire() const
 {
-	return std::make_shared<CUnitState>(*this);
+	auto ret = std::make_shared<CUnitStateDetached>(this, this);
+	ret->localInit(env);
+	*ret = *this;
+	return ret;
 }
 
 void CUnitState::serializeJson(JsonSerializeFormat & handler)
@@ -802,8 +745,11 @@ void CUnitState::serializeJson(JsonSerializeFormat & handler)
 	handler.serializeInt("position", position);
 }
 
-void CUnitState::localInit()
+void CUnitState::localInit(const IUnitEnvironment * env_)
 {
+	env = env_;
+
+	shots.setEnv(env);
 	reset();
 	health.init();
 }
@@ -846,7 +792,7 @@ void CUnitState::toInfo(UnitChanges & info)
 void CUnitState::fromInfo(const UnitChanges & info)
 {
 	if(info.id != unitId())
-		logGlobal->error("Deserialized state from wrong stack");
+		logGlobal->error("Deserialized state from wrong unit");
 
 	if(info.operation != UnitChanges::EOperation::RESET_STATE)
 		logGlobal->error("RESET_STATE operation expected");
@@ -855,11 +801,6 @@ void CUnitState::fromInfo(const UnitChanges & info)
 	reset();
     JsonDeserializer deser(nullptr, info.data);
     deser.serializeStruct("state", *this);
-}
-
-const IUnitInfo * CUnitState::getUnitInfo() const
-{
-	return unit;
 }
 
 void CUnitState::damage(int64_t & amount)
@@ -890,16 +831,6 @@ void CUnitState::heal(int64_t & amount, EHealLevel level, EHealPower power)
 		logGlobal->error("Attempt to heal clone");
 	else
 		health.heal(amount, level, power);
-}
-
-const TBonusListPtr CUnitState::getAllBonuses(const CSelector & selector, const CSelector & limit, const CBonusSystemNode * root, const std::string & cachingStr) const
-{
-	return bonus->getAllBonuses(selector, limit, root, cachingStr);
-}
-
-int64_t CUnitState::getTreeVersion() const
-{
-	return bonus->getTreeVersion();
 }
 
 void CUnitState::afterAttack(bool ranged, bool counter)
@@ -946,6 +877,61 @@ void CUnitState::onRemoved()
 	health.reset();
 	ghostPending = false;
 	ghost = true;
+}
+
+CUnitStateDetached::CUnitStateDetached(const IUnitInfo * unit_, const IBonusBearer * bonus_)
+	: CUnitState(),
+	unit(unit_),
+	bonus(bonus_)
+{
+
+}
+
+const TBonusListPtr CUnitStateDetached::getAllBonuses(const CSelector & selector, const CSelector & limit, const CBonusSystemNode * root, const std::string & cachingStr) const
+{
+	return bonus->getAllBonuses(selector, limit, root, cachingStr);
+}
+
+int64_t CUnitStateDetached::getTreeVersion() const
+{
+	return bonus->getTreeVersion();
+}
+
+CUnitStateDetached & CUnitStateDetached::operator=(const CUnitState & other)
+{
+	CUnitState::operator=(other);
+	return *this;
+}
+
+uint32_t CUnitStateDetached::unitId() const
+{
+	return unit->unitId();
+}
+
+ui8 CUnitStateDetached::unitSide() const
+{
+	return unit->unitSide();
+}
+
+const CCreature * CUnitStateDetached::creatureType() const
+{
+	return unit->creatureType();
+}
+
+PlayerColor CUnitStateDetached::unitOwner() const
+{
+	return unit->unitOwner();
+}
+
+SlotID CUnitStateDetached::unitSlot() const
+{
+	return unit->unitSlot();
+}
+
+
+int32_t CUnitStateDetached::unitBaseAmount() const
+{
+	return unit->unitBaseAmount();
 }
 
 }

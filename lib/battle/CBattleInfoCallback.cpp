@@ -1093,13 +1093,16 @@ ReachabilityInfo CBattleInfoCallback::makeBFS(const AccessibilityInfo &accessibi
 		const int costToNeighbour = ret.distances[curHex.hex] + 1;
 		for(BattleHex neighbour : BattleHex::neighbouringTilesCache[curHex.hex])
 		{
-			const int costFoundSoFar = ret.distances[neighbour.hex];
-
-			if(accessibleCache[neighbour.hex] && costToNeighbour < costFoundSoFar)
+			if(neighbour.isValid())
 			{
-				hexq.push(neighbour);
-				ret.distances[neighbour.hex] = costToNeighbour;
-				ret.predecessors[neighbour.hex] = curHex;
+				const int costFoundSoFar = ret.distances[neighbour.hex];
+
+				if(accessibleCache[neighbour.hex] && costToNeighbour < costFoundSoFar)
+				{
+					hexq.push(neighbour);
+					ret.distances[neighbour.hex] = costToNeighbour;
+					ret.predecessors[neighbour.hex] = curHex;
+				}
 			}
 		}
 	}

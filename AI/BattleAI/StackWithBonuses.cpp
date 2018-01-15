@@ -24,40 +24,47 @@ void actualizeEffect(TBonusListPtr target, const Bonus & ef)
 }
 
 StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const CStack * Stack)
-	: state(Stack, this, this),
-	origInfo(Stack),
+	: battle::CUnitState(),
 	origBearer(Stack),
 	owner(Owner),
-	type(Stack->type),
-	baseAmount(Stack->baseAmount),
-	id(Stack->ID),
-	side(Stack->side),
-	player(Stack->owner)
+	type(Stack->creatureType()),
+	baseAmount(Stack->unitBaseAmount()),
+	id(Stack->unitId()),
+	side(Stack->unitSide()),
+	player(Stack->unitOwner()),
+	slot(Stack->unitSlot())
 {
-	state = Stack->stackState;
+	localInit(Owner);
+
+	battle::CUnitState::operator=(*Stack);
 }
 
 StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const battle::NewUnitInfo & info)
-	: state(this, this, this),
-	origInfo(nullptr),
+	: battle::CUnitState(),
 	origBearer(nullptr),
 	owner(Owner),
 	baseAmount(info.count),
 	id(info.id),
-	side(info.side)
+	side(info.side),
+	slot(SlotID::SUMMONED_SLOT_PLACEHOLDER)
 {
 	type = info.type.toCreature();
 	origBearer = type;
 
 	player = Owner->getSidePlayer(side);
 
-	state.position = info.position;
-	state.summoned = info.summoned;
-	state.localInit();
+	position = info.position;
+	summoned = info.summoned;
+	localInit(Owner);
 }
 
 StackWithBonuses::~StackWithBonuses() = default;
 
+StackWithBonuses & StackWithBonuses::operator=(const battle::CUnitState & other)
+{
+	battle::CUnitState::operator=(other);
+	return *this;
+}
 
 const CCreature * StackWithBonuses::creatureType() const
 {
@@ -91,10 +98,7 @@ PlayerColor StackWithBonuses::unitOwner() const
 
 SlotID StackWithBonuses::unitSlot() const
 {
-	if(origInfo)
-		return origInfo->unitSlot();
-	else
-		return SlotID::SUMMONED_SLOT_PLACEHOLDER;
+	return slot;
 }
 
 const TBonusListPtr StackWithBonuses::getAllBonuses(const CSelector & selector, const CSelector & limit,
@@ -138,13 +142,6 @@ const TBonusListPtr StackWithBonuses::getAllBonuses(const CSelector & selector, 
 int64_t StackWithBonuses::getTreeVersion() const
 {
 	return owner->getTreeVersion();
-}
-
-
-bool StackWithBonuses::unitHasAmmoCart() const
-{
-	//FIXME: check ammocart alive state here
-	return false;
 }
 
 void StackWithBonuses::addUnitBonus(const std::vector<Bonus> & bonus)
@@ -203,6 +200,17 @@ HypotheticBattle::HypotheticBattle(Subject realBattle)
 	nextId = 0xF0000000;
 }
 
+bool HypotheticBattle::unitHasAmmoCart(const battle::Unit * unit) const
+{
+	//FIXME: check ammocart alive state here
+	return false;
+}
+
+PlayerColor HypotheticBattle::unitEffectiveOwner(const battle::Unit * unit) const
+{
+	return battleGetOwner(unit);
+}
+
 std::shared_ptr<StackWithBonuses> HypotheticBattle::getForUpdate(uint32_t id)
 {
 	auto iter = stackStates.find(id);
@@ -237,10 +245,8 @@ battle::Units HypotheticBattle::getUnitsIf(battle::UnitFilter predicate) const
 
 	for(auto id_unit : stackStates)
 	{
-		auto & swb = id_unit.second;
-		const battle::Unit * changed = &(swb->state);
-		if(predicate(changed))
-			ret.push_back(changed);
+		if(predicate(id_unit.second.get()))
+			ret.push_back(id_unit.second.get());
 	}
 
 	return ret;
@@ -259,7 +265,7 @@ void HypotheticBattle::nextRound(int32_t roundNr)
 	{
 		auto forUpdate = getForUpdate(unit->unitId());
 		//TODO: update Bonus::NTurns effects
-		forUpdate->state.afterNewRound();
+		forUpdate->afterNewRound();
 	}
 }
 
@@ -270,7 +276,7 @@ void HypotheticBattle::nextTurn(uint32_t unitId)
 
 	unit->removeUnitBonus(Bonus::UntilGetsTurn);
 
-	unit->state.afterGetsTurn();
+	unit->afterGetsTurn();
 }
 
 void HypotheticBattle::addUnit(const UnitChanges & changes)
@@ -285,14 +291,14 @@ void HypotheticBattle::addUnit(const UnitChanges & changes)
 void HypotheticBattle::moveUnit(uint32_t id, BattleHex destination)
 {
 	std::shared_ptr<StackWithBonuses> changed = getForUpdate(id);
-	changed->state.position = destination;
+	changed->position = destination;
 }
 
 void HypotheticBattle::setUnitState(const UnitChanges & changes)
 {
 	std::shared_ptr<StackWithBonuses> changed = getForUpdate(changes.id);
 
-	changed->state.fromInfo(changes);
+	changed->fromInfo(changes);
 
 	if(changes.healthDelta < 0)
 	{
@@ -311,25 +317,25 @@ void HypotheticBattle::removeUnit(uint32_t id)
 
 		auto toRemove = getForUpdate(toRemoveId);
 
-		if(!toRemove->state.ghost)
+		if(!toRemove->ghost)
 		{
-			toRemove->state.onRemoved();
+			toRemove->onRemoved();
 
 			//TODO: emulate detachFromAll() somehow
 
 			//stack may be removed instantly (not being killed first)
 			//handle clone remove also here
-			if(toRemove->state.cloneID >= 0)
+			if(toRemove->cloneID >= 0)
 			{
-				ids.insert(toRemove->state.cloneID);
-				toRemove->state.cloneID = -1;
+				ids.insert(toRemove->cloneID);
+				toRemove->cloneID = -1;
 			}
 
 			//TODO: cleanup remaining clone links if any
 //			for(auto s : stacks)
 //			{
-//				if(s->state.cloneID == toRemoveId)
-//					s->state.cloneID = -1;
+//				if(s->cloneID == toRemoveId)
+//					s->cloneID = -1;
 //			}
 		}
 

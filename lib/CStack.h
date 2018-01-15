@@ -20,7 +20,7 @@
 struct BattleStackAttacked;
 class BattleInfo;
 
-class DLL_LINKAGE CStack : public CBonusSystemNode, public spells::Caster, public battle::Unit, public battle::IUnitEnvironment
+class DLL_LINKAGE CStack : public CBonusSystemNode, public spells::Caster, public battle::CUnitState, public battle::IUnitEnvironment
 {
 public:
 	const CStackInstance * base; //garrison slot from which stack originates (nullptr for war machines, summoned cres, etc)
@@ -34,8 +34,6 @@ public:
 	ui8 side;
 	BattleHex initialPosition; //position on battlefield; -2 - keep, -3 - lower tower, -4 - upper tower
 
-	battle::CUnitState stackState;
-
 	CStack(const CStackInstance * base, PlayerColor O, int I, ui8 Side, SlotID S);
 	CStack(const CStackBasicDescriptor * stack, PlayerColor O, int I, ui8 Side, SlotID S = SlotID(255));
 	CStack();
@@ -47,12 +45,6 @@ public:
 
 	void localInit(BattleInfo * battleInfo);
 	std::string getName() const; //plural or singular
-
-	bool canMove(int turn = 0) const override;
-	bool defended(int turn = 0) const override;
-	bool moved(int turn = 0) const override;
-	bool willMove(int turn = 0) const override;
-	bool waited(int turn = 0) const override;
 
 	bool canBeHealed() const; //for first aid tent - only harmed stacks that are not war machines
 
@@ -92,55 +84,18 @@ public:
 	void getCastDescription(const spells::Spell  * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const override;
 	void spendMana(const spells::Mode mode, const spells::Spell  * spell, const spells::PacketSender * server, const int spellCost) const override;
 
-	///IUnitInfo
-
 	const CCreature * creatureType() const override;
-
-	int32_t unitMaxHealth() const override;
 	int32_t unitBaseAmount() const override;
-
-	bool unitHasAmmoCart() const override;
 
 	uint32_t unitId() const override;
 	ui8 unitSide() const override;
 	PlayerColor unitOwner() const override;
 	SlotID unitSlot() const override;
 
-	///battle::Unit
-
-	bool ableToRetaliate() const override;
-	bool alive() const override;
-	bool isGhost() const override;
-
-	bool isClone() const override;
-	bool hasClone() const override;
-
-	bool isSummoned() const override;
-
-	bool canCast() const override;
-	bool isCaster() const override;
-
-	bool canShoot() const override;
-	bool isShooter() const override;
-
-	int32_t getKilled() const override;
-	int32_t getCount() const override;
-	int32_t getFirstHPleft() const override;
-	int64_t getAvailableHealth() const override;
-	int64_t getTotalHealth() const override;
-
-	BattleHex getPosition() const override;
-	std::shared_ptr<battle::CUnitState> asquire() const	override;
-
-	int battleQueuePhase(int turn) const override;
 	std::string getDescription() const override;
-	int32_t getInitiative(int turn = 0) const override;
 
-	int getMinDamage(bool ranged) const override;
-	int getMaxDamage(bool ranged) const override;
-
-	int getAttack(bool ranged) const override;
-	int getDefence(bool ranged) const override;
+	bool unitHasAmmoCart(const battle::Unit * unit) const override;
+	PlayerColor unitEffectiveOwner(const battle::Unit * unit) const override;
 
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{

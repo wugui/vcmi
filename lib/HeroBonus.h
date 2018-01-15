@@ -652,7 +652,7 @@ private:
 
 	static const bool cachingEnabled;
 	mutable BonusList cachedBonuses;
-	mutable int cachedLast;
+	mutable int64_t cachedLast;
 	static std::atomic<int32_t> treeChanged;
 
 	// Setting a value to cachingStr before getting any bonuses caches the result for later requests.

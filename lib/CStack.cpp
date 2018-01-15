@@ -21,6 +21,7 @@
 ///CStack
 CStack::CStack(const CStackInstance * Base, PlayerColor O, int I, ui8 Side, SlotID S)
 	: CBonusSystemNode(STACK_BATTLE),
+	CUnitState(),
 	base(Base),
 	ID(I),
 	type(Base->type),
@@ -28,15 +29,14 @@ CStack::CStack(const CStackInstance * Base, PlayerColor O, int I, ui8 Side, Slot
 	owner(O),
 	slot(S),
 	side(Side),
-	stackState(this, this, this),
 	initialPosition()
 {
-	stackState.health.init(); //???
+	health.init(); //???
 }
 
 CStack::CStack()
 	: CBonusSystemNode(STACK_BATTLE),
-	stackState(this, this, this)
+	CUnitState()
 {
 	base = nullptr;
 	type = nullptr;
@@ -50,6 +50,7 @@ CStack::CStack()
 
 CStack::CStack(const CStackBasicDescriptor * stack, PlayerColor O, int I, ui8 Side, SlotID S)
 	: CBonusSystemNode(STACK_BATTLE),
+	CUnitState(),
 	base(nullptr),
 	ID(I),
 	type(stack->type),
@@ -57,10 +58,9 @@ CStack::CStack(const CStackBasicDescriptor * stack, PlayerColor O, int I, ui8 Si
 	owner(O),
 	slot(S),
 	side(Side),
-	stackState(this, this, this),
 	initialPosition()
 {
-	stackState.health.init(); //???
+	health.init(); //???
 }
 
 const CCreature * CStack::getCreature() const
@@ -85,8 +85,8 @@ void CStack::localInit(BattleInfo * battleInfo)
 		attachTo(const_cast<CCreature *>(type));
 	}
 
-	stackState.localInit();
-	stackState.position = initialPosition;
+	CUnitState::localInit(this);
+	position = initialPosition;
 }
 
 ui32 CStack::level() const
@@ -112,31 +112,6 @@ si32 CStack::magicResistance() const
 	vstd::amin(magicResistance, 100);
 
 	return magicResistance;
-}
-
-bool CStack::willMove(int turn) const
-{
-	return stackState.willMove(turn);
-}
-
-bool CStack::canMove(int turn) const
-{
-	return stackState.canMove(turn);
-}
-
-bool CStack::defended(int turn) const
-{
-	return stackState.defended(turn);
-}
-
-bool CStack::moved(int turn) const
-{
-	return stackState.moved(turn);
-}
-
-bool CStack::waited(int turn) const
-{
-	return stackState.waited(turn);
 }
 
 BattleHex::EDir CStack::destShiftDir() const
@@ -197,7 +172,7 @@ std::string CStack::nodeName() const
 {
 	std::ostringstream oss;
 	oss << owner.getStr();
-	oss << " battle stack [" << ID << "]: " << stackState.getCount() << " of ";
+	oss << " battle stack [" << ID << "]: " << getCount() << " of ";
 	if(type)
 		oss << type->namePl;
 	else
@@ -211,7 +186,7 @@ std::string CStack::nodeName() const
 
 void CStack::prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand) const
 {
-	auto newState = stackState.asquire();
+	auto newState = asquire();
 	prepareAttacked(bsa, rand, newState);
 }
 
@@ -295,7 +270,7 @@ bool CStack::isMeleeAttackPossible(const battle::Unit * attacker, const battle::
 
 std::string CStack::getName() const
 {
-	return (stackState.getCount() == 1) ? type->nameSing : type->namePl; //War machines can't use base
+	return (getCount() == 1) ? type->nameSing : type->namePl; //War machines can't use base
 }
 
 bool CStack::canBeHealed() const
@@ -330,7 +305,7 @@ int CStack::getEffectLevel(const spells::Mode mode, const spells::Spell * spell)
 
 int CStack::getEffectPower(const spells::Mode mode, const spells::Spell * spell) const
 {
-	return valOfBonuses(Bonus::CREATURE_SPELL_POWER) * stackState.getCount() / 100;
+	return valOfBonuses(Bonus::CREATURE_SPELL_POWER) * getCount() / 100;
 }
 
 int CStack::getEnchantPower(const spells::Mode mode, const spells::Spell * spell) const
@@ -343,12 +318,12 @@ int CStack::getEnchantPower(const spells::Mode mode, const spells::Spell * spell
 
 int CStack::getEffectValue(const spells::Mode mode, const spells::Spell * spell) const
 {
-	return valOfBonuses(Bonus::SPECIFIC_SPELL_POWER, spell->getIndex()) * stackState.getCount();
+	return valOfBonuses(Bonus::SPECIFIC_SPELL_POWER, spell->getIndex()) * getCount();
 }
 
 const PlayerColor CStack::getOwner() const
 {
-	return battle->battleGetOwner(this);
+	return unitEffectiveOwner(this);
 }
 
 void CStack::getCasterName(MetaString & text) const
@@ -408,29 +383,29 @@ const CCreature * CStack::creatureType() const
 	return type;
 }
 
-int32_t CStack::unitMaxHealth() const
-{
-	return MaxHealth();
-}
-
 int32_t CStack::unitBaseAmount() const
 {
 	return baseAmount;
 }
 
-bool CStack::unitHasAmmoCart() const
+bool CStack::unitHasAmmoCart(const battle::Unit * unit) const
 {
 	bool hasAmmoCart = false;
 
 	for(const CStack * st : battle->stacks)
 	{
-		if(battle->battleMatchOwner(st, this, true) && st->getCreature()->idNumber == CreatureID::AMMO_CART && st->alive())
+		if(battle->battleMatchOwner(st, unit, true) && st->getCreature()->idNumber == CreatureID::AMMO_CART && st->alive())
 		{
 			hasAmmoCart = true;
 			break;
 		}
 	}
 	return hasAmmoCart;
+}
+
+PlayerColor CStack::unitEffectiveOwner(const battle::Unit * unit) const
+{
+	return battle->battleGetOwner(unit);
 }
 
 uint32_t CStack::unitId() const
@@ -453,122 +428,7 @@ SlotID CStack::unitSlot() const
 	return slot;
 }
 
-bool CStack::ableToRetaliate() const
-{
-	return stackState.ableToRetaliate();
-}
-
-bool CStack::alive() const
-{
-	return stackState.alive();
-}
-
-bool CStack::isClone() const
-{
-	return stackState.isClone();
-}
-
-bool CStack::hasClone() const
-{
-	return stackState.hasClone();
-}
-
-bool CStack::isSummoned() const
-{
-	return stackState.isSummoned();
-}
-
-bool CStack::isGhost() const
-{
-	return stackState.isGhost();
-}
-
-int32_t CStack::getKilled() const
-{
-	return stackState.getKilled();
-}
-
-bool CStack::canCast() const
-{
-	return stackState.canCast();
-}
-
-bool CStack::isCaster() const
-{
-	return stackState.isCaster();
-}
-
-bool CStack::canShoot() const
-{
-	return stackState.canShoot();
-}
-
-bool CStack::isShooter() const
-{
-	return stackState.isShooter();
-}
-
-int32_t CStack::getCount() const
-{
-	return stackState.getCount();
-}
-
-int32_t CStack::getFirstHPleft() const
-{
-	return stackState.getFirstHPleft();
-}
-
-int64_t CStack::getAvailableHealth() const
-{
-	return stackState.getAvailableHealth();
-}
-
-int64_t CStack::getTotalHealth() const
-{
-	return stackState.getTotalHealth();
-}
-
-BattleHex CStack::getPosition() const
-{
-	return stackState.getPosition();
-}
-
-std::shared_ptr<battle::CUnitState> CStack::asquire() const
-{
-	return stackState.asquire();
-}
-
-int CStack::battleQueuePhase(int turn) const
-{
-	return stackState.battleQueuePhase(turn);
-}
-
 std::string CStack::getDescription() const
 {
 	return nodeName();
-}
-
-int32_t CStack::getInitiative(int turn) const
-{
-	return stackState.getInitiative(turn);
-}
-
-int CStack::getMinDamage(bool ranged) const
-{
-	return stackState.getMinDamage(ranged);
-}
-
-int CStack::getMaxDamage(bool ranged) const
-{
-	return stackState.getMaxDamage(ranged);
-}
-
-int CStack::getAttack(bool ranged) const
-{
-	return stackState.getAttack(ranged);
-}
-
-int CStack::getDefence(bool ranged) const
-{
-	return stackState.getDefence(ranged);
 }

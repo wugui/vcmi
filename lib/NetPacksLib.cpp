@@ -1244,13 +1244,13 @@ DLL_LINKAGE void BattleTriggerEffect::applyGs(CGameState *gs)
 	case Bonus::HP_REGENERATION:
 	{
 		int64_t toHeal = val;
-		st->stackState.heal(toHeal, EHealLevel::HEAL, EHealPower::PERMANENT);
+		st->heal(toHeal, EHealLevel::HEAL, EHealPower::PERMANENT);
 		break;
 	}
 	case Bonus::MANA_DRAIN:
 	{
 		CGHeroInstance * h = gs->getHero(ObjectInstanceID(additionalInfo));
-		st->stackState.drainedMana = true;
+		st->drainedMana = true;
 		h->mana -= val;
 		vstd::amax(h->mana, 0);
 		break;
@@ -1266,7 +1266,7 @@ DLL_LINKAGE void BattleTriggerEffect::applyGs(CGameState *gs)
 	case Bonus::ENCHANTER:
 		break;
 	case Bonus::FEAR:
-		st->stackState.fear = true;
+		st->fear = true;
 		break;
 	default:
 		logNetwork->error("Unrecognized trigger effect type %d", effect);
@@ -1377,20 +1377,20 @@ DLL_LINKAGE void StartAction::applyGs(CGameState *gs)
 	switch(ba.actionType)
 	{
 	case EActionType::DEFEND:
-		st->stackState.waiting = false;
-		st->stackState.defending = true;
-		st->stackState.defendingAnim = true;
+		st->waiting = false;
+		st->defending = true;
+		st->defendingAnim = true;
 		break;
 	case EActionType::WAIT:
-		st->stackState.defendingAnim = false;
-		st->stackState.waiting = true;
+		st->defendingAnim = false;
+		st->waiting = true;
 		break;
 	case EActionType::HERO_SPELL: //no change in current stack state
 		break;
 	default: //any active stack action - attack, catapult, heal, spell...
-		st->stackState.waiting = false;
-		st->stackState.defendingAnim = false;
-		st->stackState.movedThisRound = true;
+		st->waiting = false;
+		st->defendingAnim = false;
+		st->movedThisRound = true;
 		break;
 	}
 }
@@ -1530,7 +1530,7 @@ DLL_LINKAGE void BattleSetStackProperty::applyGs(CGameState * gs)
 			if(absolute)
 				logNetwork->error("Can not change casts in absolute mode");
 			else
-				stack->stackState.casts.use(-val);
+				stack->casts.use(-val);
 			break;
 		}
 		case ENCHANTER_COUNTER:
@@ -1550,12 +1550,12 @@ DLL_LINKAGE void BattleSetStackProperty::applyGs(CGameState * gs)
 		}
 		case CLONED:
 		{
-			stack->stackState.cloned = true;
+			stack->cloned = true;
 			break;
 		}
 		case HAS_CLONE:
 		{
-			stack->stackState.cloneID = val;
+			stack->cloneID = val;
 			break;
 		}
 	}
