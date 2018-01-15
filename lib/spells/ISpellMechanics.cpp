@@ -11,10 +11,14 @@
 #include "StdInc.h"
 #include "ISpellMechanics.h"
 
-#include "../CStack.h"
+#include "../CRandomGenerator.h"
+
 #include "../HeroBonus.h"
 #include "../battle/CBattleInfoCallback.h"
 #include "../battle/IBattleState.h"
+#include "../battle/Unit.h"
+
+#include "../mapObjects/CGHeroInstance.h"
 
 #include "../serializer/JsonDeserializer.h"
 #include "../serializer/JsonSerializer.h"
@@ -311,9 +315,6 @@ void BattleCast::cast(const SpellCastEnvironment * env)
 
 		if(rangeGen() < mirrorChance)
 		{
-			//TODO: make battle::Unit Caster descendant
-			const CStack * mirrorCaster = cb->battleGetStackByID(mainTarget->unitId(), false);
-
 			auto mirrorTargets = cb->battleGetUnitsIf([this](const battle::Unit * unit)
 			{
 				//Get all caster stacks. Magic mirror can reflect to immune creature (with no effect)
@@ -325,7 +326,7 @@ void BattleCast::cast(const SpellCastEnvironment * env)
 			{
 				auto mirrorTarget = (*RandomGeneratorUtil::nextItem(mirrorTargets, env->getRandomGenerator()));
 
-				BattleCast mirror(*this, mirrorCaster);
+				BattleCast mirror(*this, mainTarget);
 				mirror.aimToUnit(mirrorTarget);
 				mirror.cast(env);
 			}
@@ -441,7 +442,7 @@ Mechanics::Mechanics(const IBattleCast * event)
 	mode(event->getMode()),
 	caster(event->getCaster())
 {
-	casterUnit = dynamic_cast<const CStack *>(caster);
+	casterUnit = dynamic_cast<const battle::Unit *>(caster);
 
 	//FIXME: ensure caster and check for valid player and side
 	casterSide = 0;

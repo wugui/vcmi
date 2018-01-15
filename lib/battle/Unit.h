@@ -14,6 +14,7 @@
 
 #include "IUnitInfo.h"
 #include "BattleHex.h"
+#include "../spells/Magic.h"
 
 struct MetaString;
 class UnitChanges;
@@ -23,7 +24,7 @@ namespace battle
 {
 class CUnitState;
 
-class DLL_LINKAGE Unit : public IUnitInfo, public virtual IBonusBearer
+class DLL_LINKAGE Unit : public IUnitInfo, public spells::Caster, public virtual IBonusBearer
 {
 public:
 	virtual bool ableToRetaliate() const = 0;

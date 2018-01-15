@@ -11,7 +11,7 @@
 
 #include "CUnitState.h"
 
-#include "../NetPacksBase.h"
+#include "../NetPacks.h"
 
 #include "../serializer/JsonDeserializer.h"
 #include "../serializer/JsonSerializer.h"
@@ -521,6 +521,104 @@ CUnitState & CUnitState::operator=(const CUnitState & other)
 	cloneID = other.cloneID;
 	position = other.position;
 	return *this;
+}
+
+ui8 CUnitState::getSpellSchoolLevel(const spells::Mode mode, const spells::Spell * spell, int * outSelectedSchool) const
+{
+	int skill = valOfBonuses(Selector::typeSubtype(Bonus::SPELLCASTER, spell->getIndex()));
+	vstd::abetween(skill, 0, 3);
+	return skill;
+}
+
+int64_t CUnitState::getSpellBonus(const spells::Spell * spell, int64_t base, const Unit * affectedStack) const
+{
+	//does not have sorcery-like bonuses (yet?)
+	return base;
+}
+
+int64_t CUnitState::getSpecificSpellBonus(const spells::Spell * spell, int64_t base) const
+{
+	return base;
+}
+
+int CUnitState::getEffectLevel(const spells::Mode mode, const spells::Spell * spell) const
+{
+	return getSpellSchoolLevel(mode, spell);
+}
+
+int CUnitState::getEffectPower(const spells::Mode mode, const spells::Spell * spell) const
+{
+	return valOfBonuses(Bonus::CREATURE_SPELL_POWER) * getCount() / 100;
+}
+
+int CUnitState::getEnchantPower(const spells::Mode mode, const spells::Spell * spell) const
+{
+	int res = valOfBonuses(Bonus::CREATURE_ENCHANT_POWER);
+	if(res <= 0)
+		res = 3;//default for creatures
+	return res;
+}
+
+int CUnitState::getEffectValue(const spells::Mode mode, const spells::Spell * spell) const
+{
+	return valOfBonuses(Bonus::SPECIFIC_SPELL_POWER, spell->getIndex()) * getCount();
+}
+
+const PlayerColor CUnitState::getOwner() const
+{
+	return env->unitEffectiveOwner(this);
+}
+
+void CUnitState::getCasterName(MetaString & text) const
+{
+	//always plural name in case of spell cast.
+	addNameReplacement(text, true);
+}
+
+void CUnitState::getCastDescription(const spells::Spell * spell, MetaString & text) const
+{
+	text.addTxt(MetaString::GENERAL_TXT, 565);//The %s casts %s
+	//todo: use text 566 for single creature
+	getCasterName(text);
+	text.addReplacement(MetaString::SPELL_NAME, spell->getIndex());
+}
+
+void CUnitState::getCastDescription(const spells::Spell * spell, const std::vector<const Unit *> & attacked, MetaString & text) const
+{
+	getCastDescription(spell, text);
+}
+
+void CUnitState::spendMana(const spells::Mode mode, const spells::Spell * spell, const spells::PacketSender * server, const int spellCost) const
+{
+	if(mode == spells::Mode::CREATURE_ACTIVE || mode == spells::Mode::ENCHANTER)
+	{
+		if(spellCost != 1)
+			logGlobal->warn("Unexpected spell cost for creature %d", spellCost);
+
+		BattleSetStackProperty ssp;
+		ssp.stackID = unitId();
+		ssp.which = BattleSetStackProperty::CASTS;
+		ssp.val = -spellCost;
+		ssp.absolute = false;
+		server->sendAndApply(&ssp);
+
+		if(mode == spells::Mode::ENCHANTER)
+		{
+			auto bl = getBonuses(Selector::typeSubtype(Bonus::ENCHANTER, spell->getIndex()));
+
+			int cooldown = 1;
+			for(auto b : *(bl))
+				if(b->additionalInfo > cooldown)
+					cooldown = b->additionalInfo;
+
+			BattleSetStackProperty ssp;
+			ssp.which = BattleSetStackProperty::ENCHANTER_COUNTER;
+			ssp.absolute = false;
+			ssp.val = cooldown;
+			ssp.stackID = unitId();
+			server->sendAndApply(&ssp);
+		}
+	}
 }
 
 bool CUnitState::ableToRetaliate() const

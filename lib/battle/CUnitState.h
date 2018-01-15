@@ -206,6 +206,22 @@ public:
 	CUnitState & operator= (const CUnitState & other);
 	CUnitState & operator= (CUnitState && other) = delete;
 
+	ui8 getSpellSchoolLevel(const spells::Mode mode, const spells::Spell * spell, int * outSelectedSchool = nullptr) const override;
+	int getEffectLevel(const spells::Mode mode, const spells::Spell * spell) const override;
+
+	int64_t getSpellBonus(const spells::Spell * spell, int64_t base, const Unit * affectedStack) const override;
+	int64_t getSpecificSpellBonus(const spells::Spell  * spell, int64_t base) const override;
+
+	int getEffectPower(const spells::Mode mode, const spells::Spell * spell) const override;
+	int getEnchantPower(const spells::Mode mode, const spells::Spell * spell) const override;
+	int getEffectValue(const spells::Mode mode, const spells::Spell * spell) const override;
+
+	const PlayerColor getOwner() const override;
+	void getCasterName(MetaString & text) const override;
+	void getCastDescription(const spells::Spell  * spell, MetaString & text) const override;
+	void getCastDescription(const spells::Spell  * spell, const std::vector<const Unit *> & attacked, MetaString & text) const override;
+	void spendMana(const spells::Mode mode, const spells::Spell  * spell, const spells::PacketSender * server, const int spellCost) const override;
+
 	bool ableToRetaliate() const override;
 	bool alive() const override;
 	bool isGhost() const override;

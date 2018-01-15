@@ -20,7 +20,7 @@
 struct BattleStackAttacked;
 class BattleInfo;
 
-class DLL_LINKAGE CStack : public CBonusSystemNode, public spells::Caster, public battle::CUnitState, public battle::IUnitEnvironment
+class DLL_LINKAGE CStack : public CBonusSystemNode, public battle::CUnitState, public battle::IUnitEnvironment
 {
 public:
 	const CStackInstance * base; //garrison slot from which stack originates (nullptr for war machines, summoned cres, etc)
@@ -59,30 +59,6 @@ public:
 
 	void prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand) const; //requires bsa.damageAmout filled
 	static void prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand, std::shared_ptr<battle::CUnitState> customState); //requires bsa.damageAmout filled
-
-	///spells::Caster
-
-	ui8 getSpellSchoolLevel(const spells::Mode mode, const spells::Spell * spell, int * outSelectedSchool = nullptr) const override;
-	///default spell school level for effect calculation
-	int getEffectLevel(const spells::Mode mode, const spells::Spell * spell) const override;
-
-	int64_t getSpellBonus(const spells::Spell * spell, int64_t base, const battle::Unit * affectedStack) const override;
-	int64_t getSpecificSpellBonus(const spells::Spell  * spell, int64_t base) const override;
-
-	///default spell-power for damage/heal calculation
-	int getEffectPower(const spells::Mode mode, const spells::Spell  * spell) const override;
-
-	///default spell-power for timed effects duration
-	int getEnchantPower(const spells::Mode mode, const spells::Spell  * spell) const override;
-
-	///damage/heal override(ignores spell configuration, effect level and effect power)
-	int getEffectValue(const spells::Mode mode, const spells::Spell  * spell) const override;
-
-	const PlayerColor getOwner() const override;
-	void getCasterName(MetaString & text) const override;
-	void getCastDescription(const spells::Spell  * spell, MetaString & text) const override;
-	void getCastDescription(const spells::Spell  * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const override;
-	void spendMana(const spells::Mode mode, const spells::Spell  * spell, const spells::PacketSender * server, const int spellCost) const override;
 
 	const CCreature * creatureType() const override;
 	int32_t unitBaseAmount() const override;
