@@ -103,10 +103,10 @@ public:
 	/// returns level on which given spell would be cast by this(0 - none, 1 - basic etc);
 	/// caster may not know this spell at all
 	/// optionally returns number of selected school by arg - 0 - air magic, 1 - fire magic, 2 - water magic, 3 - earth magic
-	virtual ui8 getSpellSchoolLevel(const Mode mode, const Spell * spell, int * outSelectedSchool = nullptr) const = 0;
+	virtual ui8 getSpellSchoolLevel(const Spell * spell, int * outSelectedSchool = nullptr) const = 0;
 
 	///default spell school level for effect calculation
-	virtual int getEffectLevel(const Mode mode, const Spell * spell) const = 0;
+	virtual int getEffectLevel(const Spell * spell) const = 0;
 
 	///applying sorcery secondary skill etc
 	virtual int64_t getSpellBonus(const Spell * spell, int64_t base, const battle::Unit * affectedStack) const = 0;
@@ -115,13 +115,13 @@ public:
 	virtual int64_t getSpecificSpellBonus(const Spell * spell, int64_t base) const = 0;
 
 	///default spell-power for damage/heal calculation
-	virtual int getEffectPower(const Mode mode, const Spell * spell) const = 0;
+	virtual int getEffectPower(const Spell * spell) const = 0;
 
 	///default spell-power for timed effects duration
-	virtual int getEnchantPower(const Mode mode, const Spell * spell) const = 0;
+	virtual int getEnchantPower(const Spell * spell) const = 0;
 
 	///damage/heal override(ignores spell configuration, effect level and effect power)
-	virtual int getEffectValue(const Mode mode, const Spell * spell) const = 0;
+	virtual int getEffectValue(const Spell * spell) const = 0;
 
 	virtual const PlayerColor getOwner() const = 0;
 
@@ -132,7 +132,7 @@ public:
 	virtual void getCastDescription(const Spell * spell, MetaString & text) const = 0;
 	virtual void getCastDescription(const Spell * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const = 0;
 
-	virtual void spendMana(const Mode mode, const Spell * spell, const spells::PacketSender * server, const int spellCost) const = 0;
+	virtual void spendMana(const spells::PacketSender * server, const int spellCost) const = 0;
 };
 
 }

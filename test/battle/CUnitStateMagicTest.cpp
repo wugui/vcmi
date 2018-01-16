@@ -82,7 +82,7 @@ TEST_F(UnitStateMagicTest, schoolLevelByDefault)
 	setDefaultExpectations();
 	initUnit();
 
-	EXPECT_EQ(subject.getSpellSchoolLevel(spells::Mode::CREATURE_ACTIVE, &spellMock, nullptr), 0);
+	EXPECT_EQ(subject.getSpellSchoolLevel(&spellMock, nullptr), 0);
 }
 
 TEST_F(UnitStateMagicTest, schoolLevelForNormalCaster)
@@ -91,7 +91,7 @@ TEST_F(UnitStateMagicTest, schoolLevelForNormalCaster)
 	initUnit();
 
 	makeNormalCaster();
-	EXPECT_EQ(subject.getSpellSchoolLevel(spells::Mode::CREATURE_ACTIVE, &spellMock, nullptr), DEFAULT_SCHOOL_LEVEL);
+	EXPECT_EQ(subject.getSpellSchoolLevel(&spellMock, nullptr), DEFAULT_SCHOOL_LEVEL);
 }
 
 TEST_F(UnitStateMagicTest, effectLevelForNormalCaster)
@@ -100,7 +100,7 @@ TEST_F(UnitStateMagicTest, effectLevelForNormalCaster)
 	initUnit();
 
 	makeNormalCaster();
-	EXPECT_EQ(subject.getEffectLevel(spells::Mode::CREATURE_ACTIVE, &spellMock), DEFAULT_SCHOOL_LEVEL);
+	EXPECT_EQ(subject.getEffectLevel(&spellMock), DEFAULT_SCHOOL_LEVEL);
 }
 
 TEST_F(UnitStateMagicTest, spellBonus)
@@ -126,12 +126,12 @@ TEST_F(UnitStateMagicTest, effectPower)
 	setDefaultExpectations();
 	initUnit();
 
-	const int32_t EFFECT_POWER = 1200;
+	const int32_t EFFECT_POWER = 12 * 100;
 
 	bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::CREATURE_SPELL_POWER, Bonus::CREATURE_ABILITY, EFFECT_POWER, 0));
 
 	makeNormalCaster();
-	EXPECT_EQ(subject.getEffectPower(spells::Mode::CREATURE_ACTIVE, &spellMock), 12*DEFAULT_AMOUNT);
+	EXPECT_EQ(subject.getEffectPower(&spellMock), 12 * DEFAULT_AMOUNT);
 }
 
 TEST_F(UnitStateMagicTest, enchantPowerByDefault)
@@ -141,7 +141,7 @@ TEST_F(UnitStateMagicTest, enchantPowerByDefault)
 
 	makeNormalCaster();
 
-	EXPECT_EQ(subject.getEnchantPower(spells::Mode::CREATURE_ACTIVE, &spellMock), 3);
+	EXPECT_EQ(subject.getEnchantPower(&spellMock), 3);
 }
 
 TEST_F(UnitStateMagicTest, enchantPower)
@@ -155,7 +155,7 @@ TEST_F(UnitStateMagicTest, enchantPower)
 
 	makeNormalCaster();
 
-	EXPECT_EQ(subject.getEnchantPower(spells::Mode::CREATURE_ACTIVE, &spellMock), ENCHANT_POWER);
+	EXPECT_EQ(subject.getEnchantPower(&spellMock), ENCHANT_POWER);
 }
 
 TEST_F(UnitStateMagicTest, effectValueByDefault)
@@ -164,7 +164,7 @@ TEST_F(UnitStateMagicTest, effectValueByDefault)
 	initUnit();
 
 	makeNormalCaster();
-	EXPECT_EQ(subject.getEffectValue(spells::Mode::CREATURE_ACTIVE, &spellMock), 0);
+	EXPECT_EQ(subject.getEffectValue(&spellMock), 0);
 }
 
 TEST_F(UnitStateMagicTest, effectValue)
@@ -177,7 +177,7 @@ TEST_F(UnitStateMagicTest, effectValue)
 	bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::SPECIFIC_SPELL_POWER, Bonus::CREATURE_ABILITY, EFFECT_VALUE, 0, DEFAULT_SPELL_INDEX));
 
 	makeNormalCaster();
-	EXPECT_EQ(subject.getEffectValue(spells::Mode::CREATURE_ACTIVE, &spellMock), EFFECT_VALUE*DEFAULT_AMOUNT);
+	EXPECT_EQ(subject.getEffectValue(&spellMock), EFFECT_VALUE * DEFAULT_AMOUNT);
 }
 
 TEST_F(UnitStateMagicTest, getOwner)

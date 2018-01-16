@@ -1407,7 +1407,7 @@ CBattleInterface::PossibleActions CBattleInterface::getCasterAction(const CSpell
 {
 	PossibleActions spellSelMode = ANY_LOCATION;
 
-	const CSpell::TargetInfo ti(spell, caster->getSpellSchoolLevel(mode, spell), mode);
+	const CSpell::TargetInfo ti(spell, caster->getSpellSchoolLevel(spell), mode);
 
 	if(ti.massive || ti.type == spells::AimType::NO_TARGET)
 		spellSelMode = NO_LOCATION;
@@ -2208,9 +2208,9 @@ void CBattleInterface::handleHex(BattleHex myNumber, int eventType)
 				//todo: move to mechanics
 				ui8 skill = 0;
 				if (creatureCasting)
-					skill = activeStack->getEffectLevel(spells::Mode::CREATURE_ACTIVE, SpellID(SpellID::TELEPORT).toSpell());
+					skill = activeStack->getEffectLevel(SpellID(SpellID::TELEPORT).toSpell());
 				else
-					skill = getActiveHero()->getEffectLevel(spells::Mode::HERO, SpellID(SpellID::TELEPORT).toSpell());
+					skill = getActiveHero()->getEffectLevel(SpellID(SpellID::TELEPORT).toSpell());
 				//TODO: explicitely save power, skill
 				if (curInt->cb->battleCanTeleportTo(selectedStack, myNumber, skill))
 					legalAction = true;

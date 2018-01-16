@@ -287,11 +287,12 @@ void BattleSpellMechanics::cast(const PacketSender * server, vstd::RNG & rng, co
 
 	if(sc.activeCast)
 	{
-		caster->spendMana(mode, owner, server, spellCost);
+		caster->spendMana(server, spellCost);
+
 		if(sc.manaGained > 0)
 		{
 			assert(otherHero);
-			otherHero->spendMana(Mode::HERO, owner, server, -sc.manaGained);
+			otherHero->spendMana(server, -sc.manaGained);
 		}
 	}
 }

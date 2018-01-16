@@ -644,7 +644,7 @@ void CSpellWindow::SpellArea::setSpell(const CSpell * spell)
 	mySpell = spell;
 	if(mySpell)
 	{
-		schoolLevel = owner->myHero->getSpellSchoolLevel(spells::Mode::HERO, mySpell, &whichSchool);
+		schoolLevel = owner->myHero->getSpellSchoolLevel(mySpell, &whichSchool);
 		spellCost = owner->myInt->cb->getSpellCost(mySpell, owner->myHero);
 
 		image->setFrame(mySpell->id);

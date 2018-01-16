@@ -93,17 +93,17 @@ public:
 
 	~ObstacleCasterProxy() = default;
 
-	ui8 getSpellSchoolLevel(const Mode mode, const spells::Spell * spell, int * outSelectedSchool = nullptr) const override
+	ui8 getSpellSchoolLevel(const Spell * spell, int * outSelectedSchool = nullptr) const override
 	{
 		return obs->spellLevel;
 	}
 
-	int getEffectLevel(const Mode mode, const spells::Spell * spell) const override
+	int getEffectLevel(const Spell * spell) const override
 	{
 		return obs->spellLevel;
 	}
 
-	int64_t getSpellBonus(const spells::Spell * spell, int64_t base, const battle::Unit * affectedStack) const override
+	int64_t getSpellBonus(const Spell * spell, int64_t base, const battle::Unit * affectedStack) const override
 	{
 		if(hero)
 			return hero->getSpellBonus(spell, base, affectedStack);
@@ -111,7 +111,7 @@ public:
 			return base;
 	}
 
-	int64_t getSpecificSpellBonus(const spells::Spell * spell, int64_t base) const override
+	int64_t getSpecificSpellBonus(const Spell * spell, int64_t base) const override
 	{
 		if(hero)
 			return hero->getSpecificSpellBonus(spell, base);
@@ -119,20 +119,20 @@ public:
 			return base;
 	}
 
-	int getEffectPower(const Mode mode, const spells::Spell * spell) const override
+	int getEffectPower(const Spell * spell) const override
 	{
 		return obs->casterSpellPower;
 	}
 
-	int getEnchantPower(const Mode mode, const spells::Spell * spell) const override
+	int getEnchantPower(const Spell * spell) const override
 	{
 		return obs->casterSpellPower;
 	}
 
-	int getEffectValue(const Mode mode, const spells::Spell * spell) const override
+	int getEffectValue(const Spell * spell) const override
 	{
 		if(hero)
-			return hero->getEffectValue(mode, spell);
+			return hero->getEffectValue(spell);
 		else
 			return 0;
 	}
@@ -147,17 +147,17 @@ public:
 		logGlobal->error("Unexpected call to ObstacleCasterProxy::getCasterName");
 	}
 
-	void getCastDescription(const spells::Spell * spell, MetaString & text) const override
+	void getCastDescription(const Spell * spell, MetaString & text) const override
 	{
 		logGlobal->error("Unexpected call to ObstacleCasterProxy::getCastDescription");
 	}
 
-	void getCastDescription(const spells::Spell * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const override
+	void getCastDescription(const Spell * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const override
 	{
 		logGlobal->error("Unexpected call to ObstacleCasterProxy::getCastDescription");
 	}
 
-	void spendMana(const Mode mode, const spells::Spell * spell, const spells::PacketSender * server, const int spellCost) const override
+	void spendMana(const PacketSender * server, const int spellCost) const override
 	{
 		logGlobal->error("Unexpected call to ObstacleCasterProxy::spendMana");
 	}
@@ -4805,7 +4805,17 @@ void CGameHandler::stackTurnTrigger(const CStack *st)
 				parameters.setSpellLevel(bonus->val);
 				//todo: recheck effect level
 				if(parameters.castIfPossible(spellEnv))
+				{
 					cast = true;
+
+					int cooldown = bonus->additionalInfo;
+					BattleSetStackProperty ssp;
+					ssp.which = BattleSetStackProperty::ENCHANTER_COUNTER;
+					ssp.absolute = false;
+					ssp.val = cooldown;
+					ssp.stackID = st->unitId();
+					sendAndApply(&ssp);
+				}
 			}
 		}
 	}

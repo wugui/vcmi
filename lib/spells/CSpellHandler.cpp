@@ -141,7 +141,7 @@ int64_t CSpell::calculateDamage(const spells::Caster * caster) const
 	//check if spell really does damage - if not, return 0
 	if(!isDamageSpell())
 		return 0;
-	auto rawDamage = calculateRawEffectValue(caster->getEffectLevel(spells::Mode::HERO, this), caster->getEffectPower(spells::Mode::HERO, this), 1);
+	auto rawDamage = calculateRawEffectValue(caster->getEffectLevel(this), caster->getEffectPower(this), 1);
 
 	return caster->getSpellBonus(this, rawDamage, nullptr);
 }

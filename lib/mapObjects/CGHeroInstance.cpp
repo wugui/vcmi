@@ -821,7 +821,7 @@ TExpType CGHeroInstance::calculateXp(TExpType exp) const
 	return exp * (100 + valOfBonuses(Bonus::SECONDARY_SKILL_PREMY, SecondarySkill::LEARNING))/100.0;
 }
 
-ui8 CGHeroInstance::getSpellSchoolLevel(const spells::Mode mode, const spells::Spell * spell, int * outSelectedSchool) const
+ui8 CGHeroInstance::getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool) const
 {
 	si16 skill = -1; //skill level
 
@@ -871,25 +871,25 @@ int64_t CGHeroInstance::getSpecificSpellBonus(const spells::Spell * spell, int64
 	return base;
 }
 
-int CGHeroInstance::getEffectLevel(const spells::Mode mode, const spells::Spell * spell) const
+int CGHeroInstance::getEffectLevel(const spells::Spell * spell) const
 {
 	if(hasBonusOfType(Bonus::MAXED_SPELL, spell->getIndex()))
 		return 3;//todo: recheck specialty from where this bonus is. possible bug
 	else
-		return getSpellSchoolLevel(mode, spell);
+		return getSpellSchoolLevel(spell);
 }
 
-int CGHeroInstance::getEffectPower(const spells::Mode mode, const spells::Spell * spell) const
+int CGHeroInstance::getEffectPower(const spells::Spell * spell) const
 {
 	return getPrimSkillLevel(PrimarySkill::SPELL_POWER);
 }
 
-int CGHeroInstance::getEnchantPower(const spells::Mode mode, const spells::Spell * spell) const
+int CGHeroInstance::getEnchantPower(const spells::Spell * spell) const
 {
 	return getPrimSkillLevel(PrimarySkill::SPELL_POWER) + valOfBonuses(Bonus::SPELL_DURATION);
 }
 
-int CGHeroInstance::getEffectValue(const spells::Mode mode, const spells::Spell * spell) const
+int CGHeroInstance::getEffectValue(const spells::Spell * spell) const
 {
 	return 0;
 }
@@ -924,9 +924,9 @@ void CGHeroInstance::getCastDescription(const spells::Spell * spell, const std::
 		attacked.at(0)->addNameReplacement(text, true);
 }
 
-void CGHeroInstance::spendMana(const spells::Mode mode, const spells::Spell * spell, const spells::PacketSender * server, const int spellCost) const
+void CGHeroInstance::spendMana(const spells::PacketSender * server, const int spellCost) const
 {
-	if(mode == spells::Mode::HERO && spellCost != 0)
+	if(spellCost != 0)
 	{
 		SetMana sm;
 		sm.absolute = false;
@@ -1162,7 +1162,7 @@ void CGHeroInstance::getOutOffsets(std::vector<int3> &offsets) const
 
 int CGHeroInstance::getSpellCost(const CSpell * sp) const
 {
-	return sp->getCost(getSpellSchoolLevel(spells::Mode::HERO, sp));
+	return sp->getCost(getSpellSchoolLevel(sp));
 }
 
 void CGHeroInstance::pushPrimSkill( PrimarySkill::PrimarySkill which, int val )

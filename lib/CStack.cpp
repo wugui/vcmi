@@ -334,3 +334,16 @@ std::string CStack::getDescription() const
 {
 	return nodeName();
 }
+
+void CStack::spendMana(const spells::PacketSender * server, const int spellCost) const
+{
+	if(spellCost != 1)
+		logGlobal->warn("Unexpected spell cost %d for creature", spellCost);
+
+	BattleSetStackProperty ssp;
+	ssp.stackID = unitId();
+	ssp.which = BattleSetStackProperty::CASTS;
+	ssp.val = -spellCost;
+	ssp.absolute = false;
+	server->sendAndApply(&ssp);
+}

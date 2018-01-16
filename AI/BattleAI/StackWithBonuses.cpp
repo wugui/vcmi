@@ -190,6 +190,11 @@ void StackWithBonuses::removeUnitBonus(const CSelector & selector)
 	vstd::erase_if(bonusesToUpdate, [&](const Bonus & b){return selector(&b);});
 }
 
+void StackWithBonuses::spendMana(const spells::PacketSender * server, const int spellCost) const
+{
+	//TODO: evaluate cast use
+}
+
 HypotheticBattle::HypotheticBattle(Subject realBattle)
 	: BattleProxy(realBattle),
 	bonusTreeVersion(1)

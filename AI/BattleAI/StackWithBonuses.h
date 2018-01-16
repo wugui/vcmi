@@ -54,6 +54,8 @@ public:
 
 	void removeUnitBonus(const CSelector & selector);
 
+	void spendMana(const spells::PacketSender * server, const int spellCost) const override;
+
 private:
 	const IBonusBearer * origBearer;
 	const HypotheticBattle * owner;

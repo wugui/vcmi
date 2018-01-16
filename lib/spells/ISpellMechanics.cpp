@@ -461,7 +461,7 @@ BaseMechanics::BaseMechanics(const IBattleCast * event)
 		if(value)
 			rangeLevel = value.get();
 		else
-			rangeLevel = caster->getSpellSchoolLevel(mode, owner);
+			rangeLevel = caster->getSpellSchoolLevel(owner);
 		vstd::abetween(rangeLevel, 0, 3);
 	}
 	{
@@ -469,7 +469,7 @@ BaseMechanics::BaseMechanics(const IBattleCast * event)
         if(value)
 			effectLevel = value.get();
 		else
-			effectLevel = caster->getEffectLevel(mode, owner);
+			effectLevel = caster->getEffectLevel(owner);
 		vstd::abetween(effectLevel, 0, 3);
 	}
 	{
@@ -477,7 +477,7 @@ BaseMechanics::BaseMechanics(const IBattleCast * event)
 		if(value)
 			effectPower = value.get();
 		else
-			effectPower = caster->getEffectPower(mode, owner);
+			effectPower = caster->getEffectPower(owner);
 		vstd::amax(effectPower, 0);
 	}
 	{
@@ -485,7 +485,7 @@ BaseMechanics::BaseMechanics(const IBattleCast * event)
 		if(value)
 			effectDuration = value.get();
 		else
-			effectDuration = caster->getEnchantPower(mode, owner);
+			effectDuration = caster->getEnchantPower(owner);
 		vstd::amax(effectDuration, 0); //???
 	}
 	{
@@ -496,7 +496,7 @@ BaseMechanics::BaseMechanics(const IBattleCast * event)
 		}
 		else
 		{
-			auto casterValue = caster->getEffectValue(mode, owner);
+			auto casterValue = caster->getEffectValue(owner);
 			if(casterValue == 0)
 				effectValue = owner->calculateRawEffectValue(effectLevel, effectPower, 1);
 			else

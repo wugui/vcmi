@@ -73,6 +73,8 @@ public:
 	bool unitHasAmmoCart(const battle::Unit * unit) const override;
 	PlayerColor unitEffectiveOwner(const battle::Unit * unit) const override;
 
+	void spendMana(const spells::PacketSender * server, const int spellCost) const override;
+
 	template <typename Handler> void serialize(Handler & h, const int version)
 	{
 		//this assumes that stack objects is newly created
