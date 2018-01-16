@@ -29,10 +29,13 @@ public:
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;
 
-	EffectTarget transformTarget(const Mechanics * m,  const Target & aimPoint, const Target & spellTarget) const override;
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+	EffectTarget transformTarget(const Mechanics * m,  const Target & aimPoint, const Target & spellTarget) const override;
+
+protected:
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override;
+
 private:
 	bool prepareEffects(std::string & errorMessage, BattleStackMoved & pack, const Mechanics * m, const EffectTarget & target) const;
 };

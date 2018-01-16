@@ -23,8 +23,8 @@ public:
 	Clone(const int level);
 	virtual ~Clone();
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+protected:
 	bool isReceptive(const Mechanics * m, const battle::Unit * s) const override;
 	bool isValidTarget(const Mechanics * m, const battle::Unit * s) const override;
 

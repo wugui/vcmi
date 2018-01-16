@@ -28,8 +28,9 @@ public:
 	Dispel(const int level);
 	virtual ~Dispel();
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+protected:
 	bool isValidTarget(const Mechanics * m, const battle::Unit * unit) const override;
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override final;
 

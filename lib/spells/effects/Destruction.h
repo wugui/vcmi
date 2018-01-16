@@ -28,6 +28,7 @@ protected:
 	void describeEffect(std::vector<MetaString> & log, const Mechanics * m, const battle::Unit * firstTarget, uint32_t kills, int64_t damage, bool multiple) const override;
 
 	void serializeJsonDamageEffect(JsonSerializeFormat & handler) override;
+
 private:
 	bool killByPercentage;
 };

@@ -56,6 +56,30 @@ public:
 namespace spells
 {
 
+class BattleStateProxy
+{
+public:
+	const bool describe;
+
+	BattleStateProxy(const PacketSender * server_);
+	BattleStateProxy(IBattleState * battleState_);
+
+	template<typename P>
+	void apply(P * pack)
+	{
+		if(server)
+			server->sendAndApply(pack);
+		else
+			pack->applyBattle(battleState);
+	}
+
+	void complain(const std::string & problem) const;
+private:
+	const PacketSender * server;
+	IBattleState * battleState;
+};
+
+
 class DLL_LINKAGE IBattleCast
 {
 public:
@@ -183,7 +207,7 @@ public:
 	virtual bool canBeCast(Problem & problem) const = 0;
 	virtual bool canBeCastAt(BattleHex destination) const = 0;
 
-	virtual void applyEffects(const PacketSender * server, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
+	virtual void applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
 
 	virtual void cast(const PacketSender * server, vstd::RNG & rng, const Target & target) = 0;
 

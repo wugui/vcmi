@@ -26,8 +26,9 @@ public:
 	Heal(const int level);
 	virtual ~Heal();
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+protected:
 	void apply(int64_t value, BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const;
 
 	bool isValidTarget(const Mechanics * m, const battle::Unit * unit) const override;

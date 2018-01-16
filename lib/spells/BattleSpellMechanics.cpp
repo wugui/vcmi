@@ -132,7 +132,7 @@ BattleSpellMechanics::BattleSpellMechanics(const IBattleCast * event, std::share
 
 BattleSpellMechanics::~BattleSpellMechanics() = default;
 
-void BattleSpellMechanics::applyEffects(const PacketSender * server, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const
+void BattleSpellMechanics::applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const
 {
 	auto callback = [&](const effects::Effect * effect, bool & stop)
 	{
@@ -140,12 +140,12 @@ void BattleSpellMechanics::applyEffects(const PacketSender * server, vstd::RNG &
 		{
 			if(ignoreImmunity)
 			{
-				effect->apply(server, rng, this, targets);
+				effect->apply(battleState, rng, this, targets);
 			}
 			else
 			{
-				EffectTarget target = effect->filterTarget(this, targets);
-				effect->apply(server, rng, this, target);
+				EffectTarget filtered = effect->filterTarget(this, targets);
+				effect->apply(battleState, rng, this, filtered);
 			}
 		}
 	};
@@ -280,8 +280,11 @@ void BattleSpellMechanics::cast(const PacketSender * server, vstd::RNG & rng, co
 
 	server->sendAndApply(&sc);
 
-	for(auto & p : effectsToApply)
-		p.first->apply(server, rng, this, p.second);
+	{
+		BattleStateProxy proxy(server);
+		for(auto & p : effectsToApply)
+			p.first->apply(&proxy, rng, this, p.second);
+	}
 
 //	afterCast();
 
@@ -384,8 +387,11 @@ void BattleSpellMechanics::cast(IBattleState * battleState, vstd::RNG & rng, con
 			battleState->removeUnitBonus(one->unitId(), buffer);
 	}
 
-	for(auto & p : effectsToApply)
-		p.first->apply(battleState, rng, this, p.second);
+	{
+		BattleStateProxy proxy(battleState);
+		for(auto & p : effectsToApply)
+			p.first->apply(&proxy, rng, this, p.second);
+	}
 }
 
 void BattleSpellMechanics::addCustomEffect(BattleSpellCast & sc, const battle::Unit * target, ui32 effect)

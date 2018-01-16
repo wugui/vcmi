@@ -151,6 +151,28 @@ public:
 	}
 };
 
+BattleStateProxy::BattleStateProxy(const PacketSender * server_)
+	: server(server_),
+	battleState(nullptr),
+	describe(true)
+{
+}
+
+BattleStateProxy::BattleStateProxy(IBattleState * battleState_)
+	: server(nullptr),
+	battleState(battleState_),
+	describe(false)
+{
+}
+
+void BattleStateProxy::complain(const std::string & problem) const
+{
+	if(server)
+		server->complain(problem);
+	else
+		logGlobal->error(problem);
+}
+
 
 BattleCast::BattleCast(const CBattleInfoCallback * cb, const Caster * caster_, const Mode mode_, const CSpell * spell_)
 	: spell(spell_),
@@ -278,7 +300,10 @@ void BattleCast::aimToUnit(const battle::Unit * destination)
 void BattleCast::applyEffects(const SpellCastEnvironment * env, bool indirect, bool ignoreImmunity) const
 {
 	auto m = spell->battleMechanics(this);
-	m->applyEffects(env, env->getRandomGenerator(), target, indirect, ignoreImmunity);
+
+	BattleStateProxy proxy(env);
+
+	m->applyEffects(&proxy, env->getRandomGenerator(), target, indirect, ignoreImmunity);
 }
 
 void BattleCast::cast(const SpellCastEnvironment * env)

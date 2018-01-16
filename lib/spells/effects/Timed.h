@@ -30,8 +30,9 @@ public:
 	Timed(const int level);
 	virtual ~Timed();
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+protected:
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override final;
 
 private:

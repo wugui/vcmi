@@ -31,8 +31,9 @@ public:
 	bool applicable(Problem & problem, const Mechanics * m) const override;
 	bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const override;
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+protected:
 	void serializeJsonEffect(JsonSerializeFormat & handler) override;
 
 private:

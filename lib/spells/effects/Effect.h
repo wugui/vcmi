@@ -26,6 +26,8 @@ namespace spells
 {
 using EffectTarget = Target;
 
+class BattleStateProxy;
+
 namespace effects
 {
 using RNG = ::vstd::RNG;
@@ -37,29 +39,6 @@ template<typename F>
 class RegisterEffect;
 
 using TargetType = ::spells::AimType;
-
-class BattleStateProxy
-{
-public:
-	const bool describe;
-
-	BattleStateProxy(const PacketSender * server_);
-	BattleStateProxy(IBattleState * battleState_);
-
-	template<typename P>
-	void apply(P * pack)
-	{
-		if(server)
-			server->sendAndApply(pack);
-		else
-			pack->applyBattle(battleState);
-	}
-
-	void complain(const std::string & problem) const;
-private:
-	const PacketSender * server;
-	IBattleState * battleState;
-};
 
 class Effect
 {
@@ -79,8 +58,7 @@ public:
 	virtual bool applicable(Problem & problem, const Mechanics * m) const;
 	virtual bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const;
 
-	void apply(const PacketSender * server, RNG & rng, const Mechanics * m, const EffectTarget & target) const;
-	void apply(IBattleState * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const;
+	virtual void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const = 0;
 
 	virtual EffectTarget filterTarget(const Mechanics * m, const EffectTarget & target) const = 0;
 
@@ -90,8 +68,6 @@ public:
 
 protected:
 	int spellLevel;
-
-	virtual void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const = 0;
 
 	virtual void serializeJsonEffect(JsonSerializeFormat & handler) = 0;
 };

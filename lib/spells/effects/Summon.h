@@ -28,10 +28,11 @@ public:
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;
 
+	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
 	EffectTarget transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const override;
 
 protected:
-	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
 	void serializeJsonEffect(JsonSerializeFormat & handler) override final;
 
 private:

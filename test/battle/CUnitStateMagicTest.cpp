@@ -200,6 +200,24 @@ TEST_F(UnitStateMagicTest, getOwner)
 	EXPECT_EQ(subject.getOwner(), otherPlayer);
 }
 
+TEST_F(UnitStateMagicTest, spendMana)
+{
+	setDefaultExpectations();
+
+	bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::CASTS, Bonus::CREATURE_ABILITY, 1, 0));
+
+	initUnit();
+
+	EXPECT_TRUE(subject.canCast());
+
+	subject.spendMana(nullptr, 1);
+
+	EXPECT_FALSE(subject.canCast());
+}
+
+
+
+
 //TODO:getCasterName
 //TODO:getCastDescription
 //TODO:spendMana

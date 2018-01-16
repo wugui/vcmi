@@ -53,8 +53,9 @@ public:
 
 	EffectTarget transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const override;
 
-protected:
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+protected:
 	void serializeJsonEffect(JsonSerializeFormat & handler) override;
 
 private:

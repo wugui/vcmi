@@ -18,29 +18,6 @@ namespace spells
 namespace effects
 {
 
-BattleStateProxy::BattleStateProxy(const PacketSender * server_)
-	: server(server_),
-	battleState(nullptr),
-	describe(true)
-{
-}
-
-BattleStateProxy::BattleStateProxy(IBattleState * battleState_)
-	: server(nullptr),
-	battleState(battleState_),
-	describe(false)
-{
-}
-
-void BattleStateProxy::complain(const std::string & problem) const
-{
-	if(server)
-		server->complain(problem);
-	else
-		logGlobal->error(problem);
-}
-
-
 Effect::Effect(const int level)
 	: indirect(false),
 	optional(false),
@@ -59,18 +36,6 @@ bool Effect::applicable(Problem & problem, const Mechanics * m) const
 bool Effect::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
 {
 	return true;
-}
-
-void Effect::apply(const PacketSender * server, RNG & rng, const Mechanics * m, const EffectTarget & target) const
-{
-	BattleStateProxy proxy(server);
-	apply(&proxy, rng, m, target);
-}
-
-void Effect::apply(IBattleState * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
-{
-	BattleStateProxy proxy(battleState);
-	apply(&proxy, rng, m, target);
 }
 
 void Effect::serializeJson(JsonSerializeFormat & handler)
