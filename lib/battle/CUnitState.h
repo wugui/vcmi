@@ -218,9 +218,9 @@ public:
 
 	const PlayerColor getOwner() const override;
 	void getCasterName(MetaString & text) const override;
-	void getCastDescription(const spells::Spell  * spell, MetaString & text) const override;
-	void getCastDescription(const spells::Spell  * spell, const std::vector<const Unit *> & attacked, MetaString & text) const override;
-	void spendMana(const spells::Mode mode, const spells::Spell  * spell, const spells::PacketSender * server, const int spellCost) const override;
+	void getCastDescription(const spells::Spell * spell, MetaString & text) const override;
+	void getCastDescription(const spells::Spell * spell, const std::vector<const Unit *> & attacked, MetaString & text) const override;
+	void spendMana(const spells::Mode mode, const spells::Spell * spell, const spells::PacketSender * server, const int spellCost) const override;
 
 	bool ableToRetaliate() const override;
 	bool alive() const override;

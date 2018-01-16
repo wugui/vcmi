@@ -20,6 +20,7 @@ set(test_SRCS
  		battle/BattleHexTest.cpp
  		battle/CHealthTest.cpp
 		battle/CUnitStateTest.cpp
+		battle/CUnitStateMagicTest.cpp
 		battle/battle_UnitTest.cpp
 
  		game/CGameStateTest.cpp
@@ -48,6 +49,7 @@ set(test_HEADERS
 assign_source_group(${test_SRCS} ${test_HEADERS})
 
 set(mock_HEADERS
+		mock/mock_spells_Spell.h
 		mock/mock_UnitInfo.h
 		mock/mock_UnitEnvironment.h
 )

@@ -229,7 +229,7 @@ TEST_F(CGameStateTest, issue2765)
 		cast.aimToUnit(def);
 		cast.setSpellLevel(3);
 
-		EXPECT_TRUE(age->canBeCastAt(gameState->curB, spells::Mode::AFTER_ATTACK, att, def->getPosition()));
+		EXPECT_FALSE(age->canBeCastAt(gameState->curB, spells::Mode::AFTER_ATTACK, att, def->getPosition()));
 
 		EXPECT_TRUE(cast.castIfPossible(this));//should be possible, but with no effect (change to aimed cast check?)
 
@@ -318,7 +318,7 @@ TEST_F(CGameStateTest, battleResurrection)
 		spells::BattleCast cast(gameState->curB, attacker, spells::Mode::HERO, spell);
 		cast.aimToUnit(unit);
 
-		EXPECT_TRUE(spell->canBeCast(gameState->curB, spells::Mode::HERO, attacker));
+		EXPECT_FALSE(spell->canBeCast(gameState->curB, spells::Mode::HERO, attacker));
 
 		EXPECT_TRUE(spell->canBeCastAt(gameState->curB, spells::Mode::HERO, attacker, unit->getPosition()));
 
