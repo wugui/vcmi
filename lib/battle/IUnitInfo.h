@@ -30,8 +30,6 @@ public:
 class DLL_LINKAGE IUnitInfo
 {
 public:
-	bool doubleWide() const;
-
 	virtual int32_t unitMaxHealth() const = 0;
 	virtual int32_t unitBaseAmount() const = 0;
 
@@ -40,12 +38,7 @@ public:
 	virtual PlayerColor unitOwner() const = 0;
 	virtual SlotID unitSlot() const = 0;
 
-	int32_t creatureIndex() const;
-	CreatureID creatureId() const;
-	int32_t creatureLevel() const;
-	int32_t creatureCost() const;
-
-	virtual const CCreature * creatureType() const = 0;
+	virtual const CCreature * unitType() const = 0;
 };
 
 }

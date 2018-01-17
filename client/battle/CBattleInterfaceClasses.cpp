@@ -764,7 +764,7 @@ void CStackQueue::StackBox::setStack(const battle::Unit * nStack, size_t turn)
 	{
 		bg->colorize(nStack->unitOwner());
 		icon->visible = true;
-		icon->setFrame(nStack->creatureType()->iconIndex);
+		icon->setFrame(nStack->creatureIconIndex());
 		amount->setText(makeNumberShort(nStack->getCount()));
 
 		if(stateIcon)

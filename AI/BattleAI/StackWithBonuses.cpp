@@ -27,7 +27,7 @@ StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const CStack 
 	: battle::CUnitState(),
 	origBearer(Stack),
 	owner(Owner),
-	type(Stack->creatureType()),
+	type(Stack->unitType()),
 	baseAmount(Stack->unitBaseAmount()),
 	id(Stack->unitId()),
 	side(Stack->unitSide()),
@@ -66,7 +66,7 @@ StackWithBonuses & StackWithBonuses::operator=(const battle::CUnitState & other)
 	return *this;
 }
 
-const CCreature * StackWithBonuses::creatureType() const
+const CCreature * StackWithBonuses::unitType() const
 {
 	return type;
 }

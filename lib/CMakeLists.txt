@@ -19,7 +19,6 @@ set(lib_SRCS
 		battle/CUnitState.cpp
 		battle/Destination.cpp
 		battle/IBattleState.cpp
-		battle/IUnitInfo.cpp
 		battle/ReachabilityInfo.cpp
 		battle/SideInBattle.cpp
 		battle/SiegeInfo.cpp

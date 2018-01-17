@@ -27,6 +27,14 @@ class CUnitState;
 class DLL_LINKAGE Unit : public IUnitInfo, public spells::Caster, public virtual IBonusBearer
 {
 public:
+	virtual bool doubleWide() const = 0;
+
+	virtual int32_t creatureIndex() const = 0;
+	virtual CreatureID creatureId() const = 0;
+	virtual int32_t creatureLevel() const = 0;
+	virtual int32_t creatureCost() const = 0;
+	virtual int32_t creatureIconIndex() const = 0;
+
 	virtual bool ableToRetaliate() const = 0;
 	virtual bool alive() const = 0;
 	virtual bool isGhost() const = 0;

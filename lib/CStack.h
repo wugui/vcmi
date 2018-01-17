@@ -60,7 +60,7 @@ public:
 	void prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand) const; //requires bsa.damageAmout filled
 	static void prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand, std::shared_ptr<battle::CUnitState> customState); //requires bsa.damageAmout filled
 
-	const CCreature * creatureType() const override;
+	const CCreature * unitType() const override;
 	int32_t unitBaseAmount() const override;
 
 	uint32_t unitId() const override;

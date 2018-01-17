@@ -241,7 +241,6 @@
 		<Unit filename="battle/Destination.h" />
 		<Unit filename="battle/IBattleState.cpp" />
 		<Unit filename="battle/IBattleState.h" />
-		<Unit filename="battle/IUnitInfo.cpp" />
 		<Unit filename="battle/IUnitInfo.h" />
 		<Unit filename="battle/ReachabilityInfo.cpp" />
 		<Unit filename="battle/ReachabilityInfo.h" />

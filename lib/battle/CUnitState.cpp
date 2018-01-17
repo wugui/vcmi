@@ -12,6 +12,7 @@
 #include "CUnitState.h"
 
 #include "../NetPacks.h"
+#include "../CCreatureHandler.h"
 
 #include "../serializer/JsonDeserializer.h"
 #include "../serializer/JsonSerializer.h"
@@ -523,6 +524,36 @@ CUnitState & CUnitState::operator=(const CUnitState & other)
 	return *this;
 }
 
+int32_t CUnitState::creatureIndex() const
+{
+	return static_cast<int32_t>(creatureId().toEnum());
+}
+
+CreatureID CUnitState::creatureId() const
+{
+	return unitType()->idNumber;
+}
+
+int32_t CUnitState::creatureLevel() const
+{
+	return static_cast<int32_t>(unitType()->level);
+}
+
+bool CUnitState::doubleWide() const
+{
+	return unitType()->doubleWide;
+}
+
+int32_t CUnitState::creatureCost() const
+{
+	return unitType()->cost[Res::GOLD];
+}
+
+int32_t CUnitState::creatureIconIndex() const
+{
+	return unitType()->iconIndex;
+}
+
 ui8 CUnitState::getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool) const
 {
 	int skill = valOfBonuses(Selector::typeSubtype(Bonus::SPELLCASTER, spell->getIndex()));
@@ -978,9 +1009,9 @@ ui8 CUnitStateDetached::unitSide() const
 	return unit->unitSide();
 }
 
-const CCreature * CUnitStateDetached::creatureType() const
+const CCreature * CUnitStateDetached::unitType() const
 {
-	return unit->creatureType();
+	return unit->unitType();
 }
 
 PlayerColor CUnitStateDetached::unitOwner() const

@@ -280,7 +280,7 @@ bool CStack::canBeHealed() const
 		   && !hasBonusOfType(Bonus::SIEGE_WEAPON);
 }
 
-const CCreature * CStack::creatureType() const
+const CCreature * CStack::unitType() const
 {
 	return type;
 }

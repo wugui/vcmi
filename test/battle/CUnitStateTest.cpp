@@ -55,7 +55,7 @@ public:
 		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::PRIMARY_SKILL, Bonus::CREATURE_ABILITY, DEFAULT_DEFENCE, 0, PrimarySkill::DEFENSE));
 
 		EXPECT_CALL(infoMock, unitBaseAmount()).WillRepeatedly(Return(DEFAULT_AMOUNT));
-		EXPECT_CALL(infoMock, creatureType()).WillRepeatedly(Return(pikeman));
+		EXPECT_CALL(infoMock, unitType()).WillRepeatedly(Return(pikeman));
 		EXPECT_CALL(infoMock, unitMaxHealth()).WillRepeatedly(Return(pikeman->MaxHealth()));
 
 		EXPECT_CALL(envMock, unitHasAmmoCart(_)).WillRepeatedly(Return(hasAmmoCart));

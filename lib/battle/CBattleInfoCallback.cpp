@@ -686,7 +686,7 @@ TDmgRange CBattleInfoCallback::calculateDmgRange(const BattleAttackInfo & info) 
 	{
 		std::vector<int32_t> affectedIds;
 		const auto spLevel = slayerEffect->val;
-		const CCreature * defenderType = info.defender->creatureType();
+		const CCreature * defenderType = info.defender->unitType();
 		bool isAffected = false;
 
 		for(const auto & b : defenderType->getBonusList())

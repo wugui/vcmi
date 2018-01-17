@@ -32,7 +32,7 @@ public:
 	StackWithBonuses & operator= (const battle::CUnitState & other);
 
 	///IUnitInfo
-	const CCreature * creatureType() const override;
+	const CCreature * unitType() const override;
 
 	int32_t unitMaxHealth() const override;
 	int32_t unitBaseAmount() const override;

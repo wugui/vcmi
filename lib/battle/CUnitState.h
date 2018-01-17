@@ -206,6 +206,14 @@ public:
 	CUnitState & operator= (const CUnitState & other);
 	CUnitState & operator= (CUnitState && other) = delete;
 
+	bool doubleWide() const override;
+
+	int32_t creatureIndex() const override;
+	CreatureID creatureId() const override;
+	int32_t creatureLevel() const override;
+	int32_t creatureCost() const override;
+	int32_t creatureIconIndex() const override;
+
 	ui8 getSpellSchoolLevel(const spells::Spell * spell, int * outSelectedSchool = nullptr) const override;
 	int getEffectLevel(const spells::Spell * spell) const override;
 
@@ -308,7 +316,7 @@ public:
 	uint32_t unitId() const override;
 	ui8 unitSide() const override;
 
-	const CCreature * creatureType() const override;
+	const CCreature * unitType() const override;
 	PlayerColor unitOwner() const override;
 
 	SlotID unitSlot() const override;

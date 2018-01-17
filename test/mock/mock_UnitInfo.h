@@ -25,9 +25,6 @@ public:
 
 	MOCK_CONST_METHOD0(unitSlot, SlotID());
 
-	MOCK_CONST_METHOD0(creatureIndex, int32_t());
-	MOCK_CONST_METHOD0(creatureId, CreatureID());
-	MOCK_CONST_METHOD0(creatureLevel, int32_t());
-	MOCK_CONST_METHOD0(creatureType, const CCreature * ());
+	MOCK_CONST_METHOD0(unitType, const CCreature * ());
 };
 
