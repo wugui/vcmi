@@ -889,7 +889,7 @@ int CGHeroInstance::getEnchantPower(const spells::Spell * spell) const
 	return getPrimSkillLevel(PrimarySkill::SPELL_POWER) + valOfBonuses(Bonus::SPELL_DURATION);
 }
 
-int CGHeroInstance::getEffectValue(const spells::Spell * spell) const
+int64_t CGHeroInstance::getEffectValue(const spells::Spell * spell) const
 {
 	return 0;
 }

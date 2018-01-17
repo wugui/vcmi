@@ -184,7 +184,7 @@ EffectTarget Sacrifice::transformTarget(const Mechanics * m, const Target & aimP
 
 int64_t Sacrifice::calculateHealEffectValue(const Mechanics * m, const battle::Unit * victim) const
 {
-	return (m->getEffectPower() + victim->unitMaxHealth() + m->calculateRawEffectValue(0, 1)) * victim->getCount();
+	return (m->getEffectPower() + victim->MaxHealth() + m->calculateRawEffectValue(0, 1)) * victim->getCount();
 }
 
 

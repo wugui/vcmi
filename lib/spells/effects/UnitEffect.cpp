@@ -25,6 +25,8 @@ namespace effects
 
 UnitEffect::UnitEffect(const int level)
 	: Effect(level),
+	chainLength(0),
+	chainFactor(0.0),
 	ignoreImmunity(false)
 {
 }

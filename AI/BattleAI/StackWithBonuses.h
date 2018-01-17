@@ -34,7 +34,6 @@ public:
 	///IUnitInfo
 	const CCreature * unitType() const override;
 
-	int32_t unitMaxHealth() const override;
 	int32_t unitBaseAmount() const override;
 
 	uint32_t unitId() const override;

@@ -238,7 +238,7 @@ void CStack::prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand, std::s
 			{
 				customState->casts.use();
 				bsa.flags |= BattleStackAttacked::REBIRTH;
-				int64_t toHeal = customState->unitMaxHealth() * resurrectedCount;
+				int64_t toHeal = customState->MaxHealth() * resurrectedCount;
 				//TODO: add one-battle rebirth?
 				customState->heal(toHeal, EHealLevel::RESURRECT, EHealPower::PERMANENT);
 				customState->counterAttacks.use(customState->counterAttacks.available());

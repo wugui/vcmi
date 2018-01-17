@@ -136,7 +136,7 @@ private:
 class DLL_LINKAGE CHealth
 {
 public:
-	explicit CHealth(const IUnitInfo * Owner);
+	explicit CHealth(const battle::Unit * Owner);
 	CHealth(const CHealth & other);
 
 	CHealth & operator=(const CHealth & other);
@@ -160,7 +160,7 @@ public:
 private:
 	void addResurrected(int32_t amount);
 	void setFromTotal(const int64_t totalHealth);
-	const IUnitInfo * owner;
+	const battle::Unit * owner;
 
 	int32_t firstHPleft;
 	int32_t fullUnits;
@@ -222,7 +222,7 @@ public:
 
 	int getEffectPower(const spells::Spell * spell) const override;
 	int getEnchantPower(const spells::Spell * spell) const override;
-	int getEffectValue(const spells::Spell * spell) const override;
+	int64_t getEffectValue(const spells::Spell * spell) const override;
 
 	const PlayerColor getOwner() const override;
 	void getCasterName(MetaString & text) const override;
@@ -257,8 +257,6 @@ public:
 	bool moved(int turn = 0) const override;
 	bool willMove(int turn = 0) const override;
 	bool waited(int turn = 0) const override;
-
-	int32_t unitMaxHealth() const override;
 
 	std::shared_ptr<CUnitState> asquire() const override;
 

@@ -50,6 +50,7 @@ assign_source_group(${test_SRCS} ${test_HEADERS})
 
 set(mock_HEADERS
 		mock/mock_spells_Spell.h
+		mock/mock_battle_Unit.h
 		mock/mock_UnitInfo.h
 		mock/mock_UnitEnvironment.h
 )

@@ -48,15 +48,15 @@ public:
 	void setDefaultExpectations()
 	{
 		using namespace testing;
-		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, DEFAULT_HP, 0));
 		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACKS_SPEED, Bonus::CREATURE_ABILITY, DEFAULT_SPEED, 0));
 
 		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::PRIMARY_SKILL, Bonus::CREATURE_ABILITY, DEFAULT_ATTACK, 0, PrimarySkill::ATTACK));
 		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::PRIMARY_SKILL, Bonus::CREATURE_ABILITY, DEFAULT_DEFENCE, 0, PrimarySkill::DEFENSE));
 
+		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, DEFAULT_HP, 0));
+
 		EXPECT_CALL(infoMock, unitBaseAmount()).WillRepeatedly(Return(DEFAULT_AMOUNT));
 		EXPECT_CALL(infoMock, unitType()).WillRepeatedly(Return(pikeman));
-		EXPECT_CALL(infoMock, unitMaxHealth()).WillRepeatedly(Return(pikeman->MaxHealth()));
 
 		EXPECT_CALL(envMock, unitHasAmmoCart(_)).WillRepeatedly(Return(hasAmmoCart));
 	}

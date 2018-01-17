@@ -244,7 +244,7 @@ public:
 
 	int getEnchantPower(const spells::Spell * spell) const override;
 
-	int getEffectValue(const spells::Spell * spell) const override;
+	int64_t getEffectValue(const spells::Spell * spell) const override;
 
 	const PlayerColor getOwner() const override;
 

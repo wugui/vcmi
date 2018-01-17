@@ -71,11 +71,6 @@ const CCreature * StackWithBonuses::unitType() const
 	return type;
 }
 
-int32_t StackWithBonuses::unitMaxHealth() const
-{
-	return MaxHealth();
-}
-
 int32_t StackWithBonuses::unitBaseAmount() const
 {
 	return baseAmount;

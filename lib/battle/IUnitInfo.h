@@ -30,7 +30,6 @@ public:
 class DLL_LINKAGE IUnitInfo
 {
 public:
-	virtual int32_t unitMaxHealth() const = 0;
 	virtual int32_t unitBaseAmount() const = 0;
 
 	virtual uint32_t unitId() const = 0;

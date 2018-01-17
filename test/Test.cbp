@@ -97,6 +97,7 @@
 		<Unit filename="mock/mock_MapService.h" />
 		<Unit filename="mock/mock_UnitEnvironment.h" />
 		<Unit filename="mock/mock_UnitInfo.h" />
+		<Unit filename="mock/mock_battle_Unit.h" />
 		<Unit filename="mock/mock_spells_Spell.h" />
 		<Extensions>
 			<code_completion />

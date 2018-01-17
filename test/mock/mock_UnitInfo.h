@@ -15,10 +15,8 @@
 class UnitInfoMock : public battle::IUnitInfo
 {
 public:
-	MOCK_CONST_METHOD0(unitMaxHealth, int32_t());
 	MOCK_CONST_METHOD0(unitBaseAmount, int32_t());
 
-	MOCK_CONST_METHOD0(doubleWide, bool());
 	MOCK_CONST_METHOD0(unitId, uint32_t());
 	MOCK_CONST_METHOD0(unitSide, ui8());
 	MOCK_CONST_METHOD0(unitOwner, PlayerColor());

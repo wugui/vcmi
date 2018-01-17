@@ -121,7 +121,7 @@ public:
 	virtual int getEnchantPower(const Spell * spell) const = 0;
 
 	///damage/heal override(ignores spell configuration, effect level and effect power)
-	virtual int getEffectValue(const Spell * spell) const = 0;
+	virtual int64_t getEffectValue(const Spell * spell) const = 0;
 
 	virtual const PlayerColor getOwner() const = 0;
 
@@ -132,7 +132,7 @@ public:
 	virtual void getCastDescription(const Spell * spell, MetaString & text) const = 0;
 	virtual void getCastDescription(const Spell * spell, const std::vector<const battle::Unit *> & attacked, MetaString & text) const = 0;
 
-	virtual void spendMana(const spells::PacketSender * server, const int spellCost) const = 0;
+	virtual void spendMana(const PacketSender * server, const int spellCost) const = 0;
 };
 
 }

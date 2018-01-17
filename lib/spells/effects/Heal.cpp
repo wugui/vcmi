@@ -67,7 +67,7 @@ bool Heal::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
 	if(insuries == 0)
 		return false;
 
-	if(hpGained < minFullUnits * unit->unitMaxHealth())
+	if(hpGained < minFullUnits * unit->MaxHealth())
 		return false;
 
 	if(unit->isDead())

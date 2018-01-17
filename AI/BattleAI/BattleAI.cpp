@@ -139,10 +139,13 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 			{
 				//ThreatMap threatsToUs(stack); // These lines may be usefull but they are't used in the code.
 				auto dists = getCbc()->battleGetDistances(stack, stack->getPosition());
-				const EnemyInfo &ei= *range::min_element(targets.unreachableEnemies, std::bind(isCloser, _1, _2, std::ref(dists)));
-				if(distToNearestNeighbour(ei.s->getPosition(), dists) < GameConstants::BFIELD_SIZE)
+				if(!targets.unreachableEnemies.empty())
 				{
-					return goTowards(stack, ei.s->getPosition());
+					const EnemyInfo &ei= *range::min_element(targets.unreachableEnemies, std::bind(isCloser, _1, _2, std::ref(dists)));
+					if(distToNearestNeighbour(ei.s->getPosition(), dists) < GameConstants::BFIELD_SIZE)
+					{
+						return goTowards(stack, ei.s->getPosition());
+					}
 				}
 			}
 			else

@@ -9,8 +9,10 @@
  */
 
 #include "StdInc.h"
-#include "mock/mock_UnitInfo.h"
+#include "mock/mock_battle_Unit.h"
+#include "mock/mock_BonusBearer.h"
 #include "../../lib/battle/CUnitState.h"
+#include "../../lib/NetPacksBase.h"
 
 using namespace testing;
 using namespace battle;
@@ -18,27 +20,32 @@ using namespace battle;
 static const int32_t UNIT_HEALTH = 123;
 static const int32_t UNIT_AMOUNT = 300;
 
-class HealthTest : public ::testing::Test
+class HealthTest : public Test
 {
 public:
-	UnitInfoMock mock;
+	UnitMock mock;
+	BonusBearerMock bonusMock;
 	HealthTest() : health(&mock)
 	{}
 
 	void setDefaultExpectations()
 	{
-		EXPECT_CALL(mock, unitMaxHealth()).WillRepeatedly(Return(UNIT_HEALTH));
+		EXPECT_CALL(mock, getAllBonuses(_, _, _, _)).WillRepeatedly(Invoke(&bonusMock, &BonusBearerMock::getAllBonuses));
+		EXPECT_CALL(mock, getTreeVersion()).WillRepeatedly(Return(1));
+
+		bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, UNIT_HEALTH, 0));
+
 		EXPECT_CALL(mock, unitBaseAmount()).WillRepeatedly(Return(UNIT_AMOUNT));
 	}
 	CHealth health;
 };
 
-static void checkTotal(const CHealth & health, const UnitInfoMock & mock)
+static void checkTotal(const CHealth & health, const UnitMock & mock)
 {
-	EXPECT_EQ(health.total(), mock.unitMaxHealth() * mock.unitBaseAmount());
+	EXPECT_EQ(health.total(), mock.MaxHealth() * mock.unitBaseAmount());
 }
 
-static void checkEmptyHealth(const CHealth & health, const UnitInfoMock  & mock)
+static void checkEmptyHealth(const CHealth & health, const UnitMock  & mock)
 {
 	checkTotal(health, mock);
 	EXPECT_EQ(health.getCount(), 0);
@@ -47,13 +54,13 @@ static void checkEmptyHealth(const CHealth & health, const UnitInfoMock  & mock)
 	EXPECT_EQ(health.available(), 0);
 }
 
-static void checkFullHealth(const CHealth & health, const UnitInfoMock  & mock)
+static void checkFullHealth(const CHealth & health, const UnitMock  & mock)
 {
 	checkTotal(health, mock);
 	EXPECT_EQ(health.getCount(), mock.unitBaseAmount());
-	EXPECT_EQ(health.getFirstHPleft(), mock.unitMaxHealth());
+	EXPECT_EQ(health.getFirstHPleft(), mock.MaxHealth());
 	EXPECT_EQ(health.getResurrected(), 0);
-	EXPECT_EQ(health.available(), mock.unitMaxHealth() * mock.unitBaseAmount());
+	EXPECT_EQ(health.available(), mock.MaxHealth() * mock.unitBaseAmount());
 }
 
 static void checkDamage(CHealth & health, const int64_t initialDamage, const int64_t expectedDamage)
@@ -103,7 +110,7 @@ TEST_F(HealthTest, damage)
 	checkNormalDamage(health, 0);
 	checkFullHealth(health, mock);
 
-	checkNormalDamage(health, mock.unitMaxHealth() - 1);
+	checkNormalDamage(health, mock.MaxHealth() - 1);
 	EXPECT_EQ(health.getCount(), UNIT_AMOUNT);
 	EXPECT_EQ(health.getFirstHPleft(), 1);
 	EXPECT_EQ(health.getResurrected(), 0);
@@ -229,7 +236,11 @@ TEST_F(HealthTest, singleUnitStack)
 
 	//one Titan
 
-	EXPECT_CALL(mock, unitMaxHealth()).WillRepeatedly(Return(300));
+	EXPECT_CALL(mock, getAllBonuses(_, _, _, _)).WillRepeatedly(Invoke(&bonusMock, &BonusBearerMock::getAllBonuses));
+	EXPECT_CALL(mock, getTreeVersion()).WillRepeatedly(Return(1));
+
+	bonusMock.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, 300, 0));
+
 	EXPECT_CALL(mock, unitBaseAmount()).WillRepeatedly(Return(1));
 
 	health.init();

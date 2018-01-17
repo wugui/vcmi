@@ -129,7 +129,7 @@ public:
 		return obs->casterSpellPower;
 	}
 
-	int getEffectValue(const Spell * spell) const override
+	int64_t getEffectValue(const Spell * spell) const override
 	{
 		if(hero)
 			return hero->getEffectValue(spell);
@@ -5616,7 +5616,7 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 		BattleStackAttacked bsa;
 		bsa.attackerID = -1;
 		bsa.stackAttacked = defender->ID;
-		bsa.damageAmount = amountToDie * defender->unitMaxHealth();
+		bsa.damageAmount = amountToDie * defender->MaxHealth();
 		bsa.flags = BattleStackAttacked::SPELL_EFFECT;
 		bsa.spellID = SpellID::SLAYER;
 		defender->prepareAttacked(bsa, getRandomGenerator());
