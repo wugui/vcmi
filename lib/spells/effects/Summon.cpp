@@ -106,7 +106,7 @@ void Summon::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * 
 
 	for(auto & dest : target)
 	{
-		battle::NewUnitInfo info;
+		battle::UnitInfo info;
 		info.id = m->cb->battleNextUnitId();
 		info.count = amount;
 		info.type = creature;

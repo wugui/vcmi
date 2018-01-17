@@ -25,7 +25,7 @@ public:
 
 	StackWithBonuses(const HypotheticBattle * Owner, const CStack * Stack);
 
-	StackWithBonuses(const HypotheticBattle * Owner, const battle::NewUnitInfo & info);
+	StackWithBonuses(const HypotheticBattle * Owner, const battle::UnitInfo & info);
 
 	virtual ~StackWithBonuses();
 

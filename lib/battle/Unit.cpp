@@ -178,8 +178,8 @@ int Unit::getRawSurrenderCost() const
 		return 0;
 }
 
-///NewUnitInfo
-NewUnitInfo::NewUnitInfo()
+///UnitInfo
+UnitInfo::UnitInfo()
 	: id(0),
 	count(0),
 	type(),
@@ -189,7 +189,7 @@ NewUnitInfo::NewUnitInfo()
 {
 }
 
-void NewUnitInfo::serializeJson(JsonSerializeFormat & handler)
+void UnitInfo::serializeJson(JsonSerializeFormat & handler)
 {
 	handler.serializeInt("count", count);
 	handler.serializeId("type", type, CreatureID::NONE);
@@ -198,7 +198,7 @@ void NewUnitInfo::serializeJson(JsonSerializeFormat & handler)
 	handler.serializeBool("summoned", summoned);
 }
 
-void NewUnitInfo::toInfo(UnitChanges & info)
+void UnitInfo::toInfo(UnitChanges & info)
 {
 	info.id = id;
 	info.operation = UnitChanges::EOperation::ADD;
@@ -208,7 +208,7 @@ void NewUnitInfo::toInfo(UnitChanges & info)
 	ser.serializeStruct("newUnitInfo", *this);
 }
 
-void NewUnitInfo::fromInfo(const UnitChanges & info)
+void UnitInfo::fromInfo(const UnitChanges & info)
 {
 	id = info.id;
 

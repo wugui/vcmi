@@ -96,7 +96,7 @@ public:
 	int getRawSurrenderCost() const;
 };
 
-class DLL_LINKAGE NewUnitInfo
+class DLL_LINKAGE UnitInfo
 {
 public:
     uint32_t id;
@@ -106,7 +106,7 @@ public:
 	BattleHex position;
 	bool summoned;
 
-	NewUnitInfo();
+	UnitInfo();
 
 	void serializeJson(JsonSerializeFormat & handler);
 

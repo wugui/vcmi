@@ -61,7 +61,7 @@ void Clone::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m
 
 		auto unitId = m->cb->battleNextUnitId();
 
-		battle::NewUnitInfo info;
+		battle::UnitInfo info;
 		info.id = unitId;
 		info.count = clonedStack->getCount();
 		info.type = clonedStack->creatureId();

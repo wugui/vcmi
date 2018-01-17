@@ -4463,7 +4463,7 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 			ui64 canRiseHp = std::min(targetHealth, risedHp);
 			ui32 canRiseAmount = canRiseHp / summonedType.toCreature()->MaxHealth();
 
-			battle::NewUnitInfo info;
+			battle::UnitInfo info;
 			info.id = gs->curB->battleNextUnitId();
 			info.count = std::min(canRiseAmount, destStack->baseAmount);
 			info.type = summonedType;
@@ -5563,7 +5563,7 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 			(bonusAdditionalInfo == -1 && defender->getCreature()->idNumber == attacker->getCreature()->idNumber))
 			return;
 
-		battle::NewUnitInfo resurrectInfo;
+		battle::UnitInfo resurrectInfo;
 		resurrectInfo.id = gs->curB->battleNextUnitId();
 		resurrectInfo.summoned = false;
 		resurrectInfo.position = defender->getPosition();
@@ -5929,7 +5929,7 @@ void CGameHandler::runBattle()
 			{
 				if(accessibility.accessible(hex, guardianIsBig, stack->side)) //without this multiple creatures can occupy one hex
 				{
-					battle::NewUnitInfo info;
+					battle::UnitInfo info;
 					info.id = gs->curB->battleNextUnitId();
 					info.count =  std::max(1, (int)(stack->getCount() * 0.01 * summonInfo->val));
 					info.type = creatureData;

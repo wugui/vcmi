@@ -191,7 +191,7 @@ TEST_F(CGameStateTest, issue2765)
 	startTestBattle(attacker, defender);
 
 	{
-		battle::NewUnitInfo info;
+		battle::UnitInfo info;
 		info.id = gameState->curB->battleNextUnitId();
 		info.count = 1;
 		info.type = CreatureID(69);
@@ -272,7 +272,7 @@ TEST_F(CGameStateTest, battleResurrection)
 	uint32_t unitId = gameState->curB->battleNextUnitId();
 
 	{
-		battle::NewUnitInfo info;
+		battle::UnitInfo info;
 		info.id = unitId;
 		info.count = 10;
 		info.type = CreatureID(13);
@@ -287,7 +287,7 @@ TEST_F(CGameStateTest, battleResurrection)
 	}
 
 	{
-		battle::NewUnitInfo info;
+		battle::UnitInfo info;
 		info.id = gameState->curB->battleNextUnitId();
 		info.count = 10;
 		info.type = CreatureID(13);

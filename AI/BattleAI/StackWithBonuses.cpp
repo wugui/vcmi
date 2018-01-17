@@ -39,7 +39,7 @@ StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const CStack 
 	battle::CUnitState::operator=(*Stack);
 }
 
-StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const battle::NewUnitInfo & info)
+StackWithBonuses::StackWithBonuses(const HypotheticBattle * Owner, const battle::UnitInfo & info)
 	: battle::CUnitState(),
 	origBearer(nullptr),
 	owner(Owner),
@@ -286,7 +286,7 @@ void HypotheticBattle::nextTurn(uint32_t unitId)
 
 void HypotheticBattle::addUnit(const UnitChanges & changes)
 {
-	battle::NewUnitInfo info;
+	battle::UnitInfo info;
 	info.fromInfo(changes);
 
 	std::shared_ptr<StackWithBonuses> newUnit = std::make_shared<StackWithBonuses>(this, info);

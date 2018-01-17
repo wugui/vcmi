@@ -23,7 +23,7 @@ namespace vstd
 
 namespace battle
 {
-	class NewUnitInfo;
+	class UnitInfo;
 }
 
 

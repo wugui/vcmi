@@ -788,7 +788,7 @@ void BattleInfo::nextTurn(uint32_t unitId)
 
 void BattleInfo::addUnit(const UnitChanges & changes)
 {
-	battle::NewUnitInfo info;
+	battle::UnitInfo info;
 	info.fromInfo(changes);
 	CStackBasicDescriptor base(info.type, info.count);
 
