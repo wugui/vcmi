@@ -15,6 +15,7 @@
 #include "../CServerHandler.h"
 #include "../CGameInfo.h"
 #include "../gui/CGuiHandler.h"
+#include "../widgets/Buttons.h"
 #include "../../lib/NetPacks.h"
 #include "../../lib/serializer/Connection.h"
 
@@ -82,7 +83,16 @@ void UpdateStartOptions::apply(CSelectionScreen * selScreen)
 	if(!CSH->isGuest())
 		return;
 
-	selScreen->setSInfo(*options);
+	CSH->si = *startInfo;
+	if(CSH->current)
+		selScreen->opt->recreate(); //will force to recreate using current sInfo
+
+	selScreen->card->difficulty->setSelected(startInfo->difficulty);
+
+	if(selScreen->curTab == selScreen->randMapTab)
+		selScreen->randMapTab->setMapGenOptions(startInfo->mapGenOptions);
+
+	GH.totalRedraw();
 }
 
 void PregameGuiAction::apply(CSelectionScreen * selScreen)
@@ -178,7 +188,6 @@ void StartWithCurrentSettings::apply(CSelectionScreen * selScreen)
 	}
 	vstd::clear_pointer(selScreen->serverHandlingThread); //detach us
 
-	CSH->myPlayers = CSH->getMyIds();
 	CGP->showLoadingScreen(std::bind(&startGame));
 	throw 666; //EVIL, EVIL, EVIL workaround to kill thread (does "goto catch" outside listening loop)
 }

@@ -32,6 +32,7 @@
 //
 #include "CGameInfo.h"
 #include "../lib/mapping/CMap.h"
+#include "../lib/mapping/CMapInfo.h"
 #include "../lib/CGeneralTextHandler.h"
 
 extern std::string NAME;
@@ -234,7 +235,7 @@ std::set<PlayerColor> CServerHandler::getPlayers()
 	std::set<PlayerColor> players;
 	for(auto & elem : si.playerInfos)
 	{
-		if(isHost() && elem.second.connectedPlayerID == PlayerSettings::PLAYER_AI || vstd::contains(myPlayers, elem.second.connectedPlayerID))
+		if(isHost() && elem.second.connectedPlayerID == PlayerSettings::PLAYER_AI || vstd::contains(getMyIds(), elem.second.connectedPlayerID))
 		{
 			players.insert(elem.first); //add player
 		}
@@ -250,7 +251,7 @@ std::set<PlayerColor> CServerHandler::getHumanColors()
 	std::set<PlayerColor> players;
 	for(auto & elem : si.playerInfos)
 	{
-		if(vstd::contains(myPlayers, elem.second.connectedPlayerID))
+		if(vstd::contains(getMyIds(), elem.second.connectedPlayerID))
 		{
 			players.insert(elem.first); //add player
 		}
@@ -279,27 +280,25 @@ void CServerHandler::setPlayer(PlayerSettings & pset, ui8 player) const
 	pset.connectedPlayerID = player;
 }
 
-void CServerHandler::updateStartInfo(std::string filename, StartInfo & sInfo, const std::unique_ptr<CMapHeader> & mapHeader) const
+void CServerHandler::updateStartInfo()
 {
-	sInfo.playerInfos.clear();
-	if(!mapHeader.get())
-	{
+	si.playerInfos.clear();
+	if(!current)
 		return;
-	}
 
-	sInfo.mapname = filename;
+	si.mapname = current->fileURI;
 
 	auto namesIt = playerNames.cbegin();
 
-	for(int i = 0; i < mapHeader->players.size(); i++)
+	for(int i = 0; i < current->mapHeader->players.size(); i++)
 	{
-		const PlayerInfo & pinfo = mapHeader->players[i];
+		const PlayerInfo & pinfo = current->mapHeader->players[i];
 
 		//neither computer nor human can play - no player
 		if(!(pinfo.canHumanPlay || pinfo.canComputerPlay))
 			continue;
 
-		PlayerSettings & pset = sInfo.playerInfos[PlayerColor(i)];
+		PlayerSettings & pset = si.playerInfos[PlayerColor(i)];
 		pset.color = PlayerColor(i);
 		if(pinfo.canHumanPlay && namesIt != playerNames.cend())
 		{
