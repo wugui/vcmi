@@ -56,7 +56,7 @@ public:
 namespace spells
 {
 
-class BattleStateProxy
+class DLL_LINKAGE BattleStateProxy
 {
 public:
 	const bool describe;

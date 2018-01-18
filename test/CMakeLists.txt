@@ -18,6 +18,7 @@ set(test_SRCS
  		CVcmiTestConfig.cpp
 
  		battle/BattleHexTest.cpp
+ 		battle/CBattleInfoCallbackTest.cpp
  		battle/CHealthTest.cpp
 		battle/CUnitStateTest.cpp
 		battle/CUnitStateMagicTest.cpp
@@ -49,10 +50,11 @@ set(test_HEADERS
 assign_source_group(${test_SRCS} ${test_HEADERS})
 
 set(mock_HEADERS
-		mock/mock_spells_Spell.h
+		mock/mock_battle_IBattleState.h
 		mock/mock_battle_Unit.h
 		mock/mock_UnitInfo.h
 		mock/mock_UnitEnvironment.h
+		mock/mock_spells_Spell.h
 )
 
 add_subdirectory_with_folder("3rdparty" googletest EXCLUDE_FROM_ALL)

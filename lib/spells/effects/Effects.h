@@ -18,7 +18,7 @@ namespace spells
 namespace effects
 {
 
-class Effects
+class DLL_LINKAGE Effects
 {
 public:
 	using EffectsToApply = std::vector<std::pair<const Effect *, EffectTarget>>;

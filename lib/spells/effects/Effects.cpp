@@ -10,7 +10,6 @@
 #include "StdInc.h"
 
 #include "Effects.h"
-#include "Registry.h"
 
 #include "../ISpellMechanics.h"
 
@@ -144,16 +143,12 @@ void Effects::serializeJson(JsonSerializeFormat & handler, const int level)
 		std::string type;
 		handler.serializeString("type", type);
 
-		auto factory = Registry::get()->find(type);
-		if(!factory)
+		auto effect = Effect::create(type, level);
+		if(effect)
 		{
-			logGlobal->error("Unknown effect type '%s'", type);
-			continue;
+			effect->serializeJson(handler);
+			add(name, effect, level);
 		}
-
-		auto effect = std::shared_ptr<Effect>(factory->create(level));
-		effect->serializeJson(handler);
-		add(name, effect, level);
 	}
 }
 

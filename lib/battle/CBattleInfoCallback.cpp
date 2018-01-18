@@ -292,7 +292,7 @@ template <typename T>
 const T * takeOneUnit(std::vector<const T *> & all, const int turn, int8_t & lastMoved)
 {
 	const T * ret = nullptr;
-	unsigned i, //fastest stack
+	size_t i, //fastest stack
 			j=0; //fastest stack of the other side
 	for(i = 0; i < all.size(); i++)
 		if(all[i])
@@ -372,7 +372,7 @@ void CBattleInfoCallback::battleGetTurnOrder(std::vector<battle::Units> & out, c
 	// [1] - normal (unmoved) creatures, other war machines,
 	// [2] - waited cres that had morale,
 	// [3] - rest of waited cres
-	battle::Units phase[4];
+	std::array<battle::Units, 4> phase;
 
 	const battle::Unit * active = battleActiveUnit();
 
@@ -1817,25 +1817,30 @@ si8 CBattleInfoCallback::battleMaxSpellLevel(ui8 side) const
 
 boost::optional<int> CBattleInfoCallback::battleIsFinished() const
 {
-	auto stacks = battleGetAllStacks();
-
-	//checking winning condition
-	bool hasStack[2]; //hasStack[0] - true if attacker has a living stack; defender similarly
-	hasStack[0] = hasStack[1] = false;
-
-	for(auto & stack : stacks)
+	auto units = battleGetUnitsIf([=](const battle::Unit * unit)
 	{
-		if(stack->alive() && !stack->hasBonusOfType(Bonus::SIEGE_WEAPON))
+		return unit->alive() && !unit->isTurret() && unit->alive();
+	});
+
+	std::array<bool, 2> hasUnit = {false, false}; //index is BattleSide
+
+	for(auto & unit : units)
+	{
+		//todo: move SIEGE_WEAPON check to Unit state
+		if(!unit->hasBonusOfType(Bonus::SIEGE_WEAPON))
 		{
-			hasStack[stack->side] = true;
+			hasUnit.at(unit->unitSide()) = true;
 		}
+
+		if(hasUnit[0] && hasUnit[1])
+			break;
 	}
 
-	if(!hasStack[0] && !hasStack[1])
+	if(!hasUnit[0] && !hasUnit[1])
 		return 2;
-	if(!hasStack[1])
+	if(!hasUnit[1])
 		return 0;
-	if(!hasStack[0])
+	if(!hasUnit[0])
 		return 1;
 	return boost::none;
 }

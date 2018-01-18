@@ -10,6 +10,7 @@
 #include "StdInc.h"
 
 #include "Effect.h"
+#include "Registry.h"
 
 #include "../../serializer/JsonSerializeFormat.h"
 
@@ -43,6 +44,23 @@ void Effect::serializeJson(JsonSerializeFormat & handler)
 	handler.serializeBool("indirect", indirect, false);
 	handler.serializeBool("optional", optional, false);
 	serializeJsonEffect(handler);
+}
+
+std::shared_ptr<Effect> Effect::create(const std::string & type, const int level)
+{
+	auto factory = Registry::get()->find(type);
+
+	if(factory)
+	{
+		std::shared_ptr<Effect> ret;
+		ret.reset(factory->create(level));
+		return ret;
+	}
+	else
+	{
+		logGlobal->error("Unknown effect type '%s'", type);
+		return std::shared_ptr<Effect>();
+	}
 }
 
 }

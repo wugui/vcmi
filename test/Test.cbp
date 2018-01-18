@@ -77,6 +77,7 @@
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="battle/BattleHexTest.cpp" />
+		<Unit filename="battle/CBattleInfoCallbackTest.cpp" />
 		<Unit filename="battle/CHealthTest.cpp" />
 		<Unit filename="battle/CUnitStateMagicTest.cpp" />
 		<Unit filename="battle/CUnitStateTest.cpp" />
@@ -97,6 +98,7 @@
 		<Unit filename="mock/mock_MapService.h" />
 		<Unit filename="mock/mock_UnitEnvironment.h" />
 		<Unit filename="mock/mock_UnitInfo.h" />
+		<Unit filename="mock/mock_battle_IBattleState.h" />
 		<Unit filename="mock/mock_battle_Unit.h" />
 		<Unit filename="mock/mock_spells_Spell.h" />
 		<Extensions>

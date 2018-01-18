@@ -40,7 +40,7 @@ class RegisterEffect;
 
 using TargetType = ::spells::AimType;
 
-class Effect
+class DLL_LINKAGE Effect
 {
 public:
 	bool indirect;
@@ -65,6 +65,8 @@ public:
 	virtual EffectTarget transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const = 0;
 
 	void serializeJson(JsonSerializeFormat & handler);
+
+	static std::shared_ptr<Effect> create(const std::string & type, const int level);
 
 protected:
 	int spellLevel;
