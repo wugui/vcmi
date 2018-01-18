@@ -131,7 +131,7 @@ BattleAction CBattleAI::activeStack( const CStack * stack )
 			if(hlp.attack.shooting)
 				return BattleAction::makeShotAttack(stack, hlp.attack.defender);
 			else
-				return BattleAction::makeMeleeAttack(stack, hlp.attack.defender, hlp.tile);
+				return BattleAction::makeMeleeAttack(stack, hlp.attack.defender->getPosition(), hlp.tile);
 		}
 		else
 		{

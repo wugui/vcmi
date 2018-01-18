@@ -42,14 +42,14 @@ BattleAction BattleAction::makeDefend(const battle::Unit * stack)
 	return ba;
 }
 
-BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, const battle::Unit * attacked, BattleHex attackFrom, bool returnAfterAttack)
+BattleAction BattleAction::makeMeleeAttack(const battle::Unit * stack, BattleHex destination, BattleHex attackFrom, bool returnAfterAttack)
 {
 	BattleAction ba;
 	ba.side = stack->unitSide(); //FIXME: will it fail if stack mind controlled?
 	ba.actionType = EActionType::WALK_AND_ATTACK;
 	ba.stackNumber = stack->unitId();
 	ba.aimToHex(attackFrom);
-	ba.aimToUnit(attacked);
+	ba.aimToHex(destination);
 	if(returnAfterAttack && stack->hasBonusOfType(Bonus::RETURN_AFTER_STRIKE))
 		ba.aimToHex(stack->getPosition());
 	return ba;

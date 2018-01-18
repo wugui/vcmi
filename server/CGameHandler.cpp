@@ -4074,7 +4074,8 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 			}
 
 			BattleHex attackPos = target.at(0).hexValue;
-			const CStack * destinationStack = gs->curB->battleGetStackByID(target.at(1).unitValue->unitId());//FIXME: set same type for destinationStack and unitValue
+			BattleHex destinationTile = target.at(1).hexValue;
+			const CStack * destinationStack = gs->curB->battleGetStackByPos(destinationTile, true);
 
 			if(!destinationStack)
 			{
@@ -4133,7 +4134,7 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 				//move can cause death, eg. by walking into the moat
 				if(stack->alive() && destinationStack->alive())
 				{
-					makeAttack(stack, destinationStack, (i ? 0 : distance), destinationStack->getPosition(), i==0, false, false);//no distance travelled on second attack
+					makeAttack(stack, destinationStack, (i ? 0 : distance), destinationTile, i==0, false, false);//no distance travelled on second attack
 				}
 
 				//counterattack

@@ -2335,7 +2335,7 @@ void CBattleInterface::handleHex(BattleHex myNumber, int eventType)
 						BattleHex attackFromHex = fromWhichHexAttack(myNumber);
 						if(attackFromHex.isValid()) //we can be in this line when unreachable creature is L - clicked (as of revision 1308)
 						{
-							auto command = new BattleAction(BattleAction::makeMeleeAttack(activeStack, shere, attackFromHex, returnAfterAttack));
+							auto command = new BattleAction(BattleAction::makeMeleeAttack(activeStack, myNumber, attackFromHex, returnAfterAttack));
 							sendCommand(command, activeStack);
 						}
 					};
