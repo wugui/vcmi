@@ -19,6 +19,7 @@
 #include "../../battle/CBattleInfoCallback.h"
 #include "../../battle/Unit.h"
 #include "../../mapObjects/CGTownInstance.h"
+#include "../../serializer/JsonSerializeFormat.h"
 
 static const std::string EFFECT_NAME = "core:catapult";
 
@@ -30,7 +31,8 @@ namespace effects
 VCMI_REGISTER_SPELL_EFFECT(Catapult, EFFECT_NAME);
 
 Catapult::Catapult()
-	: LocationEffect()
+	: LocationEffect(),
+	targetsToAttack(0)
 {
 }
 
@@ -80,8 +82,6 @@ void Catapult::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics 
 	};
 
 	assert(possibleTargets.size() == EWallPart::PARTS_COUNT);
-
-	const int targetsToAttack = 2 + std::max<int>(m->getEffectLevel() - 1, 0);
 
 	CatapultAttack ca;
 	ca.attacker = -1;
@@ -147,6 +147,7 @@ void Catapult::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics 
 void Catapult::serializeJsonEffect(JsonSerializeFormat & handler)
 {
 	//TODO: add configuration unifying with Catapult ability
+	handler.serializeInt("targetsToAttack", targetsToAttack);
 }
 
 

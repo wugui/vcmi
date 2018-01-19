@@ -15,7 +15,7 @@ class JsonSerializeFormat;
 class JsonStructSerializer;
 class JsonArraySerializer;
 
-class IInstanceResolver
+class DLL_LINKAGE IInstanceResolver
 {
 public:
 	virtual ~IInstanceResolver(){};
@@ -23,7 +23,7 @@ public:
 	virtual std::string encode(si32 identifier) const = 0;
 };
 
-class JsonSerializeHelper: public boost::noncopyable
+class DLL_LINKAGE JsonSerializeHelper: public boost::noncopyable
 {
 public:
 	JsonSerializeHelper(JsonSerializeHelper && other);
@@ -39,7 +39,7 @@ private:
 	bool restoreState;
 };
 
-class JsonStructSerializer: public JsonSerializeHelper
+class DLL_LINKAGE JsonStructSerializer: public JsonSerializeHelper
 {
 public:
 	JsonStructSerializer(JsonStructSerializer && other);
@@ -51,7 +51,7 @@ protected:
 	friend class JsonArraySerializer;
 };
 
-class JsonArraySerializer: public JsonSerializeHelper
+class DLL_LINKAGE JsonArraySerializer: public JsonSerializeHelper
 {
 public:
 	JsonArraySerializer(JsonArraySerializer && other);
@@ -95,7 +95,7 @@ private:
 	void serializeInt64(const size_t index, int64_t & value);
 };
 
-class JsonSerializeFormat: public boost::noncopyable
+class DLL_LINKAGE JsonSerializeFormat: public boost::noncopyable
 {
 public:
 	///user-provided callback to resolve string identifier

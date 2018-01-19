@@ -275,10 +275,25 @@
 				"targetModifier":{"smart":true},
 				"battleEffects":{
 					"catapult":{
-						"type":"core:catapult"
+						"type":"core:catapult",
+						"targetsToAttack": 2
 					}
 				},
 				"range" : "X"
+			},
+			"advanced":{
+				"battleEffects":{
+					"catapult":{
+						"targetsToAttack": 3
+					}
+				}
+			},
+			"expert":{
+				"battleEffects":{
+					"catapult":{
+						"targetsToAttack": 4
+					}
+				}
 			}
 		},
 		"flags" : {

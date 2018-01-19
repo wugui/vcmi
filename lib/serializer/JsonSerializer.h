@@ -11,7 +11,7 @@
 
 #include  "JsonTreeSerializer.h"
 
-class JsonSerializer : public JsonTreeSerializer<JsonNode *>
+class DLL_LINKAGE JsonSerializer : public JsonTreeSerializer<JsonNode *>
 {
 public:
 	JsonSerializer(const IInstanceResolver * instanceResolver_, JsonNode & root_);

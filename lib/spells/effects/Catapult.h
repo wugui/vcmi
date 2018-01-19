@@ -28,6 +28,8 @@ public:
 
 protected:
 	void serializeJsonEffect(JsonSerializeFormat & handler) override;
+private:
+	int targetsToAttack;
 };
 
 }

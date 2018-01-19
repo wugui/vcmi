@@ -30,6 +30,9 @@ set(test_SRCS
  		map/CMapFormatTest.cpp
  		map/MapComparer.cpp
 
+		spells/effects/EffectFixture.cpp
+ 		spells/effects/CatapultTest.cpp
+
  		mock/mock_IGameCallback.cpp
  		mock/mock_MapService.cpp
  		mock/mock_BonusBearer.cpp
@@ -40,6 +43,8 @@ set(test_HEADERS
 
  		CVcmiTestConfig.h
  		map/MapComparer.h
+
+		spells/effects/EffectFixture.h
 
 		mock/mock_BonusBearer.h
  		mock/mock_IGameCallback.h
@@ -54,7 +59,10 @@ set(mock_HEADERS
 		mock/mock_battle_Unit.h
 		mock/mock_UnitInfo.h
 		mock/mock_UnitEnvironment.h
+		mock/mock_spells_Mechanics.h
+		mock/mock_spells_Problem.h
 		mock/mock_spells_Spell.h
+		mock/mock_vstd_RNG.h
 )
 
 add_subdirectory_with_folder("3rdparty" googletest EXCLUDE_FROM_ALL)

@@ -100,7 +100,13 @@
 		<Unit filename="mock/mock_UnitInfo.h" />
 		<Unit filename="mock/mock_battle_IBattleState.h" />
 		<Unit filename="mock/mock_battle_Unit.h" />
+		<Unit filename="mock/mock_spells_Mechanics.h" />
+		<Unit filename="mock/mock_spells_Problem.h" />
 		<Unit filename="mock/mock_spells_Spell.h" />
+		<Unit filename="mock/mock_vstd_RNG.h" />
+		<Unit filename="spells/effects/CatapultTest.cpp" />
+		<Unit filename="spells/effects/EffectFixture.cpp" />
+		<Unit filename="spells/effects/EffectFixture.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
