@@ -17,11 +17,10 @@ namespace spells
 namespace effects
 {
 
-
 class Catapult : public LocationEffect
 {
 public:
-	Catapult(const int level);
+	Catapult();
 	virtual ~Catapult();
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;

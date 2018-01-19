@@ -27,8 +27,8 @@ namespace effects
 {
 VCMI_REGISTER_SPELL_EFFECT(Teleport, EFFECT_NAME);
 
-Teleport::Teleport(const int level)
-	: UnitEffect(level)
+Teleport::Teleport()
+	: UnitEffect()
 {
 }
 
@@ -94,7 +94,8 @@ bool Teleport::prepareEffects(std::string & errorMessage, BattleStackMoved & pac
 		return false;
 	}
 
-	if(!m->cb->battleCanTeleportTo(targetUnit, destination, spellLevel))
+	//TODO: move here all teleport checks
+	if(!m->cb->battleCanTeleportTo(targetUnit, destination, m->getEffectLevel()))
 	{
 		errorMessage = "Forbidden teleport.";
 		return false;

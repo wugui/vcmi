@@ -28,8 +28,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Dispel, EFFECT_NAME);
 
-Dispel::Dispel(const int level)
-	: UnitEffect(level)
+Dispel::Dispel()
+	: UnitEffect()
 {
 
 }

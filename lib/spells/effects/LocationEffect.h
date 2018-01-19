@@ -21,7 +21,7 @@ namespace effects
 class LocationEffect : public Effect
 {
 public:
-	LocationEffect(const int level);
+	LocationEffect();
 	virtual ~LocationEffect();
 
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;

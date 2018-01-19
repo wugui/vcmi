@@ -29,8 +29,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Heal, EFFECT_NAME);
 
-Heal::Heal(const int level)
-	: UnitEffect(level),
+Heal::Heal()
+	: UnitEffect(),
 	healLevel(EHealLevel::HEAL),
 	healPower(EHealPower::PERMANENT),
 	minFullUnits(0)

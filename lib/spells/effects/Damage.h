@@ -22,7 +22,7 @@ namespace effects
 class Damage : public UnitEffect
 {
 public:
-	Damage(const int level);
+	Damage();
 	virtual ~Damage();
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;

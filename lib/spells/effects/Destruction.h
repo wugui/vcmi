@@ -20,7 +20,7 @@ namespace effects
 class Destruction : public Damage
 {
 public:
-	Destruction(const int level);
+	Destruction();
 	virtual ~Destruction();
 
 protected:

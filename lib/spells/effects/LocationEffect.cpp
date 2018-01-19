@@ -17,8 +17,8 @@ namespace spells
 namespace effects
 {
 
-LocationEffect::LocationEffect(const int level)
-	: Effect(level)
+LocationEffect::LocationEffect()
+	: Effect()
 {
 }
 

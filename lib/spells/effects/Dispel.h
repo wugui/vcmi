@@ -25,7 +25,7 @@ namespace effects
 class Dispel : public UnitEffect
 {
 public:
-	Dispel(const int level);
+	Dispel();
 	virtual ~Dispel();
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;

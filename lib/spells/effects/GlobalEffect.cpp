@@ -19,8 +19,8 @@ namespace spells
 namespace effects
 {
 
-GlobalEffect::GlobalEffect(const int level)
-	: Effect(level)
+GlobalEffect::GlobalEffect()
+	: Effect()
 {
 }
 

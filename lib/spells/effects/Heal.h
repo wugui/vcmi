@@ -23,7 +23,7 @@ namespace effects
 class Heal : public UnitEffect
 {
 public:
-	Heal(const int level);
+	Heal();
 	virtual ~Heal();
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;

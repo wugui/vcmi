@@ -19,10 +19,9 @@ namespace spells
 namespace effects
 {
 
-Effect::Effect(const int level)
+Effect::Effect()
 	: indirect(false),
-	optional(false),
-	spellLevel(level)
+	optional(false)
 {
 
 }
@@ -46,14 +45,14 @@ void Effect::serializeJson(JsonSerializeFormat & handler)
 	serializeJsonEffect(handler);
 }
 
-std::shared_ptr<Effect> Effect::create(const std::string & type, const int level)
+std::shared_ptr<Effect> Effect::create(const std::string & type)
 {
 	auto factory = Registry::get()->find(type);
 
 	if(factory)
 	{
 		std::shared_ptr<Effect> ret;
-		ret.reset(factory->create(level));
+		ret.reset(factory->create());
 		return ret;
 	}
 	else

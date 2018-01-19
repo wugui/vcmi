@@ -195,7 +195,7 @@ protected:
 class DLL_LINKAGE Mechanics
 {
 public:
-	Mechanics(const IBattleCast * event);
+	Mechanics();
 	virtual ~Mechanics();
 
 	virtual bool adaptProblem(ESpellCastProblem::ESpellCastProblem source, Problem & target) const = 0;

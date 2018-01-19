@@ -29,8 +29,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Damage, EFFECT_NAME);
 
-Damage::Damage(const int level)
-	: UnitEffect(level),
+Damage::Damage()
+	: UnitEffect(),
 	customEffectId(-1)
 {
 }

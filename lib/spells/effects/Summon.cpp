@@ -30,8 +30,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Summon, EFFECT_NAME);
 
-Summon::Summon(const int level)
-	: GlobalEffect(level),
+Summon::Summon()
+	: GlobalEffect(),
 	creature(),
 	permanent(false),
 	exclusive(true)

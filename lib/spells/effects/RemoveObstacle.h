@@ -25,7 +25,7 @@ namespace effects
 class RemoveObstacle : public LocationEffect
 {
 public:
-	RemoveObstacle(const int level);
+	RemoveObstacle();
 	virtual ~RemoveObstacle();
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;

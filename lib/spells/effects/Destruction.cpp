@@ -27,8 +27,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Destruction, EFFECT_NAME);
 
-Destruction::Destruction(const int level)
-	: Damage(level),
+Destruction::Destruction()
+	: Damage(),
 	killByPercentage(false)
 {
 

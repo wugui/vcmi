@@ -26,8 +26,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Clone, EFFECT_NAME);
 
-Clone::Clone(const int level)
-	: UnitEffect(level),
+Clone::Clone()
+	: UnitEffect(),
 	maxTier(0)
 {
 }

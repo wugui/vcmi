@@ -20,7 +20,7 @@ namespace effects
 class UnitEffect : public Effect
 {
 public:
-	UnitEffect(const int level);
+	UnitEffect();
 	virtual ~UnitEffect();
 
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;

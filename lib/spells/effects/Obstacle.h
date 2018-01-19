@@ -43,7 +43,7 @@ private:
 class Obstacle : public LocationEffect
 {
 public:
-	Obstacle(const int level);
+	Obstacle();
 	virtual ~Obstacle();
 
 	void adjustAffectedHexes(std::set<BattleHex> & hexes, const Mechanics * m, const Target & spellTarget) const override;

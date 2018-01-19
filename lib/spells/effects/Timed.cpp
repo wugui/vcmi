@@ -27,8 +27,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Timed, EFFECT_NAME);
 
-Timed::Timed(const int level)
-	: UnitEffect(level),
+Timed::Timed()
+	: UnitEffect(),
 	cumulative(false),
 	bonus()
 {

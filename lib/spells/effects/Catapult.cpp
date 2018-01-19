@@ -29,8 +29,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Catapult, EFFECT_NAME);
 
-Catapult::Catapult(const int level)
-	: LocationEffect(level)
+Catapult::Catapult()
+	: LocationEffect()
 {
 }
 
@@ -81,7 +81,7 @@ void Catapult::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics 
 
 	assert(possibleTargets.size() == EWallPart::PARTS_COUNT);
 
-	const int targetsToAttack = 2 + std::max<int>(spellLevel - 1, 0);
+	const int targetsToAttack = 2 + std::max<int>(m->getEffectLevel() - 1, 0);
 
 	CatapultAttack ca;
 	ca.attacker = -1;

@@ -23,8 +23,8 @@ namespace spells
 namespace effects
 {
 
-UnitEffect::UnitEffect(const int level)
-	: Effect(level),
+UnitEffect::UnitEffect()
+	: Effect(),
 	chainLength(0),
 	chainFactor(0.0),
 	ignoreImmunity(false)

@@ -143,7 +143,7 @@ void Effects::serializeJson(JsonSerializeFormat & handler, const int level)
 		std::string type;
 		handler.serializeString("type", type);
 
-		auto effect = Effect::create(type, level);
+		auto effect = Effect::create(type);
 		if(effect)
 		{
 			effect->serializeJson(handler);

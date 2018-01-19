@@ -20,7 +20,7 @@ namespace effects
 class Sacrifice : public Heal
 {
 public:
-	Sacrifice(const int level);
+	Sacrifice();
 	virtual ~Sacrifice();
 
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;

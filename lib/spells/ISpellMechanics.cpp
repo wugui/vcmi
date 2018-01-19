@@ -103,14 +103,14 @@ public:
 			if(s->isOffensiveSpell())
 			{
 				//default constructed object should be enough
-				effects->add("directDamage", std::make_shared<effects::Damage>(level), level);
+				effects->add("directDamage", std::make_shared<effects::Damage>(), level);
 			}
 
 			std::shared_ptr<effects::Effect> effect;
 
 			if(!levelInfo.effects.empty())
 			{
-				auto timed = new effects::Timed(level);
+				auto timed = new effects::Timed();
 				timed->cumulative = false;
 				timed->bonus = levelInfo.effects;
 				effect.reset(timed);
@@ -118,7 +118,7 @@ public:
 
 			if(!levelInfo.cumulativeEffects.empty())
 			{
-				auto timed = new effects::Timed(level);
+				auto timed = new effects::Timed();
 				timed->cumulative = true;
 				timed->bonus = levelInfo.cumulativeEffects;
 				effect.reset(timed);
@@ -441,25 +441,32 @@ std::unique_ptr<ISpellMechanicsFactory> ISpellMechanicsFactory::get(const CSpell
 }
 
 ///Mechanics
-Mechanics::Mechanics(const IBattleCast * event)
-	: cb(event->getBattle()),
-	caster(event->getCaster())
+Mechanics::Mechanics()
+	: cb(nullptr),
+	caster(nullptr),
+	casterUnit(nullptr),
+	casterSide(0)
 {
+
+}
+
+Mechanics::~Mechanics() = default;
+
+BaseMechanics::BaseMechanics(const IBattleCast * event)
+	: Mechanics(),
+	owner(event->getSpell()),
+	mode(event->getMode())
+{
+	cb = event->getBattle();
+	caster = event->getCaster();
+
 	casterUnit = dynamic_cast<const battle::Unit *>(caster);
 
 	//FIXME: ensure caster and check for valid player and side
 	casterSide = 0;
 	if(caster)
 		casterSide = cb->playerToSide(caster->getOwner()).get();
-}
 
-Mechanics::~Mechanics() = default;
-
-BaseMechanics::BaseMechanics(const IBattleCast * event)
-	: Mechanics(event),
-	owner(event->getSpell()),
-	mode(event->getMode())
-{
 	{
 		auto value = event->getRangeLevel();
 		if(value)

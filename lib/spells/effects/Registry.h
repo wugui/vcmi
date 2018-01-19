@@ -30,7 +30,7 @@ public:
 	IEffectFactory() = default;
 	virtual ~IEffectFactory() = default;
 
-	virtual Effect * create(const int level) const = 0;
+	virtual Effect * create() const = 0;
 };
 
 class Registry
@@ -52,9 +52,9 @@ public:
 	EffectFactory() = default;
 	virtual ~EffectFactory() = default;
 
-	Effect * create(const int level) const override
+	Effect * create() const override
 	{
-		return new E(level);
+		return new E();
 	}
 };
 

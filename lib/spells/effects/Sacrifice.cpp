@@ -29,8 +29,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(Sacrifice, EFFECT_NAME);
 
-Sacrifice::Sacrifice(const int level)
-	: Heal(level)
+Sacrifice::Sacrifice()
+	: Heal()
 {
 
 }

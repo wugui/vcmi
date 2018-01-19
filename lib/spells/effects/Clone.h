@@ -20,7 +20,7 @@ namespace effects
 class Clone : public UnitEffect
 {
 public:
-	Clone(const int level);
+	Clone();
 	virtual ~Clone();
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;

@@ -27,7 +27,7 @@ public:
 	bool cumulative;
 	std::vector<std::shared_ptr<Bonus>> bonus;
 
-	Timed(const int level);
+	Timed();
 	virtual ~Timed();
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;

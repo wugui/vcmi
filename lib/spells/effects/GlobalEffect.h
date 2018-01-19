@@ -20,7 +20,7 @@ namespace effects
 class GlobalEffect : public Effect
 {
 public:
-	GlobalEffect(const int level);
+	GlobalEffect();
 	virtual ~GlobalEffect();
 
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;

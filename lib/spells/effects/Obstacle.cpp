@@ -96,8 +96,8 @@ void ObstacleSideOptions::serializeRelativeShape(JsonSerializeFormat & handler, 
 	}
 }
 
-Obstacle::Obstacle(const int level)
-	: LocationEffect(level),
+Obstacle::Obstacle()
+	: LocationEffect(),
 	hidden(false),
 	passable(false),
 	trigger(false),
@@ -300,7 +300,7 @@ void Obstacle::placeObstacles(BattleStateProxy * battleState, const Mechanics * 
 
 		obstacle.turnsRemaining = turnsRemaining;
 		obstacle.casterSpellPower = m->getEffectPower();
-		obstacle.spellLevel = spellLevel;
+		obstacle.spellLevel = m->getEffectLevel();//todo: level of indirect effect should be also configurable
 		obstacle.casterSide = m->casterSide;
 
 		obstacle.hidden = hidden;

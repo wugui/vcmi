@@ -22,7 +22,7 @@ namespace effects
 class Teleport : public UnitEffect
 {
 public:
-	Teleport(const int level);
+	Teleport();
 	virtual ~Teleport();
 
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;

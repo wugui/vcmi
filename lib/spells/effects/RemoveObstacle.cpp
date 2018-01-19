@@ -29,8 +29,8 @@ namespace effects
 
 VCMI_REGISTER_SPELL_EFFECT(RemoveObstacle, EFFECT_NAME);
 
-RemoveObstacle::RemoveObstacle(const int level)
-	: LocationEffect(level),
+RemoveObstacle::RemoveObstacle()
+	: LocationEffect(),
 	removeAbsolute(false),
 	removeUsual(false),
 	removeAllSpells(false)

@@ -48,7 +48,7 @@ public:
 
 	std::string name;
 
-	Effect(const int level);
+	Effect();
 	virtual ~Effect();
 
 	virtual void adjustTargetTypes(std::vector<TargetType> & types) const = 0;
@@ -66,11 +66,9 @@ public:
 
 	void serializeJson(JsonSerializeFormat & handler);
 
-	static std::shared_ptr<Effect> create(const std::string & type, const int level);
+	static std::shared_ptr<Effect> create(const std::string & type);
 
 protected:
-	int spellLevel;
-
 	virtual void serializeJsonEffect(JsonSerializeFormat & handler) = 0;
 };
 

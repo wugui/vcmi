@@ -23,7 +23,7 @@ class Summon : public GlobalEffect
 public:
 	CreatureID creature;
 
-	Summon(const int level);
+	Summon();
 	virtual ~Summon();
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;

@@ -22,7 +22,7 @@ public:
 	UnitInfoMock infoMock;
 	UnitEnvironmentMock envMock;
 	BonusBearerMock bonusMock;
-	SpellMock spellMock;
+	spells::SpellMock spellMock;
 
 	const CCreature * pikeman;
 
