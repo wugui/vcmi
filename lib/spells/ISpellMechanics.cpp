@@ -443,7 +443,6 @@ std::unique_ptr<ISpellMechanicsFactory> ISpellMechanicsFactory::get(const CSpell
 ///Mechanics
 Mechanics::Mechanics(const IBattleCast * event)
 	: cb(event->getBattle()),
-	mode(event->getMode()),
 	caster(event->getCaster())
 {
 	casterUnit = dynamic_cast<const battle::Unit *>(caster);
@@ -458,7 +457,8 @@ Mechanics::~Mechanics() = default;
 
 BaseMechanics::BaseMechanics(const IBattleCast * event)
 	: Mechanics(event),
-	owner(event->getSpell())
+	owner(event->getSpell()),
+	mode(event->getMode())
 {
 	{
 		auto value = event->getRangeLevel();
@@ -619,6 +619,11 @@ bool BaseMechanics::requiresClearTiles() const
 {
 	const CSpell::TargetInfo targetInfo(owner, getRangeLevel(), mode);
 	return targetInfo.clearAffected;
+}
+
+bool BaseMechanics::alwaysHitFirstTarget() const
+{
+	return mode == Mode::SPELL_LIKE_ATTACK;
 }
 
 bool BaseMechanics::isNegativeSpell() const

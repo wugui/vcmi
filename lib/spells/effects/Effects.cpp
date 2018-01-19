@@ -112,7 +112,7 @@ Effects::EffectsToApply Effects::prepare(const Mechanics * m, const Target & aim
 		//todo: find a better way to handle such special cases
 
 		if(m->getSpellIndex() == SpellID::RESURRECTION && e->name == "cure")
-			applyThis = m->mode == Mode::CREATURE_ACTIVE;
+			applyThis = (m->casterUnit != nullptr);
 		else
 			applyThis = !e->indirect;
 

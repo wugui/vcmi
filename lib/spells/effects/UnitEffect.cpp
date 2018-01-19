@@ -181,7 +181,7 @@ EffectTarget UnitEffect::transformTargetByRange(const Mechanics * m, const Targe
 
 	vstd::erase_if(targets, predicate);
 
-	if(m->mode == Mode::SPELL_LIKE_ATTACK)
+	if(m->alwaysHitFirstTarget())
 	{
 		if(!aimPoint.empty() && aimPoint.front().unitValue)
 			targets.insert(aimPoint.front().unitValue);
@@ -235,7 +235,7 @@ EffectTarget UnitEffect::transformTargetByChain(const Mechanics * m, const Targe
 
 		if(!unit)
 			break;
-		if(m->mode == Mode::SPELL_LIKE_ATTACK && targetIndex == 0)
+		if(m->alwaysHitFirstTarget() && targetIndex == 0)
 			effectTarget.emplace_back(unit);
 		else if(isReceptive(m, unit) && isValidTarget(m, unit))
 			effectTarget.emplace_back(unit);

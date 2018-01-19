@@ -237,6 +237,7 @@ public:
 
 	virtual bool isSmart() const = 0;
 	virtual bool isMassive() const = 0;
+	virtual bool alwaysHitFirstTarget() const = 0;
 	virtual bool requiresClearTiles() const = 0;
 
 	virtual bool isNegativeSpell() const = 0;
@@ -252,7 +253,6 @@ public:
 	//Battle facade
 	virtual bool ownerMatches(const battle::Unit * unit) const = 0;
 
-	Mode mode;
 	const CBattleInfoCallback * cb;
 	const Caster * caster;
 
@@ -286,6 +286,7 @@ public:
 	bool isSmart() const override;
 	bool isMassive() const override;
 	bool requiresClearTiles() const override;
+	bool alwaysHitFirstTarget() const override;
 
 	bool isNegativeSpell() const override;
 	bool isPositiveSpell() const override;
@@ -303,7 +304,7 @@ public:
 
 protected:
 	const CSpell * owner;
-
+	Mode mode;
 private:
 
     IBattleCast::Value rangeLevel;
