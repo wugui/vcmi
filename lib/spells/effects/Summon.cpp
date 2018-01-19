@@ -42,18 +42,6 @@ Summon::~Summon() = default;
 
 bool Summon::applicable(Problem & problem, const Mechanics * m) const
 {
-	auto mode = m->mode;
-	if(mode == Mode::AFTER_ATTACK || mode == Mode::BEFORE_ATTACK || mode == Mode::SPELL_LIKE_ATTACK || mode == Mode::MAGIC_MIRROR)
-	{
-		//should not even try to do it
-		MetaString text;
-		text.addReplacement("Invalid spell cast attempt: spell %s, mode %d");
-		text.addReplacement(MetaString::SPELL_NAME, m->getSpellIndex());
-		text.addReplacement2(int(mode));
-		problem.add(std::move(text), Problem::CRITICAL);
-		return false;
-	}
-
 	if(!exclusive)
 		return true;
 

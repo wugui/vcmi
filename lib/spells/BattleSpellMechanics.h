@@ -22,7 +22,7 @@ namespace spells
 class BattleSpellMechanics : public BaseMechanics
 {
 public:
-	BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> e);
+	BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> effects_, std::shared_ptr<TargetCondition> targetCondition_);
 	virtual ~BattleSpellMechanics();
 
 	void applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const override;
@@ -38,17 +38,18 @@ public:
 	std::vector<AimType> getTargetTypes() const override final;
 	std::vector<Destination> getPossibleDestinations(size_t index, AimType aimType, const Target & current) const override final;
 
+	bool isReceptive(const battle::Unit * target) const override;
+
 	std::vector<BattleHex> rangeInHexes(BattleHex centralHex, bool * outDroppedHexes = nullptr) const override;
 
 	bool counteringSelector(const Bonus * bonus) const;
 
 private:
+	std::shared_ptr<effects::Effects> effects;
+	std::shared_ptr<TargetCondition> targetCondition;
 
 	std::vector<const battle::Unit *> affectedUnits;
-
 	effects::Effects::EffectsToApply effectsToApply;
-
-	std::shared_ptr<effects::Effects> effects;
 
 	void beforeCast(BattleSpellCast & sc, vstd::RNG & rng, const Target & target);
 

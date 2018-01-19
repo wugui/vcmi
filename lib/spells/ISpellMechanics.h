@@ -264,14 +264,11 @@ public:
 class DLL_LINKAGE BaseMechanics : public Mechanics
 {
 public:
-	std::shared_ptr<TargetCondition> targetCondition;
-
 	BaseMechanics(const IBattleCast * event);
 	virtual ~BaseMechanics();
 
 	bool adaptProblem(ESpellCastProblem::ESpellCastProblem source, Problem & target) const override;
 	bool adaptGenericProblem(Problem & target) const override;
-	bool isReceptive(const battle::Unit * target) const override;
 
 	int32_t getSpellIndex() const override;
 	SpellID getSpellId() const override;

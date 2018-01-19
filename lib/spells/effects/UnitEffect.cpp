@@ -48,28 +48,19 @@ bool UnitEffect::applicable(Problem & problem, const Mechanics * m) const
 {
 	//stack effect is applicable in general if there is at least one smart target
 
-	switch(m->mode)
-	{
-	case Mode::HERO:
-	case Mode::CREATURE_ACTIVE:
-	case Mode::ENCHANTER:
-	case Mode::PASSIVE:
-		{
-			auto mainFilter = std::bind(&UnitEffect::getStackFilter, this, m, true, _1);
-			auto predicate = std::bind(&UnitEffect::eraseByImmunityFilter, this, m, _1);
+	auto mainFilter = std::bind(&UnitEffect::getStackFilter, this, m, true, _1);
+	auto predicate = std::bind(&UnitEffect::eraseByImmunityFilter, this, m, _1);
 
-			auto targets = m->cb->battleGetUnitsIf(mainFilter);
-			vstd::erase_if(targets, predicate);
-			if(targets.empty())
-			{
-				MetaString text;
-				text.addTxt(MetaString::GENERAL_TXT, 185);
-				problem.add(std::move(text), Problem::NORMAL);
-				return false;
-			}
-		}
-		break;
+	auto targets = m->cb->battleGetUnitsIf(mainFilter);
+	vstd::erase_if(targets, predicate);
+	if(targets.empty())
+	{
+		MetaString text;
+		text.addTxt(MetaString::GENERAL_TXT, 185);
+		problem.add(std::move(text), Problem::NORMAL);
+		return false;
 	}
+
 
 	return true;
 }
@@ -83,7 +74,6 @@ bool UnitEffect::applicable(Problem & problem, const Mechanics * m, const Target
 		if(item.unitValue)
 			if(getStackFilter(m, true, item.unitValue))
 				return true;
-
 
 	return false;
 }

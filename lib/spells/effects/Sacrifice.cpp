@@ -61,45 +61,32 @@ void Sacrifice::adjustTargetTypes(std::vector<TargetType> & types) const
 
 bool Sacrifice::applicable(Problem & problem, const Mechanics * m) const
 {
-	auto mode = m->mode;
+	auto mainFilter = std::bind(&UnitEffect::getStackFilter, this, m, true, _1);
+	auto predicate = std::bind(&UnitEffect::eraseByImmunityFilter, this, m, _1);
 
-	switch(mode)
+	auto targets = m->cb->battleGetUnitsIf(mainFilter);
+	vstd::erase_if(targets, predicate);
+
+	bool targetExists = false;
+	bool targetToSacrificeExists = false;
+
+	for(auto & target : targets)
 	{
-	case Mode::HERO:
-	case Mode::CREATURE_ACTIVE:
-		{
-			auto mainFilter = std::bind(&UnitEffect::getStackFilter, this, m, true, _1);
-			auto predicate = std::bind(&UnitEffect::eraseByImmunityFilter, this, m, _1);
+		if(target->alive())
+			targetToSacrificeExists = true;
+		else if(target->isDead())
+			targetExists = true;
 
-			auto targets = m->cb->battleGetUnitsIf(mainFilter);
-			vstd::erase_if(targets, predicate);
+		if(targetExists && targetToSacrificeExists)
+			break;
+	}
 
-			bool targetExists = false;
-			bool targetToSacrificeExists = false;
-
-			for(auto & target : targets)
-			{
-				if(target->alive())
-					targetToSacrificeExists = true;
-				else if(target->isDead())
-					targetExists = true;
-
-				if(targetExists && targetToSacrificeExists)
-					break;
-			}
-
-			if(!(targetExists && targetToSacrificeExists))
-			{
-				MetaString text;
-				text.addTxt(MetaString::GENERAL_TXT, 185);
-				problem.add(std::move(text), Problem::NORMAL);
-				return false;
-			}
-		}
-		break;
-	default:
-		logGlobal->warn("Invalid mode for Sacrifice effect: spell %s, mode %d", m->getSpellName(), (int)mode); //should not even try to do it
-		return m->adaptProblem(ESpellCastProblem::INVALID, problem);
+	if(!(targetExists && targetToSacrificeExists))
+	{
+		MetaString text;
+		text.addTxt(MetaString::GENERAL_TXT, 185);
+		problem.add(std::move(text), Problem::NORMAL);
+		return false;
 	}
 
 	return true;
@@ -121,7 +108,7 @@ bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const Target 
     if(target.size() == 2)
 	{
 		auto victim = target.at(1).unitValue;
-		if(!victim->alive() || getStackFilter(m ,false, victim))
+		if(!victim->alive() || !getStackFilter(m, false, victim))
 			return false;
 	}
 
@@ -175,7 +162,7 @@ EffectTarget Sacrifice::transformTarget(const Mechanics * m, const Target & aimP
 	if(aimPoint.size() >= 2)
 	{
 		auto victim = aimPoint.at(1).unitValue;
-		if(getStackFilter(m, false, victim))
+		if(victim && getStackFilter(m, false, victim))
 			res.emplace_back(victim);
 	}
 

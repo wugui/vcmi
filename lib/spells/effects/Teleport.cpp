@@ -58,12 +58,6 @@ void Teleport::adjustTargetTypes(std::vector<TargetType> & types) const
 
 bool Teleport::applicable(Problem & problem, const Mechanics * m) const
 {
-	auto mode = m->mode;
-	if(mode == Mode::AFTER_ATTACK || mode == Mode::BEFORE_ATTACK || mode == Mode::SPELL_LIKE_ATTACK || mode == Mode::MAGIC_MIRROR)
-	{
-		logGlobal->warn("Invalid spell cast attempt: spell %s, mode %d", m->getSpellName(), (int)mode); //should not even try to do it
-		return m->adaptProblem(ESpellCastProblem::INVALID, problem);
-	}
 	return UnitEffect::applicable(problem, m);
 }
 

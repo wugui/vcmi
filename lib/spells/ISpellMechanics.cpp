@@ -50,33 +50,12 @@ static std::shared_ptr<TargetCondition> makeCondition(const CSpell * s)
 	return res;
 }
 
-template<typename T>
-class SpellMechanicsFactory : public ISpellMechanicsFactory
-{
-public:
-	SpellMechanicsFactory(const CSpell * s)
-		: ISpellMechanicsFactory(s)
-	{
-		targetCondition = makeCondition(s);
-	}
-
-	std::unique_ptr<Mechanics> create(const IBattleCast * event) const override
-	{
-		T * ret = new T(event);
-		ret->targetCondition = targetCondition;
-		return std::unique_ptr<Mechanics>(ret);
-	}
-private:
-	std::shared_ptr<TargetCondition> targetCondition;
-};
-
 class CustomMechanicsFactory : public ISpellMechanicsFactory
 {
 public:
 	std::unique_ptr<Mechanics> create(const IBattleCast * event) const override
 	{
-		BattleSpellMechanics * ret = new BattleSpellMechanics(event, effects);
-		ret->targetCondition = targetCondition;
+		BattleSpellMechanics * ret = new BattleSpellMechanics(event, effects, targetCondition);
 		return std::unique_ptr<Mechanics>(ret);
 	}
 protected:
@@ -602,11 +581,6 @@ bool BaseMechanics::adaptProblem(ESpellCastProblem::ESpellCastProblem source, Pr
 	}
 
 	return false;
-}
-
-bool BaseMechanics::isReceptive(const battle::Unit * target) const
-{
-	return targetCondition->isReceptive(cb, caster, this, target);
 }
 
 int32_t BaseMechanics::getSpellIndex() const
