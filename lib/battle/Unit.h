@@ -41,7 +41,7 @@ public:
 
 	bool isDead() const;
 	bool isTurret() const;
-	bool isValidTarget(bool allowDead = false) const; //non-turret non-ghost stacks (can be attacked or be object of magic effect)
+	virtual bool isValidTarget(bool allowDead = false) const = 0; //non-turret non-ghost stacks (can be attacked or be object of magic effect)
 
 	virtual bool isClone() const = 0;
 	virtual bool hasClone() const = 0;
@@ -69,7 +69,7 @@ public:
 	virtual bool willMove(int turn = 0) const = 0; //if stack has remaining move this turn
 	virtual bool waited(int turn = 0) const = 0;
 
-	virtual std::shared_ptr<CUnitState> asquire() const = 0;
+	virtual std::shared_ptr<CUnitState> acquire() const = 0;
 
 	virtual int battleQueuePhase(int turn) const = 0;
 

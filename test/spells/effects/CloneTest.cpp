@@ -36,7 +36,7 @@ protected:
 	}
 };
 
-TEST_F(CloneTest, UnitIsClonable)
+TEST_F(CloneTest, ApplicableToValidTarget)
 {
 	{
 		JsonNode config(JsonNode::JsonType::DATA_STRUCT);
@@ -45,16 +45,16 @@ TEST_F(CloneTest, UnitIsClonable)
 	}
 
 	auto & unit = unitsFake.add(BattleSide::ATTACKER);
-	unit.makeAlive();
 
-	EXPECT_CALL(unit, getPosition()).WillRepeatedly(Return(BattleHex(5,5)));
-	EXPECT_CALL(unit, creatureIndex()).Times(AtLeast(1)).WillRepeatedly(Return(CreatureID(0)));
+	EXPECT_CALL(unit, isValidTarget(Eq(false))).Times(AtLeast(1)).WillRepeatedly(Return(true));
+
 	EXPECT_CALL(unit, hasClone()).WillRepeatedly(Return(false));
 	EXPECT_CALL(unit, isClone()).Times(AtLeast(1)).WillRepeatedly(Return(false));
 
 	EXPECT_CALL(mechanicsMock, ownerMatches(Eq(&unit))).Times(AtLeast(1)).WillRepeatedly(Return(true));
 	EXPECT_CALL(mechanicsMock, isSmart()).Times(AtLeast(1)).WillRepeatedly(Return(true));
 
+	EXPECT_CALL(unit, getPosition()).WillOnce(Return(BattleHex(5, 5)));
 	EffectTarget target;
 	target.emplace_back(&unit);
 
@@ -64,12 +64,11 @@ TEST_F(CloneTest, UnitIsClonable)
 TEST_F(CloneTest, CloneIsNotClonable)
 {
 	auto & unit = unitsFake.add(BattleSide::ATTACKER);
-	unit.makeAlive();
 
-	EXPECT_CALL(unit, getPosition()).WillRepeatedly(Return(BattleHex(5,5)));
 	EXPECT_CALL(unit, hasClone()).WillRepeatedly(Return(false));
 	EXPECT_CALL(unit, isClone()).Times(AtLeast(1)).WillRepeatedly(Return(true));
 
+	EXPECT_CALL(unit, getPosition()).WillOnce(Return(BattleHex(5, 5)));
 	EffectTarget target;
 	target.emplace_back(&unit);
 
@@ -79,12 +78,11 @@ TEST_F(CloneTest, CloneIsNotClonable)
 TEST_F(CloneTest, SecondCloneRejected)
 {
 	auto & unit = unitsFake.add(BattleSide::ATTACKER);
-	unit.makeAlive();
 
-	EXPECT_CALL(unit, getPosition()).WillRepeatedly(Return(BattleHex(5,5)));
 	EXPECT_CALL(unit, hasClone()).Times(AtLeast(1)).WillRepeatedly(Return(true));
 	EXPECT_CALL(unit, isClone()).WillRepeatedly(Return(false));
 
+	EXPECT_CALL(unit, getPosition()).WillOnce(Return(BattleHex(5, 5)));
 	EffectTarget target;
 	target.emplace_back(&unit);
 
@@ -116,12 +114,12 @@ public:
 		using namespace ::battle;
 
 		UnitFake & clone = unitsFake.add(BattleSide::ATTACKER);
-		clone.makeAlive();
+
 		EXPECT_CALL(clone, unitId()).WillRepeatedly(Return(changes.id));
 
 		cloneState = std::make_shared<CUnitStateDetached>(&clone, &clone);
 
-		EXPECT_CALL(clone, asquire()).WillOnce(Return(cloneState));
+		EXPECT_CALL(clone, acquire()).WillOnce(Return(cloneState));
 
 		cloneAddInfo->fromInfo(changes);
 	}
@@ -154,7 +152,7 @@ public:
 		EXPECT_CALL(*battleFake, setUnitState(_)).Times(AtLeast(1));
 
 		auto & original = unitsFake.add(BattleSide::ATTACKER);
-		original.makeAlive();
+		EXPECT_CALL(original, isValidTarget(Eq(false))).Times(AtLeast(1)).WillRepeatedly(Return(true));
 		EXPECT_CALL(original, getCount()).WillRepeatedly(Return(expectedAmount));
 		EXPECT_CALL(original, unitId()).WillRepeatedly(Return(originalId));
 		EXPECT_CALL(original, creatureId()).WillRepeatedly(Return(CreatureID(0)));
@@ -164,7 +162,7 @@ public:
 
 		originalState = std::make_shared<CUnitStateDetached>(&original, &original);
 
-		EXPECT_CALL(original, asquire()).WillOnce(Return(originalState));
+		EXPECT_CALL(original, acquire()).WillOnce(Return(originalState));
 
 		target.emplace_back(&original);
 	}

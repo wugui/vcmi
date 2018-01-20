@@ -117,7 +117,7 @@ void Heal::prepareHealEffect(int64_t value, BattleUnitsChanged & pack, RNG & rng
 		{
 			auto unitHPgained = m->applySpellBonus(value, unit);
 
-			auto state = unit->asquire();
+			auto state = unit->acquire();
 			state->heal(unitHPgained, healLevel, healPower);
 
 			if(unitHPgained > 0)

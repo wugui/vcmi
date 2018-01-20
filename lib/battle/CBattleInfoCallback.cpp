@@ -900,7 +900,7 @@ TDmgRange CBattleInfoCallback::battleEstimateDamage(const BattleAttackInfo & bai
 			{
 				auto retaliationAttack = bai.reverse();
 				int64_t dmg = ret.*pairElems[i];
-				auto state = retaliationAttack.attacker->asquire();
+				auto state = retaliationAttack.attacker->acquire();
 				state->damage(dmg);
 				retaliationAttack.attacker = state.get();
 				retaliationDmg->*pairElems[!i] = calculateDmgRange(retaliationAttack).*pairElems[!i];

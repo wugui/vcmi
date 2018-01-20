@@ -32,11 +32,6 @@ bool Unit::isTurret() const
 	return creatureIndex() == CreatureID::ARROW_TOWERS;
 }
 
-bool Unit::isValidTarget(bool allowDead) const
-{
-	return (alive() || (allowDead && isDead())) && getPosition().isValid() && !isTurret();
-}
-
 std::string Unit::getDescription() const
 {
 	boost::format fmt("Unit %d of side %d");

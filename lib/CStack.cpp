@@ -186,7 +186,7 @@ std::string CStack::nodeName() const
 
 void CStack::prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand) const
 {
-	auto newState = asquire();
+	auto newState = acquire();
 	prepareAttacked(bsa, rand, newState);
 }
 
@@ -196,9 +196,9 @@ void CStack::prepareAttacked(BattleStackAttacked & bsa, vstd::RNG & rand, std::s
 
 	customState->damage(bsa.damageAmount);
 
-	bsa.killedAmount = initialCount- customState->getCount();
+	bsa.killedAmount = initialCount - customState->getCount();
 
-	if(!customState->alive() && customState->cloned)
+	if(!customState->alive() && customState->isClone())
 	{
 		bsa.flags |= BattleStackAttacked::CLONE_KILLED;
 	}

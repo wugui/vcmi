@@ -79,12 +79,12 @@ void Clone::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m
 		BattleUnitsChanged cloneFlags;
 
 		auto cloneUnit = m->cb->battleGetUnitByID(unitId);
-		auto cloneState = cloneUnit->asquire();
+		auto cloneState = cloneUnit->acquire();
 		cloneState->cloned = true;
 		cloneFlags.changedStacks.emplace_back();
 		cloneState->toInfo(cloneFlags.changedStacks.back());
 
-		auto originalState = clonedStack->asquire();
+		auto originalState = clonedStack->acquire();
 		originalState->cloneID = unitId;
 		cloneFlags.changedStacks.emplace_back();
 		originalState->toInfo(cloneFlags.changedStacks.back());

@@ -24,6 +24,7 @@ public:
 	~Destination();
 	explicit Destination(const Unit * destination);
 	explicit Destination(const BattleHex & destination);
+	explicit Destination(const Unit * destination, const BattleHex & exactHex);
 
 	Destination(const Destination & other);
 

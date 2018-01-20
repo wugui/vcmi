@@ -38,6 +38,7 @@ public:
 		void addNewBonus(const std::shared_ptr<Bonus> & b);
 
 		void makeAlive();
+		void makeDead();
 
 		void redirectBonusesToFake();
 

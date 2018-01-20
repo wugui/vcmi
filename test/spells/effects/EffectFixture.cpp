@@ -29,7 +29,13 @@ void EffectFixture::UnitFake::addNewBonus(const std::shared_ptr<Bonus> & b)
 
 void EffectFixture::UnitFake::makeAlive()
 {
-	EXPECT_CALL(*this, alive()).WillRepeatedly(Return(true));
+	EXPECT_CALL(*this, alive()).Times(AtLeast(1)).WillRepeatedly(Return(true));
+}
+
+void EffectFixture::UnitFake::makeDead()
+{
+	EXPECT_CALL(*this, alive()).Times(AtLeast(1)).WillRepeatedly(Return(false));
+	EXPECT_CALL(*this, isGhost()).Times(AtLeast(1)).WillRepeatedly(Return(false));
 }
 
 void EffectFixture::UnitFake::redirectBonusesToFake()

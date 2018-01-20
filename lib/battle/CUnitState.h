@@ -232,6 +232,7 @@ public:
 	bool ableToRetaliate() const override;
 	bool alive() const override;
 	bool isGhost() const override;
+	bool isValidTarget(bool allowDead = false) const override;
 
 	bool isClone() const override;
 	bool hasClone() const override;
@@ -258,7 +259,7 @@ public:
 	bool willMove(int turn = 0) const override;
 	bool waited(int turn = 0) const override;
 
-	std::shared_ptr<CUnitState> asquire() const override;
+	std::shared_ptr<CUnitState> acquire() const override;
 
 	int battleQueuePhase(int turn) const override;
 

@@ -33,6 +33,7 @@ set(test_SRCS
 		spells/effects/EffectFixture.cpp
  		spells/effects/CatapultTest.cpp
  		spells/effects/CloneTest.cpp
+ 		spells/effects/DamageTest.cpp
 
  		mock/mock_IGameCallback.cpp
  		mock/mock_MapService.cpp

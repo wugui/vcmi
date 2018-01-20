@@ -953,7 +953,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 	BattleAttack bat;
 	bat.stackAttacking = attacker->unitId();
 
-	std::shared_ptr<battle::CUnitState> attackerState = attacker->asquire();
+	std::shared_ptr<battle::CUnitState> attackerState = attacker->acquire();
 
 	if(ranged)
 		bat.flags |= BattleAttack::SHOT;
@@ -1118,7 +1118,7 @@ void CGameHandler::applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle
 
 		auto range = gs->curB->calculateDmgRange(bai);
 		bsa.damageAmount = gs->curB->getActualDamage(range, attackerState->getCount(), getRandomGenerator());
-		CStack::prepareAttacked(bsa, getRandomGenerator(), bai.defender->asquire()); //calculate casualties
+		CStack::prepareAttacked(bsa, getRandomGenerator(), bai.defender->acquire()); //calculate casualties
 	}
 
 	auto addLifeDrain = [&](int64_t & toHeal, EHealLevel level, EHealPower power)
@@ -4415,7 +4415,7 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 				int64_t toHeal = healer->getCount() * std::max(10, attackingHero->valOfBonuses(Bonus::SECONDARY_SKILL_PREMY, SecondarySkill::FIRST_AID));
 
 				//TODO: allow resurrection for mods
-				auto state = destStack->asquire();
+				auto state = destStack->acquire();
 				state->heal(toHeal, EHealLevel::HEAL, EHealPower::PERMANENT);
 
 				if(toHeal == 0)

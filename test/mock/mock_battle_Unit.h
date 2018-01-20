@@ -49,6 +49,7 @@ public:
 	MOCK_CONST_METHOD0(ableToRetaliate, bool());
 	MOCK_CONST_METHOD0(alive, bool());
 	MOCK_CONST_METHOD0(isGhost, bool());
+	MOCK_CONST_METHOD1(isValidTarget, bool(bool));
 
 	MOCK_CONST_METHOD0(isClone, bool());
 	MOCK_CONST_METHOD0(hasClone, bool());
@@ -75,7 +76,7 @@ public:
 
 	MOCK_CONST_METHOD1(battleQueuePhase, int(int));
 
-	MOCK_CONST_METHOD0(asquire, std::shared_ptr<battle::CUnitState>());
+	MOCK_CONST_METHOD0(acquire, std::shared_ptr<battle::CUnitState>());
 };
 
 

@@ -39,6 +39,13 @@ Destination::Destination(const BattleHex & destination)
 
 }
 
+Destination::Destination(const Unit * destination, const BattleHex & exactHex)
+	: unitValue(destination),
+	hexValue(exactHex)
+{
+
+}
+
 Destination::Destination(const Destination & other)
 	: unitValue(other.unitValue),
 	hexValue(other.hexValue)

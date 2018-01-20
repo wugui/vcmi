@@ -635,6 +635,11 @@ bool CUnitState::isGhost() const
 	return ghost;
 }
 
+bool CUnitState::isValidTarget(bool allowDead) const
+{
+	return (alive() || (allowDead && isDead())) && getPosition().isValid() && !isTurret();
+}
+
 bool CUnitState::isClone() const
 {
 	return cloned;
@@ -801,7 +806,7 @@ int CUnitState::getDefence(bool ranged) const
 	}
 }
 
-std::shared_ptr<CUnitState> CUnitState::asquire() const
+std::shared_ptr<CUnitState> CUnitState::acquire() const
 {
 	auto ret = std::make_shared<CUnitStateDetached>(this, this);
 	ret->localInit(env);

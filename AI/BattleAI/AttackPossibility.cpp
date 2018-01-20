@@ -52,14 +52,14 @@ AttackPossibility AttackPossibility::evaluate(const BattleAttackInfo & attackInf
 
 	AttackPossibility ap(hex, attackInfo);
 
-	ap.attackerState = attackInfo.attacker->asquire();
+	ap.attackerState = attackInfo.attacker->acquire();
 
 	const int totalAttacks = attackInfo.shooting ? ap.attackerState->totalAttacks.getRangedValue() : ap.attackerState->totalAttacks.getMeleeValue();
 
 	if(!attackInfo.shooting)
 		ap.attackerState->position = hex;
 
-	auto defenderState = attackInfo.defender->asquire();
+	auto defenderState = attackInfo.defender->acquire();
 	ap.affectedUnits.push_back(defenderState);
 
 	for(int i = 0; i < totalAttacks; i++)
