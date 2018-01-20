@@ -340,7 +340,8 @@
 			"base":{
 				"battleEffects":{
 					"destruction":{
-						"type":"core:destruction"
+						"type":"core:damage",
+						"killByCount": true
 					}
 				},
 				"range" : "0"

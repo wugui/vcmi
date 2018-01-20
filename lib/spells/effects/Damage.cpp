@@ -31,7 +31,9 @@ VCMI_REGISTER_SPELL_EFFECT(Damage, EFFECT_NAME);
 
 Damage::Damage()
 	: UnitEffect(),
-	customEffectId(-1)
+	customEffectId(-1),
+	killByPercentage(false),
+	killByCount(false)
 {
 }
 
@@ -65,6 +67,8 @@ bool Damage::isReceptive(const Mechanics * m, const battle::Unit * unit) const
 void Damage::serializeJsonUnitEffect(JsonSerializeFormat & handler)
 {
 	handler.serializeInt("customEffectId", customEffectId, -1);
+	handler.serializeBool("killByPercentage", killByPercentage);
+	handler.serializeBool("killByCount", killByCount);
 
 	serializeJsonDamageEffect(handler);
 }
@@ -76,12 +80,25 @@ void Damage::serializeJsonDamageEffect(JsonSerializeFormat & handler)
 
 int64_t Damage::damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const
 {
-	int64_t baseDamage = m->adjustEffectValue(target);
+	int64_t baseDamage;
+
+	if(killByPercentage)
+	{
+		int64_t amountToKill = target->getCount() * m->getEffectValue() / 100;
+		baseDamage = amountToKill * target->MaxHealth();
+	}
+	else if(killByCount)
+	{
+		baseDamage = m->getEffectValue() * target->MaxHealth();
+	}
+	else
+	{
+		baseDamage = m->adjustEffectValue(target);
+	}
 
 	if(chainLength > 1 && targetIndex > 0)
 	{
 		double indexedFactor = std::pow(chainFactor, (double) targetIndex);
-
 		return (int64_t) (indexedFactor * baseDamage);
 	}
 
@@ -90,7 +107,24 @@ int64_t Damage::damageForTarget(size_t targetIndex, const Mechanics * m, const b
 
 void Damage::describeEffect(std::vector<MetaString> & log, const Mechanics * m, const battle::Unit * firstTarget, uint32_t kills, int64_t damage, bool multiple) const
 {
-	if(m->getSpellIndex() == SpellID::THUNDERBOLT && !multiple)
+	if(m->getSpellIndex() == SpellID::DEATH_STARE && !multiple)
+	{
+		MetaString line;
+		if(kills > 1)
+		{
+			line.addTxt(MetaString::GENERAL_TXT, 119); //%d %s die under the terrible gaze of the %s.
+			line.addReplacement(kills);
+			firstTarget->addNameReplacement(line, true);
+		}
+		else
+		{
+			line.addTxt(MetaString::GENERAL_TXT, 118); //One %s dies under the terrible gaze of the %s.
+			firstTarget->addNameReplacement(line, false);
+		}
+		m->caster->getCasterName(line);
+		log.push_back(line);
+	}
+	else if(m->getSpellIndex() == SpellID::THUNDERBOLT && !multiple)
 	{
 		{
 			MetaString line;
@@ -129,15 +163,19 @@ void Damage::describeEffect(std::vector<MetaString> & log, const Mechanics * m, 
 				line.addReplacement(kills);
 
 			if(kills > 1)
-				if(multiple || !firstTarget)
+			{
+				if(multiple)
 					line.addReplacement(MetaString::GENERAL_TXT, 43);
 				else
 					firstTarget->addNameReplacement(line, true);
+			}
 			else
-				if(multiple || !firstTarget)
+			{
+				if(multiple)
 					line.addReplacement(MetaString::GENERAL_TXT, 42);
 				else
 					firstTarget->addNameReplacement(line, false);
+			}
 
 			log.push_back(line);
 		}
