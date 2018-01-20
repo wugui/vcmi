@@ -22,6 +22,70 @@ using namespace ::spells;
 using namespace ::spells::effects;
 using namespace ::testing;
 
+void EffectFixture::UnitFake::addNewBonus(const std::shared_ptr<Bonus> & b)
+{
+	bonusFake.addNewBonus(b);
+}
+
+void EffectFixture::UnitFake::makeAlive()
+{
+	EXPECT_CALL(*this, alive()).WillRepeatedly(Return(true));
+}
+
+void EffectFixture::UnitFake::redirectBonusesToFake()
+{
+	ON_CALL(*this, getAllBonuses(_, _, _, _)).WillByDefault(Invoke(&bonusFake, &BonusBearerMock::getAllBonuses));
+	ON_CALL(*this, getTreeVersion()).WillByDefault(Invoke(&bonusFake, &BonusBearerMock::getTreeVersion));
+}
+
+void EffectFixture::UnitFake::expectAnyBonusSystemCall()
+{
+	EXPECT_CALL(*this, getAllBonuses(_, _, _, _)).Times(AtLeast(0));
+	EXPECT_CALL(*this, getTreeVersion()).Times(AtLeast(0));
+}
+
+EffectFixture::UnitFake & EffectFixture::UnitsFake::add(ui8 side)
+{
+	UnitFake * unit = new UnitFake();
+	EXPECT_CALL(*unit, unitSide()).WillRepeatedly(Return(side));
+//	unit->setDefaultExpectations();
+
+	allUnits.emplace_back(unit);
+	return *allUnits.back().get();
+}
+
+battle::Units EffectFixture::UnitsFake::getUnitsIf(battle::UnitFilter predicate) const
+{
+	battle::Units ret;
+
+	for(auto & unit : allUnits)
+	{
+		if(predicate(unit.get()))
+			ret.push_back(unit.get());
+	}
+	return ret;
+}
+
+EffectFixture::BattleFake::BattleFake()
+	: CBattleInfoCallback(),
+	BattleStateMock()
+{
+}
+
+void EffectFixture::BattleFake::setUp()
+{
+	CBattleInfoCallback::setBattle(this);
+}
+
+void EffectFixture::UnitsFake::setDefaultBonusExpectations()
+{
+	for(auto & unit : allUnits)
+	{
+		unit->redirectBonusesToFake();
+		unit->expectAnyBonusSystemCall();
+	}
+}
+
 EffectFixture::EffectFixture(std::string effectName_)
 	:subject(),
 	problemMock(),
@@ -44,8 +108,14 @@ void EffectFixture::setUp()
 {
 	subject = Effect::create(effectName);
 	ASSERT_TRUE(subject);
-	battleFake.setUp();
-	mechanicsMock.cb = &battleFake;
+	battleFake = std::make_shared<BattleFake>();
+	battleFake->setUp();
+
+	mechanicsMock.cb = battleFake.get();
+
+	battleProxy = std::make_shared<BattleStateProxy>(battleFake.get());
+
+	ON_CALL(*battleFake, getUnitsIf(_)).WillByDefault(Invoke(&unitsFake, &UnitsFake::getUnitsIf));
 }
 
 static vstd::TRandI64 getInt64RangeDef(int64_t lower, int64_t upper)
@@ -68,6 +138,13 @@ void EffectFixture::setupDefaultRNG()
 {
 	EXPECT_CALL(rngMock, getInt64Range(_,_)).WillRepeatedly(Invoke(&getInt64RangeDef));
 	EXPECT_CALL(rngMock, getDoubleRange(_,_)).WillRepeatedly(Invoke(&getDoubleRangeDef));
+}
+
+void EffectFixture::setupEmptyBattlefield()
+{
+	EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(nullptr));
+	EXPECT_CALL(*battleFake, getAllObstacles()).WillRepeatedly(Return(IBattleInfo::ObstacleCList()));
+	EXPECT_CALL(*battleFake, getBattlefieldType()).WillRepeatedly(Return(BFieldType::NONE2));
 }
 
 }

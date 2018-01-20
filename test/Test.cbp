@@ -105,6 +105,7 @@
 		<Unit filename="mock/mock_spells_Spell.h" />
 		<Unit filename="mock/mock_vstd_RNG.h" />
 		<Unit filename="spells/effects/CatapultTest.cpp" />
+		<Unit filename="spells/effects/CloneTest.cpp" />
 		<Unit filename="spells/effects/EffectFixture.cpp" />
 		<Unit filename="spells/effects/EffectFixture.h" />
 		<Extensions>

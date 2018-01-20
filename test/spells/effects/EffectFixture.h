@@ -15,9 +15,11 @@
 #include "mock/mock_spells_Mechanics.h"
 #include "mock/mock_spells_Problem.h"
 
+#include "mock/mock_BonusBearer.h"
 #include "mock/mock_battle_IBattleState.h"
 #include "mock/mock_battle_Unit.h"
 #include "mock/mock_vstd_RNG.h"
+
 
 #include "../../../lib/JsonNode.h"
 #include "../../../lib/NetPacksBase.h"
@@ -29,19 +31,40 @@ namespace test
 class EffectFixture
 {
 public:
+
+	class UnitFake : public UnitMock
+	{
+	public:
+		void addNewBonus(const std::shared_ptr<Bonus> & b);
+
+		void makeAlive();
+
+		void redirectBonusesToFake();
+
+		void expectAnyBonusSystemCall();
+
+	private:
+		BonusBearerMock bonusFake;
+	};
+
+	class UnitsFake
+	{
+	public:
+		std::vector<std::shared_ptr<UnitFake>> allUnits;
+
+		UnitFake & add(ui8 side);
+
+		battle::Units getUnitsIf(battle::UnitFilter predicate) const;
+
+		void setDefaultBonusExpectations();
+	};
+
 	class BattleFake : public CBattleInfoCallback, public BattleStateMock
 	{
 	public:
-		BattleFake()
-			: CBattleInfoCallback(),
-			BattleStateMock()
-		{
-		}
+		BattleFake();
 
-		void setUp()
-		{
-			CBattleInfoCallback::setBattle(this);
-		}
+		void setUp();
 	};
 
 	std::shared_ptr<::spells::effects::Effect> subject;
@@ -49,7 +72,10 @@ public:
 	::spells::MechanicsMock mechanicsMock;
 	vstd::RNGMock rngMock;
 
-	BattleFake battleFake;
+	UnitsFake unitsFake;
+	std::shared_ptr<BattleFake> battleFake;
+
+	std::shared_ptr<::spells::BattleStateProxy> battleProxy;
 
 	std::string effectName;
 
@@ -59,6 +85,8 @@ public:
 	void setupEffect(const JsonNode & effectConfig);
 
 	void setupDefaultRNG();
+
+	void setupEmptyBattlefield();
 
 protected:
 	void setUp();

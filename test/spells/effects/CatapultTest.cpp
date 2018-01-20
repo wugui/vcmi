@@ -29,6 +29,7 @@ public:
 		:EffectFixture("core:catapult")
 	{
 	}
+
 protected:
 	void SetUp() override
 	{
@@ -38,10 +39,10 @@ protected:
 
 TEST_F(CatapultTest, NotApplicableWithoutTown)
 {
-	EXPECT_CALL(battleFake, getDefendedTown()).WillRepeatedly(Return(nullptr));
+	EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(nullptr));
 	EXPECT_CALL(mechanicsMock, adaptProblem(_, _)).WillOnce(Return(false));
 	EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(true));
-	EXPECT_CALL(battleFake, getWallState(_)).Times(0);
+	EXPECT_CALL(*battleFake, getWallState(_)).Times(0);
 
 	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock));
 }
@@ -50,10 +51,10 @@ TEST_F(CatapultTest, NotApplicableInVillage)
 {
 	std::shared_ptr<CGTownInstance> fakeTown = std::make_shared<CGTownInstance>();
 
-	EXPECT_CALL(battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
+	EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
 	EXPECT_CALL(mechanicsMock, adaptProblem(_, _)).WillOnce(Return(false));
 	EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(true));
-	EXPECT_CALL(battleFake, getWallState(_)).Times(0);
+	EXPECT_CALL(*battleFake, getWallState(_)).Times(0);
 
 	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock));
 }
@@ -64,10 +65,10 @@ TEST_F(CatapultTest, NotApplicableForDefenderIfSmart)
 	fakeTown->builtBuildings.insert(BuildingID::FORT);
 	mechanicsMock.casterSide = BattleSide::DEFENDER;
 
-	EXPECT_CALL(battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
+	EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
 	EXPECT_CALL(mechanicsMock, adaptProblem(_, _)).WillOnce(Return(false));
 	EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(true));
-	EXPECT_CALL(battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::INTACT));
+	EXPECT_CALL(*battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::INTACT));
 
 	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock));
 }
@@ -77,10 +78,10 @@ TEST_F(CatapultTest, ApplicableInTown)
 	std::shared_ptr<CGTownInstance> fakeTown = std::make_shared<CGTownInstance>();
 	fakeTown->builtBuildings.insert(BuildingID::FORT);
 
-	EXPECT_CALL(battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
+	EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
 	EXPECT_CALL(mechanicsMock, adaptProblem(_, _)).Times(0);
 	EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(true));
-	EXPECT_CALL(battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::INTACT));
+	EXPECT_CALL(*battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::INTACT));
 
 	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock));
 }
@@ -95,7 +96,7 @@ public:
 
 	void setDefaultExpectations()
 	{
-		EXPECT_CALL(battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
+		EXPECT_CALL(*battleFake, getDefendedTown()).WillRepeatedly(Return(fakeTown.get()));
 		EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(true));
 		setupDefaultRNG();
 	}
@@ -123,17 +124,15 @@ TEST_F(CatapultApplyTest, DamageToIntactPart)
 
 	const EWallPart::EWallPart targetPart = EWallPart::BELOW_GATE;
 
-	EXPECT_CALL(battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::DESTROYED));
-	EXPECT_CALL(battleFake, getWallState(Eq(int(targetPart)))).WillRepeatedly(Return(EWallState::INTACT));
+	EXPECT_CALL(*battleFake, getWallState(_)).WillRepeatedly(Return(EWallState::DESTROYED));
+	EXPECT_CALL(*battleFake, getWallState(Eq(int(targetPart)))).WillRepeatedly(Return(EWallState::INTACT));
 
-	EXPECT_CALL(battleFake, setWallState(Eq(int(targetPart)), Eq(EWallState::DAMAGED))).Times(1);
-
-	BattleStateProxy proxy(&battleFake);
+	EXPECT_CALL(*battleFake, setWallState(Eq(int(targetPart)), Eq(EWallState::DAMAGED))).Times(1);
 
     EffectTarget target;
     target.emplace_back();
 
-	subject->apply(&proxy, rngMock, &mechanicsMock, target);
+	subject->apply(battleProxy.get(), rngMock, &mechanicsMock, target);
 }
 
 }
