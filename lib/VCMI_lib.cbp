@@ -402,7 +402,6 @@
 		<Unit filename="spells/effects/Clone.h" />
 		<Unit filename="spells/effects/Damage.cpp" />
 		<Unit filename="spells/effects/Damage.h" />
-		<Unit filename="spells/effects/Destruction.cpp" />
 		<Unit filename="spells/effects/Dispel.cpp" />
 		<Unit filename="spells/effects/Dispel.h" />
 		<Unit filename="spells/effects/Effect.cpp" />

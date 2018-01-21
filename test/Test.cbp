@@ -107,8 +107,10 @@
 		<Unit filename="spells/effects/CatapultTest.cpp" />
 		<Unit filename="spells/effects/CloneTest.cpp" />
 		<Unit filename="spells/effects/DamageTest.cpp" />
+		<Unit filename="spells/effects/DispelTest.cpp" />
 		<Unit filename="spells/effects/EffectFixture.cpp" />
 		<Unit filename="spells/effects/EffectFixture.h" />
+		<Unit filename="spells/effects/HealTest.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

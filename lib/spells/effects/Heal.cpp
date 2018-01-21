@@ -61,23 +61,26 @@ bool Heal::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
 	if(!validInGenaral)
 		return false;
 
-	auto hpGained = m->getEffectValue();
 	auto insuries = unit->getTotalHealth() - unit->getAvailableHealth();
 
 	if(insuries == 0)
 		return false;
 
-	if(hpGained < minFullUnits * unit->MaxHealth())
-		return false;
+	if(minFullUnits > 0)
+	{
+		auto hpGained = m->getEffectValue();
+		if(hpGained < minFullUnits * unit->MaxHealth())
+			return false;
+	}
 
 	if(unit->isDead())
 	{
 		//check if alive unit blocks resurrection
 		for(const BattleHex & hex : battle::Unit::getHexes(unit->getPosition(), unit->doubleWide(), unit->unitSide()))
 		{
-			auto blocking = m->cb->battleGetUnitsIf([hex, unit](const battle::Unit * s)
+			auto blocking = m->cb->battleGetUnitsIf([hex, unit](const battle::Unit * other)
 			{
-				return s->isValidTarget(true) && s->coversPos(hex) && s != unit;
+				return other->isValidTarget(false) && other->coversPos(hex) && other != unit;
 			});
 
 			if(!blocking.empty())

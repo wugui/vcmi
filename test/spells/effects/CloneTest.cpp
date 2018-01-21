@@ -159,6 +159,7 @@ public:
 		EXPECT_CALL(original, creatureIndex()).WillRepeatedly(Return(0));
 		EXPECT_CALL(original, doubleWide()).WillRepeatedly(Return(false));
 		EXPECT_CALL(original, getPosition()).WillRepeatedly(Return(originalPosition));
+		EXPECT_CALL(original, unitSide()).Times(AnyNumber());
 
 		originalState = std::make_shared<CUnitStateDetached>(&original, &original);
 

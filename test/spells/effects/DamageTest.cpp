@@ -46,9 +46,8 @@ TEST_F(DamageTest, ApplicableToAliveUnit)
 	EXPECT_CALL(mechanicsMock, isSmart()).WillOnce(Return(false));
 	EXPECT_CALL(mechanicsMock, ownerMatches(Eq(&unit))).WillOnce(Return(true));
 
-	EXPECT_CALL(unit, getPosition()).WillOnce(Return(BattleHex(5,5)));
 	EffectTarget target;
-	target.emplace_back(&unit);
+	target.emplace_back(&unit, BattleHex());
 
 	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
 }
@@ -77,10 +76,6 @@ public:
 	{
 	}
 
-	void setDefaultExpectations()
-	{
-
-	}
 
 protected:
 	void SetUp() override

@@ -53,8 +53,7 @@ void EffectFixture::UnitFake::expectAnyBonusSystemCall()
 EffectFixture::UnitFake & EffectFixture::UnitsFake::add(ui8 side)
 {
 	UnitFake * unit = new UnitFake();
-	EXPECT_CALL(*unit, unitSide()).WillRepeatedly(Return(side));
-//	unit->setDefaultExpectations();
+	ON_CALL(*unit, unitSide()).WillByDefault(Return(side));
 
 	allUnits.emplace_back(unit);
 	return *allUnits.back().get();

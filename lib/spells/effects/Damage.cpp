@@ -69,13 +69,6 @@ void Damage::serializeJsonUnitEffect(JsonSerializeFormat & handler)
 	handler.serializeInt("customEffectId", customEffectId, -1);
 	handler.serializeBool("killByPercentage", killByPercentage);
 	handler.serializeBool("killByCount", killByCount);
-
-	serializeJsonDamageEffect(handler);
-}
-
-void Damage::serializeJsonDamageEffect(JsonSerializeFormat & handler)
-{
-	UNUSED(handler);
 }
 
 int64_t Damage::damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const

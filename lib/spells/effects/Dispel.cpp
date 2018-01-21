@@ -47,13 +47,10 @@ void Dispel::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * 
 
 bool Dispel::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
 {
-	if(!unit->isValidTarget(false))
-		return false;
-
 	if(getBonuses(m, unit)->empty())
 		return false;
 
-	return true;
+	return UnitEffect::isValidTarget(m, unit);
 }
 
 void Dispel::serializeJsonUnitEffect(JsonSerializeFormat & handler)
@@ -140,7 +137,6 @@ void Dispel::prepareEffects(SetStackEffect & pack, RNG & rng, const Mechanics * 
 		}
 	}
 }
-
 
 }
 }

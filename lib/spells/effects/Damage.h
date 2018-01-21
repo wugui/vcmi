@@ -31,7 +31,6 @@ protected:
 	bool isReceptive(const Mechanics * m, const battle::Unit * unit) const override;
 
 	void serializeJsonUnitEffect(JsonSerializeFormat & handler) override final;
-	virtual void serializeJsonDamageEffect(JsonSerializeFormat & handler);
 
 	int64_t damageForTarget(size_t targetIndex, const Mechanics * m, const battle::Unit * target) const;
 
