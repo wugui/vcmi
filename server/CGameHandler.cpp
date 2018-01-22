@@ -953,7 +953,7 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 	BattleAttack bat;
 	bat.stackAttacking = attacker->unitId();
 
-	std::shared_ptr<battle::CUnitState> attackerState = attacker->acquire();
+	std::shared_ptr<battle::CUnitState> attackerState = attacker->acquireState();
 
 	if(ranged)
 		bat.flags |= BattleAttack::SHOT;
@@ -1042,8 +1042,8 @@ void CGameHandler::makeAttack(const CStack * attacker, const CStack * defender, 
 	attackerState->afterAttack(ranged, counter);
 
 	{
-		UnitChanges info;
-		attackerState->toInfo(info);
+		UnitChanges info(attackerState->unitId(), UnitChanges::EOperation::RESET_STATE);
+		attackerState->save(info.data);
 		bat.attackerChanges.changedStacks.push_back(info);
 	}
 
@@ -1118,7 +1118,7 @@ void CGameHandler::applyBattleEffects(BattleAttack & bat, std::shared_ptr<battle
 
 		auto range = gs->curB->calculateDmgRange(bai);
 		bsa.damageAmount = gs->curB->getActualDamage(range, attackerState->getCount(), getRandomGenerator());
-		CStack::prepareAttacked(bsa, getRandomGenerator(), bai.defender->acquire()); //calculate casualties
+		CStack::prepareAttacked(bsa, getRandomGenerator(), bai.defender->acquireState()); //calculate casualties
 	}
 
 	auto addLifeDrain = [&](int64_t & toHeal, EHealLevel level, EHealPower power)
@@ -4415,7 +4415,7 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 				int64_t toHeal = healer->getCount() * std::max(10, attackingHero->valOfBonuses(Bonus::SECONDARY_SKILL_PREMY, SecondarySkill::FIRST_AID));
 
 				//TODO: allow resurrection for mods
-				auto state = destStack->acquire();
+				auto state = destStack->acquireState();
 				state->heal(toHeal, EHealLevel::HEAL, EHealPower::PERMANENT);
 
 				if(toHeal == 0)
@@ -4433,9 +4433,9 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 					text.addReplacement(toHeal);
 					pack.battleLog.push_back(text);
 
-					UnitChanges info;
-					state->toInfo(info);
+					UnitChanges info(state->unitId(), UnitChanges::EOperation::RESET_STATE);
 					info.healthDelta = toHeal;
+					state->save(info.data);
 					pack.changedStacks.push_back(info);
 					sendAndApply(&pack);
 				}
@@ -4473,8 +4473,8 @@ bool CGameHandler::makeBattleAction(BattleAction &ba)
 			info.summoned = false;
 
 			BattleUnitsChanged addUnits;
-			addUnits.changedStacks.emplace_back();
-			info.toInfo(addUnits.changedStacks.back());
+			addUnits.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+			info.save(addUnits.changedStacks.back().data);
 
 			if(info.count > 0) //there's rare possibility single creature cannot rise desired type
 			{
@@ -5583,8 +5583,8 @@ void CGameHandler::handleAfterAttackCasting(bool ranged, const CStack * attacker
 			return; //wrong subtype
 
 		BattleUnitsChanged addUnits;
-		addUnits.changedStacks.emplace_back();
-		resurrectInfo.toInfo(addUnits.changedStacks.back());
+		addUnits.changedStacks.emplace_back(resurrectInfo.id, UnitChanges::EOperation::ADD);
+		resurrectInfo.save(addUnits.changedStacks.back().data);
 
 		BattleUnitsChanged removeUnits;
 		removeUnits.changedStacks.emplace_back(defender->unitId(), UnitChanges::EOperation::REMOVE);
@@ -5939,8 +5939,8 @@ void CGameHandler::runBattle()
 					info.summoned = true;
 
 					BattleUnitsChanged pack;
-					pack.changedStacks.emplace_back();
-					info.toInfo(pack.changedStacks.back());
+					pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+					info.save(pack.changedStacks.back().data);
 					sendAndApply(&pack);
 				}
 			}

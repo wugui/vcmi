@@ -105,9 +105,9 @@ TEST_F(DamageApplyTest, DoesDamageToAliveUnit)
 
 	std::shared_ptr<CUnitState> targetUnitState = std::make_shared<CUnitStateDetached>(&targetUnit, &targetUnit);
 	targetUnitState->localInit(&unitEnvironmentMock);
-	EXPECT_CALL(targetUnit, acquire()).WillOnce(Return(targetUnitState));
+	EXPECT_CALL(targetUnit, acquireState()).WillOnce(Return(targetUnitState));
 
-	EXPECT_CALL(*battleFake, setUnitState(_)).Times(1);
+	EXPECT_CALL(*battleFake, setUnitState(Eq(unitId),_, Lt(0))).Times(1);
 
 	setupDefaultRNG();
 
@@ -126,9 +126,9 @@ TEST_F(DamageApplyTest, IgnoresDeadUnit)
 	auto & targetUnit = unitsFake.add(BattleSide::ATTACKER);
 
 	EXPECT_CALL(targetUnit, alive()).WillRepeatedly(Return(false));
-	EXPECT_CALL(targetUnit, acquire()).Times(0);
+	EXPECT_CALL(targetUnit, acquireState()).Times(0);
 
-	EXPECT_CALL(*battleFake, setUnitState(_)).Times(0);
+	EXPECT_CALL(*battleFake, setUnitState(_,_,_)).Times(0);
 
 	EffectTarget target;
 	target.emplace_back(&targetUnit, BattleHex());
@@ -165,9 +165,9 @@ TEST_F(DamageApplyTest, DoesDamageByPercent)
 
 	std::shared_ptr<CUnitState> targetUnitState = std::make_shared<CUnitStateDetached>(&targetUnit, &targetUnit);
 	targetUnitState->localInit(&unitEnvironmentMock);
-	EXPECT_CALL(targetUnit, acquire()).WillOnce(Return(targetUnitState));
+	EXPECT_CALL(targetUnit, acquireState()).WillOnce(Return(targetUnitState));
 
-	EXPECT_CALL(*battleFake, setUnitState(_)).Times(1);
+	EXPECT_CALL(*battleFake, setUnitState(Eq(unitId),_, Lt(0))).Times(1);
 
 	setupDefaultRNG();
 
@@ -207,9 +207,9 @@ TEST_F(DamageApplyTest, DoesDamageByCount)
 
 	std::shared_ptr<CUnitState> targetUnitState = std::make_shared<CUnitStateDetached>(&targetUnit, &targetUnit);
 	targetUnitState->localInit(&unitEnvironmentMock);
-	EXPECT_CALL(targetUnit, acquire()).WillOnce(Return(targetUnitState));
+	EXPECT_CALL(targetUnit, acquireState()).WillOnce(Return(targetUnitState));
 
-	EXPECT_CALL(*battleFake, setUnitState(_)).Times(1);
+	EXPECT_CALL(*battleFake, setUnitState(Eq(unitId), _, Lt(0))).Times(1);
 
 	setupDefaultRNG();
 

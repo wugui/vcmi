@@ -707,6 +707,11 @@ BattleHex CUnitState::getPosition() const
 	return position;
 }
 
+void CUnitState::setPosition(BattleHex hex)
+{
+	position = hex;
+}
+
 int32_t CUnitState::getInitiative(int turn) const
 {
 	return valOfBonuses(Selector::type(Bonus::STACKS_SPEED).And(Selector::turns(turn)));
@@ -767,6 +772,11 @@ int CUnitState::battleQueuePhase(int turn) const
 	}
 }
 
+int CUnitState::getTotalAttacks(bool ranged) const
+{
+	return ranged ? totalAttacks.getRangedValue() : totalAttacks.getMeleeValue();
+}
+
 int CUnitState::getMinDamage(bool ranged) const
 {
 	return ranged ? minDamage.getRangedValue() : minDamage.getMeleeValue();
@@ -806,7 +816,15 @@ int CUnitState::getDefence(bool ranged) const
 	}
 }
 
-std::shared_ptr<CUnitState> CUnitState::acquire() const
+std::shared_ptr<Unit> CUnitState::acquire() const
+{
+	auto ret = std::make_shared<CUnitStateDetached>(this, this);
+	ret->localInit(env);
+	*ret = *this;
+	return ret;
+}
+
+std::shared_ptr<CUnitState> CUnitState::acquireState() const
 {
 	auto ret = std::make_shared<CUnitStateDetached>(this, this);
 	ret->localInit(env);
@@ -874,28 +892,19 @@ void CUnitState::reset()
 	position = BattleHex::INVALID;
 }
 
-void CUnitState::toInfo(UnitChanges & info)
+void CUnitState::save(JsonNode & data)
 {
-	info.id = unitId();
-	info.operation = UnitChanges::EOperation::RESET_STATE;
-
 	//TODO: use instance resolver
-	info.data.clear();
-	JsonSerializer ser(nullptr, info.data);
+	data.clear();
+	JsonSerializer ser(nullptr, data);
 	ser.serializeStruct("state", *this);
 }
 
-void CUnitState::fromInfo(const UnitChanges & info)
+void CUnitState::load(const JsonNode & data)
 {
-	if(info.id != unitId())
-		logGlobal->error("Deserialized state from wrong unit");
-
-	if(info.operation != UnitChanges::EOperation::RESET_STATE)
-		logGlobal->error("RESET_STATE operation expected");
-
 	//TODO: use instance resolver
 	reset();
-    JsonDeserializer deser(nullptr, info.data);
+    JsonDeserializer deser(nullptr, data);
     deser.serializeStruct("state", *this);
 }
 

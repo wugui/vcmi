@@ -65,7 +65,10 @@ public:
 	MOCK_CONST_METHOD0(getAvailableHealth, int64_t());
 	MOCK_CONST_METHOD0(getTotalHealth, int64_t());
 
+	MOCK_CONST_METHOD1(getTotalAttacks, int(bool));
+
 	MOCK_CONST_METHOD0(getPosition, BattleHex());
+	MOCK_METHOD1(setPosition, void(BattleHex));
 	MOCK_CONST_METHOD1(getInitiative, int32_t(int));
 
 	MOCK_CONST_METHOD1(canMove, bool(int));
@@ -76,7 +79,11 @@ public:
 
 	MOCK_CONST_METHOD1(battleQueuePhase, int(int));
 
-	MOCK_CONST_METHOD0(acquire, std::shared_ptr<battle::CUnitState>());
+	MOCK_CONST_METHOD0(acquire, std::shared_ptr<battle::Unit>());
+	MOCK_CONST_METHOD0(acquireState, std::shared_ptr<battle::CUnitState>());
+
+	MOCK_METHOD1(save, void(JsonNode &));
+	MOCK_METHOD1(load, void(const JsonNode &));
 };
 
 

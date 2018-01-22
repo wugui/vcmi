@@ -86,8 +86,8 @@ public:
 	void nextRound(int32_t roundNr) override;
 	void nextTurn(uint32_t unitId) override;
 
-	void addUnit(const UnitChanges & changes) override;
-	void setUnitState(const UnitChanges & changes) override;
+	void addUnit(uint32_t id, const JsonNode & data) override;
+	void setUnitState(uint32_t id, const JsonNode & data, int64_t healthDelta) override;
 	void moveUnit(uint32_t id, BattleHex destination) override;
 	void removeUnit(uint32_t id) override;
 

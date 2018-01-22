@@ -786,10 +786,10 @@ void BattleInfo::nextTurn(uint32_t unitId)
 	st->afterGetsTurn();
 }
 
-void BattleInfo::addUnit(const UnitChanges & changes)
+void BattleInfo::addUnit(uint32_t id, const JsonNode & data)
 {
 	battle::UnitInfo info;
-	info.fromInfo(changes);
+	info.load(id, data);
 	CStackBasicDescriptor base(info.type, info.count);
 
 	PlayerColor owner = getSidePlayer(info.side);
@@ -824,13 +824,13 @@ void BattleInfo::moveUnit(uint32_t id, BattleHex destination)
 	sta->position = destination;
 }
 
-void BattleInfo::setUnitState(const UnitChanges & changes)
+void BattleInfo::setUnitState(uint32_t id, const JsonNode & data, int64_t healthDelta)
 {
-	CStack * changedStack = getStack(changes.id, false);
+	CStack * changedStack = getStack(id, false);
 	if(!changedStack)
 		throw std::runtime_error("Invalid unit id in BattleInfo update");
 
-	if(!changedStack->alive() && changes.healthDelta > 0)
+	if(!changedStack->alive() && healthDelta > 0)
 	{
 		//checking if we resurrect a stack that is under a living stack
 		auto accessibility = getAccesibility();
@@ -842,15 +842,15 @@ void BattleInfo::setUnitState(const UnitChanges & changes)
 		}
 	}
 
-	bool killed = (-changes.healthDelta) >= changedStack->getAvailableHealth();//todo: check using alive state once rebirth will be handled separately
+	bool killed = (-healthDelta) >= changedStack->getAvailableHealth();//todo: check using alive state once rebirth will be handled separately
 
-	bool resurrected = !changedStack->alive() && changes.healthDelta > 0;
+	bool resurrected = !changedStack->alive() && healthDelta > 0;
 
 	//applying changes
-	changedStack->fromInfo(changes);
+	changedStack->load(data);
 
 
-	if(changes.healthDelta < 0)
+	if(healthDelta < 0)
 	{
 		changedStack->popBonuses(Bonus::UntilBeingAttacked);
 	}
@@ -1055,7 +1055,6 @@ CGHeroInstance * BattleInfo::battleGetFightingHero(ui8 side) const
 {
 	return const_cast<CGHeroInstance*>(CBattleInfoEssentials::battleGetFightingHero(side));
 }
-
 
 bool CMP_stack::operator()(const battle::Unit * a, const battle::Unit * b)
 {

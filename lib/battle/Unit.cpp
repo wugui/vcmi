@@ -193,24 +193,17 @@ void UnitInfo::serializeJson(JsonSerializeFormat & handler)
 	handler.serializeBool("summoned", summoned);
 }
 
-void UnitInfo::toInfo(UnitChanges & info)
+void UnitInfo::save(JsonNode & data)
 {
-	info.id = id;
-	info.operation = UnitChanges::EOperation::ADD;
-
-	info.data.clear();
-	JsonSerializer ser(nullptr, info.data);
+	data.clear();
+	JsonSerializer ser(nullptr, data);
 	ser.serializeStruct("newUnitInfo", *this);
 }
 
-void UnitInfo::fromInfo(const UnitChanges & info)
+void UnitInfo::load(uint32_t id_, const JsonNode & data)
 {
-	id = info.id;
-
-	if(info.operation != UnitChanges::EOperation::ADD)
-		logGlobal->error("ADD operation expected");
-
-    JsonDeserializer deser(nullptr, info.data);
+	id = id_;
+    JsonDeserializer deser(nullptr, data);
     deser.serializeStruct("newUnitInfo", *this);
 }
 

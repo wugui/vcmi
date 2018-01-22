@@ -200,8 +200,8 @@ TEST_F(CGameStateTest, issue2765)
 		info.summoned = false;
 
 		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back();
-		info.toInfo(pack.changedStacks.back());
+		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+		info.save(pack.changedStacks.back().data);
 		gameCallback->sendAndApply(&pack);
 	}
 
@@ -281,8 +281,8 @@ TEST_F(CGameStateTest, battleResurrection)
 		info.summoned = false;
 
 		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back();
-		info.toInfo(pack.changedStacks.back());
+		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+		info.save(pack.changedStacks.back().data);
 		gameCallback->sendAndApply(&pack);
 	}
 
@@ -296,8 +296,8 @@ TEST_F(CGameStateTest, battleResurrection)
 		info.summoned = false;
 
 		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back();
-		info.toInfo(pack.changedStacks.back());
+		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+		info.save(pack.changedStacks.back().data);
 		gameCallback->sendAndApply(&pack);
 	}
 

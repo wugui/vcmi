@@ -103,8 +103,8 @@ void Summon::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * 
 		info.summoned = !permanent;
 
 		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back();
-		info.toInfo(pack.changedStacks.back());
+		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+		info.save(pack.changedStacks.back().data);
 		battleState->apply(&pack);
 	}
 }

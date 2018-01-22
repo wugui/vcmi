@@ -52,14 +52,14 @@ AttackPossibility AttackPossibility::evaluate(const BattleAttackInfo & attackInf
 
 	AttackPossibility ap(hex, attackInfo);
 
-	ap.attackerState = attackInfo.attacker->acquire();
+	ap.attackerState = attackInfo.attacker->acquireState();
 
-	const int totalAttacks = attackInfo.shooting ? ap.attackerState->totalAttacks.getRangedValue() : ap.attackerState->totalAttacks.getMeleeValue();
+	const int totalAttacks = ap.attackerState->getTotalAttacks(attackInfo.shooting);
 
 	if(!attackInfo.shooting)
-		ap.attackerState->position = hex;
+		ap.attackerState->setPosition(hex);
 
-	auto defenderState = attackInfo.defender->acquire();
+	auto defenderState = attackInfo.defender->acquireState();
 	ap.affectedUnits.push_back(defenderState);
 
 	for(int i = 0; i < totalAttacks; i++)
@@ -67,11 +67,11 @@ AttackPossibility AttackPossibility::evaluate(const BattleAttackInfo & attackInf
 		TDmgRange retaliation(0,0);
 		auto attackDmg = getCbc()->battleEstimateDamage(ap.attack, &retaliation);
 
-		vstd::amin(attackDmg.first, defenderState->health.available());
-		vstd::amin(attackDmg.second, defenderState->health.available());
+		vstd::amin(attackDmg.first, defenderState->getAvailableHealth());
+		vstd::amin(attackDmg.second, defenderState->getAvailableHealth());
 
-		vstd::amin(retaliation.first, ap.attackerState->health.available());
-		vstd::amin(retaliation.second, ap.attackerState->health.available());
+		vstd::amin(retaliation.first, ap.attackerState->getAvailableHealth());
+		vstd::amin(retaliation.second, ap.attackerState->getAvailableHealth());
 
 		ap.damageDealt += (attackDmg.first + attackDmg.second) / 2;
 

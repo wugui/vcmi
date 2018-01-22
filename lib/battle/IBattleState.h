@@ -14,6 +14,7 @@
 class ObstacleChanges;
 class UnitChanges;
 struct Bonus;
+class JsonNode;
 class JsonSerializeFormat;
 
 namespace vstd
@@ -74,8 +75,8 @@ public:
 	virtual void nextRound(int32_t roundNr) = 0;
 	virtual void nextTurn(uint32_t unitId) = 0;
 
-	virtual void addUnit(const UnitChanges & changes) = 0;
-	virtual void setUnitState(const UnitChanges & changes) = 0;
+	virtual void addUnit(uint32_t id, const JsonNode & data) = 0;
+	virtual void setUnitState(uint32_t id, const JsonNode & data, int64_t healthDelta) = 0;
 	virtual void moveUnit(uint32_t id, BattleHex destination) = 0;
 	virtual void removeUnit(uint32_t id) = 0;
 

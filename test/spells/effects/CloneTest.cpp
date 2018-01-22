@@ -109,19 +109,19 @@ public:
 	{
 	}
 
-    void onUnitAdded(const UnitChanges & changes)
+    void onUnitAdded(uint32_t id, const JsonNode & data)
 	{
 		using namespace ::battle;
 
 		UnitFake & clone = unitsFake.add(BattleSide::ATTACKER);
 
-		EXPECT_CALL(clone, unitId()).WillRepeatedly(Return(changes.id));
+		EXPECT_CALL(clone, unitId()).WillRepeatedly(Return(id));
 
 		cloneState = std::make_shared<CUnitStateDetached>(&clone, &clone);
 
-		EXPECT_CALL(clone, acquire()).WillOnce(Return(cloneState));
+		EXPECT_CALL(clone, acquireState()).WillOnce(Return(cloneState));
 
-		cloneAddInfo->fromInfo(changes);
+		cloneAddInfo->load(id, data);
 	}
 
 	void checkCloneLifetimeMarker(uint32_t id, const std::vector<Bonus> & bonus)
@@ -147,9 +147,10 @@ public:
 		EXPECT_CALL(*battleFake, getUnitsIf(_)).Times(AtLeast(1));
 
 		EXPECT_CALL(*battleFake, nextUnitId()).WillOnce(Return(cloneId));
-		EXPECT_CALL(*battleFake, addUnit(_)).WillOnce(Invoke(this, &CloneApplyTest::onUnitAdded));
+		EXPECT_CALL(*battleFake, addUnit(_, _)).WillOnce(Invoke(this, &CloneApplyTest::onUnitAdded));
 
-		EXPECT_CALL(*battleFake, setUnitState(_)).Times(AtLeast(1));
+		EXPECT_CALL(*battleFake, setUnitState(Eq(originalId), _, Eq(0))).Times(AtLeast(1));
+		EXPECT_CALL(*battleFake, setUnitState(Eq(cloneId), _, Eq(0))).Times(AtLeast(1));
 
 		auto & original = unitsFake.add(BattleSide::ATTACKER);
 		EXPECT_CALL(original, isValidTarget(Eq(false))).Times(AtLeast(1)).WillRepeatedly(Return(true));
@@ -163,7 +164,7 @@ public:
 
 		originalState = std::make_shared<CUnitStateDetached>(&original, &original);
 
-		EXPECT_CALL(original, acquire()).WillOnce(Return(originalState));
+		EXPECT_CALL(original, acquireState()).WillOnce(Return(originalState));
 
 		target.emplace_back(&original);
 	}

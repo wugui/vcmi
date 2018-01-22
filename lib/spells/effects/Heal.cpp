@@ -120,14 +120,14 @@ void Heal::prepareHealEffect(int64_t value, BattleUnitsChanged & pack, RNG & rng
 		{
 			auto unitHPgained = m->applySpellBonus(value, unit);
 
-			auto state = unit->acquire();
+			auto state = unit->acquireState();
 			state->heal(unitHPgained, healLevel, healPower);
 
 			if(unitHPgained > 0)
 			{
-				UnitChanges info;
-				state->toInfo(info);
+				UnitChanges info(state->unitId(), UnitChanges::EOperation::RESET_STATE);
 				info.healthDelta = unitHPgained;
+				state->save(info.data);
 				pack.changedStacks.push_back(info);
 			}
 		}

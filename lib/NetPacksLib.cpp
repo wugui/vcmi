@@ -1332,7 +1332,7 @@ DLL_LINKAGE void BattleStackAttacked::applyGs(CGameState * gs)
 
 DLL_LINKAGE void BattleStackAttacked::applyBattle(IBattleState * battleState)
 {
-	battleState->setUnitState(newState);
+	battleState->setUnitState(newState.id, newState.data, newState.healthDelta);
 }
 
 DLL_LINKAGE void BattleAttack::applyGs(CGameState * gs)
@@ -1449,13 +1449,13 @@ DLL_LINKAGE void BattleUnitsChanged::applyBattle(IBattleState * battleState)
 		switch(elem.operation)
 		{
 		case BattleChanges::EOperation::RESET_STATE:
-			battleState->setUnitState(elem);
+			battleState->setUnitState(elem.id, elem.data, elem.healthDelta);
 			break;
 		case BattleChanges::EOperation::REMOVE:
 			battleState->removeUnit(elem.id);
 			break;
 		case BattleChanges::EOperation::ADD:
-			battleState->addUnit(elem);
+			battleState->addUnit(elem.id, elem.data);
 			break;
 		default:
 			logNetwork->error("Unknown unit operation %d", (int)elem.operation);

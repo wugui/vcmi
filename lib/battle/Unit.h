@@ -17,7 +17,7 @@
 #include "../spells/Magic.h"
 
 struct MetaString;
-class UnitChanges;
+class JsonNode;
 class JsonSerializeFormat;
 
 namespace battle
@@ -59,7 +59,10 @@ public:
 	virtual int64_t getAvailableHealth() const = 0;
 	virtual int64_t getTotalHealth() const = 0;
 
+	virtual int getTotalAttacks(bool ranged) const = 0;
+
 	virtual BattleHex getPosition() const = 0;
+	virtual void setPosition(BattleHex hex) = 0;
 
 	virtual int32_t getInitiative(int turn = 0) const = 0;
 
@@ -69,7 +72,8 @@ public:
 	virtual bool willMove(int turn = 0) const = 0; //if stack has remaining move this turn
 	virtual bool waited(int turn = 0) const = 0;
 
-	virtual std::shared_ptr<CUnitState> acquire() const = 0;
+	virtual std::shared_ptr<Unit> acquire() const = 0;
+	virtual std::shared_ptr<CUnitState> acquireState() const = 0;
 
 	virtual int battleQueuePhase(int turn) const = 0;
 
@@ -94,6 +98,11 @@ public:
 	std::string formatGeneralMessage(const int32_t baseTextId) const;
 
 	int getRawSurrenderCost() const;
+
+	//NOTE: save could possibly be const, but this requires heavy changes to Json serialization,
+	//also this method should be called only after modifying object
+	virtual void save(JsonNode & data) = 0;
+	virtual void load(const JsonNode & data) = 0;
 };
 
 class DLL_LINKAGE UnitInfo
@@ -110,8 +119,8 @@ public:
 
 	void serializeJson(JsonSerializeFormat & handler);
 
-	void toInfo(UnitChanges & info);
-	void fromInfo(const UnitChanges & info);
+	void save(JsonNode & data);
+	void load(uint32_t id_, const JsonNode & data);
 };
 
 }

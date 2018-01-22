@@ -117,8 +117,8 @@ TEST_F(UnitStateTest, initialRegular)
 	EXPECT_FALSE(subject.waited());
 	EXPECT_FALSE(subject.waited(123456));
 
-	EXPECT_EQ(subject.totalAttacks.getMeleeValue(), 1);
-	EXPECT_EQ(subject.totalAttacks.getRangedValue(), 1);
+	EXPECT_EQ(subject.getTotalAttacks(true), 1);
+	EXPECT_EQ(subject.getTotalAttacks(false), 1);
 }
 
 TEST_F(UnitStateTest, canShoot)
@@ -206,8 +206,8 @@ TEST_F(UnitStateTest, additionalAttack)
 		bonusMock.addNewBonus(bonus);
 	}
 
-	EXPECT_EQ(subject.totalAttacks.getMeleeValue(), 42);
-	EXPECT_EQ(subject.totalAttacks.getRangedValue(), 42);
+	EXPECT_EQ(subject.getTotalAttacks(false), 42);
+	EXPECT_EQ(subject.getTotalAttacks(true), 42);
 }
 
 TEST_F(UnitStateTest, additionalMeleeAttack)
@@ -221,8 +221,8 @@ TEST_F(UnitStateTest, additionalMeleeAttack)
 		bonusMock.addNewBonus(bonus);
 	}
 
-	EXPECT_EQ(subject.totalAttacks.getMeleeValue(), 42);
-	EXPECT_EQ(subject.totalAttacks.getRangedValue(), 1);
+	EXPECT_EQ(subject.getTotalAttacks(false), 42);
+	EXPECT_EQ(subject.getTotalAttacks(true), 1);
 }
 
 TEST_F(UnitStateTest, additionalRangedAttack)
@@ -236,6 +236,6 @@ TEST_F(UnitStateTest, additionalRangedAttack)
 		bonusMock.addNewBonus(bonus);
 	}
 
-	EXPECT_EQ(subject.totalAttacks.getMeleeValue(), 1);
-	EXPECT_EQ(subject.totalAttacks.getRangedValue(), 42);
+	EXPECT_EQ(subject.getTotalAttacks(false), 1);
+	EXPECT_EQ(subject.getTotalAttacks(true), 42);
 }

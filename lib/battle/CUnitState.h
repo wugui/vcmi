@@ -251,6 +251,7 @@ public:
 	int64_t getTotalHealth() const override;
 
 	BattleHex getPosition() const override;
+	void setPosition(BattleHex hex) override;
 	int32_t getInitiative(int turn = 0) const override;
 
 	bool canMove(int turn = 0) const override;
@@ -259,7 +260,8 @@ public:
 	bool willMove(int turn = 0) const override;
 	bool waited(int turn = 0) const override;
 
-	std::shared_ptr<CUnitState> acquire() const override;
+	std::shared_ptr<Unit> acquire() const override;
+	std::shared_ptr<CUnitState> acquireState() const override;
 
 	int battleQueuePhase(int turn) const override;
 
@@ -269,14 +271,16 @@ public:
 	void localInit(const IUnitEnvironment * env_);
 	void serializeJson(JsonSerializeFormat & handler);
 
-	void toInfo(UnitChanges & info);
-	void fromInfo(const UnitChanges & info);
+	int getTotalAttacks(bool ranged) const override;
 
 	int getMinDamage(bool ranged) const override;
 	int getMaxDamage(bool ranged) const override;
 
 	int getAttack(bool ranged) const override;
 	int getDefence(bool ranged) const override;
+
+	void save(JsonNode & data) override;
+	void load(const JsonNode & data) override;
 
 	void afterAttack(bool ranged, bool counter);
 

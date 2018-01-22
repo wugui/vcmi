@@ -70,8 +70,8 @@ void Clone::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m
 		info.summoned = true;
 
 		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back();
-		info.toInfo(pack.changedStacks.back());
+		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+		info.save(pack.changedStacks.back().data);
 		battleState->apply(&pack);
 
 		//TODO: use BattleUnitsChanged with UPDATE operation
@@ -79,15 +79,15 @@ void Clone::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m
 		BattleUnitsChanged cloneFlags;
 
 		auto cloneUnit = m->cb->battleGetUnitByID(unitId);
-		auto cloneState = cloneUnit->acquire();
+		auto cloneState = cloneUnit->acquireState();
 		cloneState->cloned = true;
-		cloneFlags.changedStacks.emplace_back();
-		cloneState->toInfo(cloneFlags.changedStacks.back());
+		cloneFlags.changedStacks.emplace_back(cloneState->unitId(), UnitChanges::EOperation::RESET_STATE);
+		cloneState->save(cloneFlags.changedStacks.back().data);
 
-		auto originalState = clonedStack->acquire();
+		auto originalState = clonedStack->acquireState();
 		originalState->cloneID = unitId;
-		cloneFlags.changedStacks.emplace_back();
-		originalState->toInfo(cloneFlags.changedStacks.back());
+		cloneFlags.changedStacks.emplace_back(originalState->unitId(), UnitChanges::EOperation::RESET_STATE);
+		originalState->save(cloneFlags.changedStacks.back().data);
 
 		battleState->apply(&cloneFlags);
 

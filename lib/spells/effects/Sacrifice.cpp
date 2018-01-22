@@ -94,7 +94,7 @@ bool Sacrifice::applicable(Problem & problem, const Mechanics * m) const
 
 bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
 {
-	//TODO: proper support for multiple targets
+	//TODO: support for multiple targets?
 
 	if(target.empty())
 		return false;
@@ -110,9 +110,11 @@ bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const Target 
 		auto victim = target.at(1).unitValue;
 		if(!victim->alive() || !getStackFilter(m, false, victim))
 			return false;
+
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void Sacrifice::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const

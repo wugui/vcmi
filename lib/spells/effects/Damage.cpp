@@ -193,7 +193,7 @@ void Damage::prepareEffects(StacksInjured & stacksInjured, RNG & rng, const Mech
 			bsa.damageAmount = damageForTarget(targetIndex, m, unit);
 			bsa.stackAttacked = unit->unitId();
 			bsa.attackerID = -1;
-			auto newState = unit->acquire();
+			auto newState = unit->acquireState();
 			CStack::prepareAttacked(bsa, rng, newState);
 
 			if(describe)

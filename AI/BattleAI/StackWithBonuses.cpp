@@ -279,13 +279,12 @@ void HypotheticBattle::nextTurn(uint32_t unitId)
 	unit->afterGetsTurn();
 }
 
-void HypotheticBattle::addUnit(const UnitChanges & changes)
+void HypotheticBattle::addUnit(uint32_t id, const JsonNode & data)
 {
 	battle::UnitInfo info;
-	info.fromInfo(changes);
-
+	info.load(id, data);
 	std::shared_ptr<StackWithBonuses> newUnit = std::make_shared<StackWithBonuses>(this, info);
-	stackStates[info.id] = newUnit;
+	stackStates[newUnit->unitId()] = newUnit;
 }
 
 void HypotheticBattle::moveUnit(uint32_t id, BattleHex destination)
@@ -294,13 +293,13 @@ void HypotheticBattle::moveUnit(uint32_t id, BattleHex destination)
 	changed->position = destination;
 }
 
-void HypotheticBattle::setUnitState(const UnitChanges & changes)
+void HypotheticBattle::setUnitState(uint32_t id, const JsonNode & data, int64_t healthDelta)
 {
-	std::shared_ptr<StackWithBonuses> changed = getForUpdate(changes.id);
+	std::shared_ptr<StackWithBonuses> changed = getForUpdate(id);
 
-	changed->fromInfo(changes);
+	changed->load(data);
 
-	if(changes.healthDelta < 0)
+	if(healthDelta < 0)
 	{
 		changed->removeUnitBonus(Bonus::UntilBeingAttacked);
 	}
