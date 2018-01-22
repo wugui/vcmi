@@ -205,7 +205,7 @@ public:
 	virtual std::vector<const CStack *> getAffectedStacks(BattleHex destination) const = 0;
 
 	virtual bool canBeCast(Problem & problem) const = 0;
-	virtual bool canBeCastAt(BattleHex destination) const = 0;
+	virtual bool canBeCastAt(const Target & target) const = 0;
 
 	virtual void applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const = 0;
 
@@ -228,6 +228,8 @@ public:
 	virtual IBattleCast::Value getEffectDuration() const = 0;
 
 	virtual IBattleCast::Value64 getEffectValue() const = 0;
+
+	virtual PlayerColor getCasterColor() const = 0;
 
 	//Spell facade
 	virtual int32_t getSpellIndex() const = 0;
@@ -282,6 +284,8 @@ public:
 	IBattleCast::Value getEffectDuration() const override;
 
 	IBattleCast::Value64 getEffectValue() const override;
+
+	PlayerColor getCasterColor() const override;
 
 	bool isSmart() const override;
 	bool isMassive() const override;

@@ -53,7 +53,7 @@ TEST_F(HealTest, NotApplicableToHealthyUnit)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(HealTest, ApplicableToWoundedUnit)
@@ -70,7 +70,7 @@ TEST_F(HealTest, ApplicableToWoundedUnit)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(HealTest, ApplicableToDeadUnit)
@@ -102,7 +102,7 @@ TEST_F(HealTest, ApplicableToDeadUnit)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(HealTest, NotApplicableIfDeadUnitIsBlocked)
@@ -140,7 +140,45 @@ TEST_F(HealTest, NotApplicableIfDeadUnitIsBlocked)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
+}
+
+TEST_F(HealTest, ApplicableWithAnotherDeadUnitInSamePosition)
+{
+	{
+		JsonNode config(JsonNode::JsonType::DATA_STRUCT);
+		config["healLevel"].String() = "resurrect";
+		EffectFixture::setupEffect(config);
+	}
+
+	auto & unit = unitsFake.add(BattleSide::ATTACKER);
+	unit.makeDead();
+
+	EXPECT_CALL(unit, isValidTarget(Eq(true))).WillOnce(Return(true));
+	EXPECT_CALL(unit, getTotalHealth()).WillOnce(Return(200));
+	EXPECT_CALL(unit, getAvailableHealth()).WillOnce(Return(0));
+
+	EXPECT_CALL(unit, getPosition()).WillRepeatedly(Return(BattleHex(5,5)));
+	EXPECT_CALL(unit, doubleWide()).WillRepeatedly(Return(false));
+	EXPECT_CALL(unit, isValidTarget(Eq(false))).WillRepeatedly(Return(false));
+	EXPECT_CALL(unit, unitSide()).Times(AnyNumber());
+
+	auto & blockingUnit = unitsFake.add(BattleSide::ATTACKER);
+
+	EXPECT_CALL(blockingUnit, getPosition()).WillRepeatedly(Return(BattleHex(5,5)));
+	EXPECT_CALL(blockingUnit, doubleWide()).WillRepeatedly(Return(false));
+	EXPECT_CALL(blockingUnit, isValidTarget(Eq(false))).Times(AtLeast(1)).WillRepeatedly(Return(false));
+	EXPECT_CALL(blockingUnit, unitSide()).Times(AnyNumber());
+
+	EXPECT_CALL(mechanicsMock, isSmart()).WillRepeatedly(Return(false));
+	EXPECT_CALL(mechanicsMock, ownerMatches(Eq(&unit))).WillRepeatedly(Return(true));
+
+	EXPECT_CALL(*battleFake, getUnitsIf(_)).Times(AtLeast(1));
+
+	EffectTarget target;
+	target.emplace_back(&unit, BattleHex());
+
+	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(HealTest, NotApplicableIfEffectValueTooLow)
@@ -169,7 +207,7 @@ TEST_F(HealTest, NotApplicableIfEffectValueTooLow)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 class HealApplyTest : public TestWithParam<::testing::tuple<EHealLevel, EHealPower>>, public EffectFixture

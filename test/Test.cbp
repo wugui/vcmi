@@ -51,6 +51,9 @@
 			<Add option="-Wno-unused-local-typedefs" />
 			<Add option="-D_WIN32_WINNT=0x0501" />
 			<Add option="-D_WIN32" />
+			<Add option="-DBOOST_THREAD_USE_LIB" />
+			<Add option="-DBOOST_SYSTEM_NO_DEPRECATED" />
+			<Add option="-DVCMI_NO_EXTRA_VERSION" />
 			<Add directory="$(#zlib.include)" />
 			<Add directory="$(#boost.include)" />
 			<Add directory="googletest/googlemock/include" />
@@ -70,6 +73,8 @@
 		<Unit filename="CVcmiTestConfig.cpp" />
 		<Unit filename="CVcmiTestConfig.h" />
 		<Unit filename="StdInc.cpp">
+			<Option compile="0" />
+			<Option link="0" />
 			<Option weight="0" />
 		</Unit>
 		<Unit filename="StdInc.h">
@@ -111,6 +116,8 @@
 		<Unit filename="spells/effects/EffectFixture.cpp" />
 		<Unit filename="spells/effects/EffectFixture.h" />
 		<Unit filename="spells/effects/HealTest.cpp" />
+		<Unit filename="spells/effects/SacrificeTest.cpp" />
+		<Unit filename="spells/effects/SummonTest.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

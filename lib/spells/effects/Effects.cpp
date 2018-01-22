@@ -74,7 +74,7 @@ bool Effects::applicable(Problem & problem, const Mechanics * m, const Target & 
 
 		EffectTarget target = e->transformTarget(m, aimPoint, spellTarget);
 
-		if(e->applicable(problem, m, aimPoint, target))
+		if(e->applicable(problem, m, target))
 		{
 			oneEffectApplicable = true;
 		}

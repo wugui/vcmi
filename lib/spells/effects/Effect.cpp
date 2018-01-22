@@ -33,7 +33,7 @@ bool Effect::applicable(Problem & problem, const Mechanics * m) const
 	return true;
 }
 
-bool Effect::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
+bool Effect::applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const
 {
 	return true;
 }

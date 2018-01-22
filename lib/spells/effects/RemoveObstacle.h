@@ -29,7 +29,7 @@ public:
 	virtual ~RemoveObstacle();
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;
-	bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const override;
+	bool applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const override;
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
 

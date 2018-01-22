@@ -49,8 +49,8 @@ bool Summon::applicable(Problem & problem, const Mechanics * m) const
 
 	auto otherSummoned = m->cb->battleGetUnitsIf([m, this](const battle::Unit * unit)
 	{
-		return (unit->unitOwner() == m->caster->getOwner())
-			&& (unit->isSummoned())
+		return (unit->unitOwner() == m->getCasterColor())
+			&& (unit->unitSlot() == SlotID::SUMMONED_SLOT_PLACEHOLDER)
 			&& (!unit->isClone())
 			&& (unit->creatureId() != creature);
 	});
@@ -92,21 +92,36 @@ void Summon::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * 
 		return;
 	}
 
+	BattleUnitsChanged pack;
+
 	for(auto & dest : target)
 	{
-		battle::UnitInfo info;
-		info.id = m->cb->battleNextUnitId();
-		info.count = amount;
-		info.type = creature;
-		info.side = m->casterSide;
-		info.position = dest.hexValue;
-		info.summoned = !permanent;
+		if(dest.unitValue)
+		{
+			const battle::Unit * summoned = dest.unitValue;
+			std::shared_ptr<battle::Unit> state = summoned->acquire();
+			int64_t healthValue = amount * summoned->MaxHealth();
+			state->heal(healthValue, EHealLevel::OVERHEAL, (permanent ? EHealPower::PERMANENT : EHealPower::ONE_BATTLE));
+			pack.changedStacks.emplace_back(summoned->unitId(), UnitChanges::EOperation::RESET_STATE);
+			state->save(pack.changedStacks.back().data);
+		}
+		else
+		{
+			battle::UnitInfo info;
+			info.id = m->cb->battleNextUnitId();
+			info.count = amount;
+			info.type = creature;
+			info.side = m->casterSide;
+			info.position = dest.hexValue;
+			info.summoned = !permanent;
 
-		BattleUnitsChanged pack;
-		pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
-		info.save(pack.changedStacks.back().data);
-		battleState->apply(&pack);
+			pack.changedStacks.emplace_back(info.id, UnitChanges::EOperation::ADD);
+			info.save(pack.changedStacks.back().data);
+		}
 	}
+
+	if(!pack.changedStacks.empty())
+		battleState->apply(&pack);
 }
 
 void Summon::serializeJsonEffect(JsonSerializeFormat & handler)
@@ -118,12 +133,29 @@ void Summon::serializeJsonEffect(JsonSerializeFormat & handler)
 
 EffectTarget Summon::transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const
 {
+	auto sameSummoned = m->cb->battleGetUnitsIf([m, this](const battle::Unit * unit)
+	{
+		return (unit->unitOwner() == m->getCasterColor())
+			&& (unit->unitSlot() == SlotID::SUMMONED_SLOT_PLACEHOLDER)
+			&& (!unit->isClone())
+			&& (unit->creatureId() == creature)
+			&& (unit->alive());
+	});
+
 	EffectTarget effectTarget;
-	BattleHex hex = m->cb->getAvaliableHex(creature, m->casterSide);
-	if(!hex.isValid())
-		logGlobal->error("No free space to summon creature!");
+
+	if(sameSummoned.empty())
+	{
+		BattleHex hex = m->cb->getAvaliableHex(creature, m->casterSide);
+		if(!hex.isValid())
+			logGlobal->error("No free space to summon creature!");
+		else
+			effectTarget.emplace_back(hex);
+	}
 	else
-		effectTarget.push_back(Destination(hex));
+	{
+		effectTarget.emplace_back(sameSummoned.front());
+	}
 
 	return effectTarget;
 }

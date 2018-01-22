@@ -27,6 +27,8 @@ class CUnitState;
 class DLL_LINKAGE Unit : public IUnitInfo, public spells::Caster, public virtual IBonusBearer
 {
 public:
+	virtual ~Unit();
+
 	virtual bool doubleWide() const = 0;
 
 	virtual int32_t creatureIndex() const = 0;
@@ -45,8 +47,6 @@ public:
 
 	virtual bool isClone() const = 0;
 	virtual bool hasClone() const = 0;
-
-	virtual bool isSummoned() const = 0;
 
 	virtual bool canCast() const = 0;
 	virtual bool isCaster() const = 0;
@@ -103,6 +103,9 @@ public:
 	//also this method should be called only after modifying object
 	virtual void save(JsonNode & data) = 0;
 	virtual void load(const JsonNode & data) = 0;
+
+	virtual void damage(int64_t & amount) = 0;
+	virtual void heal(int64_t & amount, EHealLevel level, EHealPower power) = 0;
 };
 
 class DLL_LINKAGE UnitInfo

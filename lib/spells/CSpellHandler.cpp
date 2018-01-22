@@ -384,7 +384,22 @@ bool CSpell::canBeCastAt(const CBattleInfoCallback * cb,  spells::Mode mode, con
 	if(canBeCast(cb, mode, caster))
 	{
 		spells::BattleCast event(cb, caster, mode, this);
-		return battleMechanics(&event)->canBeCastAt(destination);
+		spells::Target tmp;
+		tmp.emplace_back(destination);
+		return battleMechanics(&event)->canBeCastAt(tmp);
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool CSpell::canBeCastAt(const CBattleInfoCallback * cb,  spells::Mode mode, const spells::Caster * caster, const spells::Target & target) const
+{
+	if(canBeCast(cb, mode, caster))
+	{
+		spells::BattleCast event(cb, caster, mode, this);
+		return battleMechanics(&event)->canBeCastAt(target);
 	}
 	else
 	{

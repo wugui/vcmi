@@ -237,8 +237,6 @@ public:
 	bool isClone() const override;
 	bool hasClone() const override;
 
-	bool isSummoned() const override;
-
 	bool canCast() const override;
 	bool isCaster() const override;
 	bool canShoot() const override;
@@ -265,12 +263,6 @@ public:
 
 	int battleQueuePhase(int turn) const override;
 
-	void damage(int64_t & amount);
-	void heal(int64_t & amount, EHealLevel level, EHealPower power);
-
-	void localInit(const IUnitEnvironment * env_);
-	void serializeJson(JsonSerializeFormat & handler);
-
 	int getTotalAttacks(bool ranged) const override;
 
 	int getMinDamage(bool ranged) const override;
@@ -281,6 +273,12 @@ public:
 
 	void save(JsonNode & data) override;
 	void load(const JsonNode & data) override;
+
+	void damage(int64_t & amount) override;
+	void heal(int64_t & amount, EHealLevel level, EHealPower power) override;
+
+	void localInit(const IUnitEnvironment * env_);
+	void serializeJson(JsonSerializeFormat & handler);
 
 	void afterAttack(bool ranged, bool counter);
 

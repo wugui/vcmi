@@ -161,18 +161,15 @@ bool BattleSpellMechanics::canBeCast(Problem & problem) const
 	return effects->applicable(problem, this);
 }
 
-bool BattleSpellMechanics::canBeCastAt(BattleHex destination) const
+bool BattleSpellMechanics::canBeCastAt(const Target & target) const
 {
 	detail::ProblemImpl problem;
 
-	//TODO: add support for secondary targets
 	//TODO: send problem to caller (for battle log message in BattleInterface)
-	Target tmp;
-	tmp.push_back(Destination(destination));
 
-	Target spellTarget = transformSpellTarget(tmp);
+	Target spellTarget = transformSpellTarget(target);
 
-    return effects->applicable(problem, this, tmp, spellTarget);
+    return effects->applicable(problem, this, target, spellTarget);
 }
 
 std::vector<const CStack *> BattleSpellMechanics::getAffectedStacks(BattleHex destination) const
@@ -579,8 +576,13 @@ std::vector<Destination> BattleSpellMechanics::getPossibleDestinations(size_t in
 		{
 			BattleHex dest(i);
 			if(dest.isAvailable())
-				if(canBeCastAt(dest))
+			{
+				Target tmp = current;
+				tmp.emplace_back(dest);
+
+				if(canBeCastAt(tmp))
 					ret.emplace_back(dest);
+			}
 		}
 		break;
 	case AimType::NO_TARGET:

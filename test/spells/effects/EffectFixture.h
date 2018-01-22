@@ -25,6 +25,11 @@
 #include "../../../lib/NetPacksBase.h"
 #include "../../../lib/battle/CBattleInfoCallback.h"
 
+namespace battle
+{
+	bool operator== (const Destination & left, const Destination & right);
+}
+
 namespace test
 {
 

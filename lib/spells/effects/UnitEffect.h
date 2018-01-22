@@ -28,7 +28,7 @@ public:
 	void adjustAffectedHexes(std::set<BattleHex> & hexes, const Mechanics * m, const Target & spellTarget) const override;
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;
-	bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const override;
+	bool applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const override;
 
 	EffectTarget filterTarget(const Mechanics * m, const EffectTarget & target) const override;
 

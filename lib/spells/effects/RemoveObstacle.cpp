@@ -44,7 +44,7 @@ bool RemoveObstacle::applicable(Problem & problem, const Mechanics * m) const
 	return !getTargets(m, EffectTarget(), true).empty();
 }
 
-bool RemoveObstacle::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
+bool RemoveObstacle::applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const
 {
 	return !getTargets(m, target, false).empty();
 }

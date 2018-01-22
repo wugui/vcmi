@@ -25,7 +25,7 @@ public:
 	MOCK_CONST_METHOD1(getAffectedStacks, std::vector<const CStack *>(BattleHex));
 
 	MOCK_CONST_METHOD1(canBeCast, bool(Problem &));
-	MOCK_CONST_METHOD1(canBeCastAt, bool(BattleHex));
+	MOCK_CONST_METHOD1(canBeCastAt, bool(const Target & target));
 
 	MOCK_CONST_METHOD5(applyEffects, void(BattleStateProxy *, vstd::RNG &, const Target &, bool, bool));
 
@@ -41,6 +41,8 @@ public:
 	MOCK_CONST_METHOD0(getEffectPower, IBattleCast::Value());
 	MOCK_CONST_METHOD0(getEffectDuration, IBattleCast::Value());
 	MOCK_CONST_METHOD0(getEffectValue, IBattleCast::Value64());
+
+	MOCK_CONST_METHOD0(getCasterColor, PlayerColor());
 
 	MOCK_CONST_METHOD0(getSpellIndex, int32_t());
 	MOCK_CONST_METHOD0(getSpellId, SpellID());

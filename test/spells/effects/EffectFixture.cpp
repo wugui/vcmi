@@ -15,6 +15,11 @@
 
 #include "../../../lib/serializer/JsonDeserializer.h"
 
+bool battle::operator==(const Destination& left, const Destination& right)
+{
+	return left.unitValue == right.unitValue && left.hexValue == right.hexValue;
+}
+
 namespace test
 {
 
@@ -54,6 +59,7 @@ EffectFixture::UnitFake & EffectFixture::UnitsFake::add(ui8 side)
 {
 	UnitFake * unit = new UnitFake();
 	ON_CALL(*unit, unitSide()).WillByDefault(Return(side));
+	unit->redirectBonusesToFake();
 
 	allUnits.emplace_back(unit);
 	return *allUnits.back().get();
@@ -86,7 +92,6 @@ void EffectFixture::UnitsFake::setDefaultBonusExpectations()
 {
 	for(auto & unit : allUnits)
 	{
-		unit->redirectBonusesToFake();
 		unit->expectAnyBonusSystemCall();
 	}
 }

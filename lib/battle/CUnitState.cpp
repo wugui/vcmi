@@ -650,11 +650,6 @@ bool CUnitState::hasClone() const
 	return cloneID > 0;
 }
 
-bool CUnitState::isSummoned() const
-{
-	return summoned;
-}
-
 bool CUnitState::canCast() const
 {
 	return casts.canUse(1);//do not check specific cast abilities here

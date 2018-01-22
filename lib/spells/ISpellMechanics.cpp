@@ -705,6 +705,11 @@ IBattleCast::Value64 BaseMechanics::getEffectValue() const
 	return effectValue;
 }
 
+PlayerColor BaseMechanics::getCasterColor() const
+{
+	return caster->getOwner();
+}
+
 std::vector<AimType> BaseMechanics::getTargetTypes() const
 {
 	std::vector<AimType> ret;

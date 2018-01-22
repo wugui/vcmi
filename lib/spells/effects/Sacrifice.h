@@ -26,11 +26,9 @@ public:
 	void adjustTargetTypes(std::vector<TargetType> & types) const override;
 
 	bool applicable(Problem & problem, const Mechanics * m) const override;
-	bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const override;
+	bool applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const override;
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
-
-	EffectTarget filterTarget(const Mechanics * m, const EffectTarget & target) const override;
 
 	EffectTarget transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const override;
 

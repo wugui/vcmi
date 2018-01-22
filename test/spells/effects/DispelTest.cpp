@@ -69,7 +69,7 @@ TEST_F(DispelTest, ApplicableToAliveUnitWithTimedEffect)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_TRUE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(DispelTest, IgnoresOwnEffects)
@@ -96,7 +96,7 @@ TEST_F(DispelTest, IgnoresOwnEffects)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(DispelTest, NotApplicableToUnitWithNoTimedEffect)
@@ -113,7 +113,7 @@ TEST_F(DispelTest, NotApplicableToUnitWithNoTimedEffect)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 TEST_F(DispelTest, NotApplicableToDeadUnit)
@@ -130,7 +130,7 @@ TEST_F(DispelTest, NotApplicableToDeadUnit)
 	EffectTarget target;
 	target.emplace_back(&unit, BattleHex());
 
-	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, EffectTarget(), target));
+	EXPECT_FALSE(subject->applicable(problemMock, &mechanicsMock, target));
 }
 
 class DispelApplyTest : public Test, public EffectFixture

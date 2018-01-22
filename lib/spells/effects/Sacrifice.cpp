@@ -92,7 +92,7 @@ bool Sacrifice::applicable(Problem & problem, const Mechanics * m) const
 	return true;
 }
 
-bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
+bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const
 {
 	//TODO: support for multiple targets?
 
@@ -102,19 +102,22 @@ bool Sacrifice::applicable(Problem & problem, const Mechanics * m, const Target 
 	EffectTarget healTarget;
 	healTarget.emplace_back(target.front());
 
-	if(!Heal::applicable(problem, m, aimPoint, healTarget))
+	if(!Heal::applicable(problem, m, healTarget))
 		return false;
 
-    if(target.size() == 2)
+	if(target.size() == 2)
 	{
 		auto victim = target.at(1).unitValue;
-		if(!victim->alive() || !getStackFilter(m, false, victim))
+		if(!victim)
+			return false;
+
+		if(!victim->alive() || !getStackFilter(m, false, victim) || !isReceptive(m, victim))
 			return false;
 
 		return true;
 	}
 
-	return false;
+	return true;
 }
 
 void Sacrifice::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const
@@ -143,11 +146,6 @@ void Sacrifice::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics
 	battleState->apply(&removeUnits);
 }
 
-EffectTarget Sacrifice::filterTarget(const Mechanics * m, const EffectTarget & target) const
-{
-	return target;
-}
-
 bool Sacrifice::isValidTarget(const Mechanics * m, const battle::Unit * unit) const
 {
 	return unit->isValidTarget(true);
@@ -164,7 +162,7 @@ EffectTarget Sacrifice::transformTarget(const Mechanics * m, const Target & aimP
 	if(aimPoint.size() >= 2)
 	{
 		auto victim = aimPoint.at(1).unitValue;
-		if(victim && getStackFilter(m, false, victim))
+		if(victim && getStackFilter(m, false, victim) && isReceptive(m, victim))
 			res.emplace_back(victim);
 	}
 

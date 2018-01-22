@@ -65,7 +65,7 @@ bool UnitEffect::applicable(Problem & problem, const Mechanics * m) const
 	return true;
 }
 
-bool UnitEffect::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
+bool UnitEffect::applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const
 {
 	//stack effect is applicable if it affects at least one smart target
 	//assume target correctly transformed, just reapply smart filter

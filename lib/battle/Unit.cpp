@@ -22,6 +22,8 @@ namespace battle
 {
 
 ///Unit
+Unit::~Unit() = default;
+
 bool Unit::isDead() const
 {
 	return !alive() && !isGhost();

@@ -147,7 +147,7 @@ bool Obstacle::applicable(Problem & problem, const Mechanics * m) const
 	return LocationEffect::applicable(problem, m);
 }
 
-bool Obstacle::applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const
+bool Obstacle::applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const
 {
 	if(!m->isMassive())
 	{
@@ -163,7 +163,7 @@ bool Obstacle::applicable(Problem & problem, const Mechanics * m, const Target &
 		}
 	}
 
-	return LocationEffect::applicable(problem, m, aimPoint, target);
+	return LocationEffect::applicable(problem, m, target);
 }
 
 EffectTarget Obstacle::transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const

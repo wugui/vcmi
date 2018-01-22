@@ -56,7 +56,7 @@ public:
 	virtual void adjustAffectedHexes(std::set<BattleHex> & hexes, const Mechanics * m, const Target & spellTarget) const = 0;
 
 	virtual bool applicable(Problem & problem, const Mechanics * m) const;
-	virtual bool applicable(Problem & problem, const Mechanics * m, const Target & aimPoint, const EffectTarget & target) const;
+	virtual bool applicable(Problem & problem, const Mechanics * m, const EffectTarget & target) const;
 
 	virtual void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const = 0;
 
