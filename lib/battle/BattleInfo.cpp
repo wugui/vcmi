@@ -870,13 +870,12 @@ void BattleInfo::setUnitState(uint32_t id, const JsonNode & data, int64_t health
 		}
 	}
 
-	if(resurrected)
+	if(resurrected || killed)
 	{
 		//removing all spells effects
 		auto selector = [](const Bonus * b)
 		{
-			//Special case: DISRUPTING_RAY is "immune" to dispell
-			//Other even PERMANENT effects can be removed
+			//Special case: DISRUPTING_RAY is absolutely permanent
 			if(b->source == Bonus::SPELL_EFFECT)
 				return b->sid != SpellID::DISRUPTING_RAY;
 			else

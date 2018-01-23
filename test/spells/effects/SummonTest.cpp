@@ -225,7 +225,6 @@ TEST_P(SummonApplyTest, UpdatesOldUnit)
 	unit.addNewBonus(std::make_shared<Bonus>(Bonus::PERMANENT, Bonus::STACK_HEALTH, Bonus::CREATURE_ABILITY, unitHealth, 0));
 
 	{
-		InSequence local;
 		EXPECT_CALL(unit, acquire()).WillOnce(Return(acquired));
 		EXPECT_CALL(*acquired, heal(Eq(unitHealth * unitAmount), Eq(EHealLevel::OVERHEAL), Eq(permanent ? EHealPower::PERMANENT : EHealPower::ONE_BATTLE)));
 		EXPECT_CALL(*acquired, save(_));
