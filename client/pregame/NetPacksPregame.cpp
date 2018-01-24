@@ -41,13 +41,16 @@ void LobbyClientConnected::applyOnLobby(CLobbyScreen * lobby)
 	GH.totalRedraw();
 }
 
+bool LobbyClientDisconnected::applyOnLobbyImmidiately(CLobbyScreen * lobby)
+{
+	CSH->c->stopHandling = true;
+	vstd::clear_pointer(CSH->threadConnectionToServer);
+	return true;
+}
+
 void LobbyClientDisconnected::applyOnLobby(CLobbyScreen * lobby)
 {
-	if(!CSH->ongoingClosing)
-	{
-		*CSH->c << this; //resend to confirm
-		GH.popIntTotally(lobby); //will wait with deleting us before this thread ends
-	}
+	GH.popIntTotally(lobby);
 	CSH->stopServerConnection();
 //	GH.popIntTotally(lobby);
 }
@@ -80,16 +83,17 @@ void LobbyGuiAction::applyOnLobby(CLobbyScreen * lobby)
 	}
 }
 
+bool LobbyStartGame::applyOnLobbyImmidiately(CLobbyScreen * lobby)
+{
+	CSH->si = std::shared_ptr<StartInfo>(initializedStartInfo);
+	CSH->c->stopHandling = true;
+//	vstd::clear_pointer(CSH->threadConnectionToServer);
+	return true;
+}
+
 void LobbyStartGame::applyOnLobby(CLobbyScreen * lobby)
 {
-	if(!CSH->ongoingClosing)
-	{
-		*CSH->c << this; //resend to confirm
-	}
-	vstd::clear_pointer(CSH->serverHandlingThread); //detach us
-
 	CGP->showLoadingScreen(std::bind(&startGame));
-	throw 666; //EVIL, EVIL, EVIL workaround to kill thread (does "goto catch" outside listening loop)
 }
 
 void LobbyChangeHost::applyOnLobby(CLobbyScreen * lobby)

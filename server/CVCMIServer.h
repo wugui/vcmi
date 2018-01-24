@@ -48,9 +48,17 @@ struct ServerCapabilities;
 struct LobbyInfo;
 class PlayerSettings;
 class PlayerColor;
+
+template<typename T> class CApplier;
+class CBaseForServerApply;
+class CBaseForGHApply;
+
 class CVCMIServer : public LobbyInfo
 {
+	CApplier<CBaseForServerApply> * applier;
+
 public:
+	std::unique_ptr<CGameHandler> gh;
 	enum
 	{
 		INVALID, RUNNING, ENDING_WITHOUT_START, ENDING_AND_STARTING_GAME
@@ -62,7 +70,7 @@ public:
 
 	boost::program_options::variables_map cmdLineOptions;
 
-	int listeningThreads;
+	std::atomic<int> listeningThreads;
 	std::set<std::shared_ptr<CConnection>> connections;
 	std::list<CPackForLobby *> announceQueue;
 	boost::recursive_mutex mx;
@@ -71,8 +79,8 @@ public:
 
 	void startAsyncAccept();
 	void connectionAccepted(const boost::system::error_code & ec);
-	void startListeningThread(std::shared_ptr<CConnection> pc);
-	void handleConnection(std::shared_ptr<CConnection> cpc);
+	void startListeningThread(std::shared_ptr<CConnection> c);
+	void handleConnection(std::shared_ptr<CConnection> c);
 
 	void processPack(CPackForLobby * pack);
 	void announcePack(const CPackForLobby & pack);
@@ -90,7 +98,7 @@ public:
 
 	std::shared_ptr<CConnection> hostClient;
 	ServerCapabilities * capabilities;
-	void sendPack(std::shared_ptr<CConnection> pc, const CPackForLobby & pack);
+	void sendPack(std::shared_ptr<CConnection> c, const CPackForLobby & pack);
 	void announceTxt(const std::string & txt, const std::string & playerName = "system");
 	void addToAnnounceQueue(CPackForLobby * pack, bool front = false);
 

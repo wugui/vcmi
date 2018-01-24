@@ -87,12 +87,13 @@ CLobbyScreen::CLobbyScreen(CMenuScreen::EState type, CMenuScreen::EGameMode game
 
 	buttonStart->assignedKeys.insert(SDLK_RETURN);
 
-	buttonBack = new CButton(Point(581, 535), "SCNRBACK.DEF", CGI->generaltexth->zelp[105], std::bind(&IServerAPI::stopServer, CSH), SDLK_ESCAPE);
+	buttonBack = new CButton(Point(581, 535), "SCNRBACK.DEF", CGI->generaltexth->zelp[105], std::bind(&IServerAPI::clientDisconnecting, CSH), SDLK_ESCAPE);
 }
 
 CLobbyScreen::~CLobbyScreen()
 {
-	CSH->stopServerConnection();
+//	MPTODO what to do? Client should only destroy lobby after disconect CPack received
+//	CSH->stopServerConnection();
 }
 
 void CLobbyScreen::toggleTab(CIntObject * tab)

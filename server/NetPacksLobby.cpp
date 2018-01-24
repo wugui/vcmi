@@ -17,6 +17,10 @@
 #include "../lib/mapping/CMapInfo.h"
 #include "../lib/rmg/CMapGenOptions.h"
 
+// MPTODO: ONLY FOR INITIALIZED START INFO, WE CAN AVOID IT!
+#include "CGameHandler.h"
+#include "../lib/CGameState.h"
+
 bool CLobbyPackToServer::checkClientPermissions(CVCMIServer * srv) const
 {
 	return srv->isClientHost(c->connectionID);
@@ -89,10 +93,6 @@ bool LobbyClientDisconnected::applyOnServer(CVCMIServer * srv)
 {
 	if(c) // Only set when client actually sent this netpack
 	{
-		c->receivedStop = true;
-		if(!c->sendStop)
-			srv->sendPack(c, *this);
-
 		if(c == srv->hostClient)
 			return true;
 		else
@@ -175,25 +175,29 @@ bool LobbyStartGame::checkClientPermissions(CVCMIServer * srv) const
 
 bool LobbyStartGame::applyOnServer(CVCMIServer * srv)
 {
-	c->receivedStop = true;
-	//MPTODO it's should work without it
-	// But for some reason not all guests get pack if it's not announced from there
-	if(!c->sendStop)
-		srv->announcePack(*this);
+	srv->startGame();
+	initializedStartInfo = srv->gh->gameState()->initialOpts;
 
-	if(c == srv->hostClient)
-		return true;
-	else
-		return false;
+	return true;
 }
 
 void LobbyStartGame::applyOnServerAfterAnnounce(CVCMIServer * srv)
 {
+	while(true)
+	{
+		{
+			boost::unique_lock<boost::recursive_mutex> queueLock(srv->mx);
+			if(srv->announceQueue.empty())
+				break;
+		}
+		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
+	}
+//	srv->gh->run(srv->si->mode == StartInfo::LOAD_GAME, srv);
 	//MOTODO: this need more thinking!
 	srv->state = CVCMIServer::ENDING_AND_STARTING_GAME;
 	//wait for sending thread to announce start
-	while(srv->state == CVCMIServer::RUNNING)
-		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
+//	while(srv->state == CVCMIServer::RUNNING)
+//		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 }
 
 bool LobbyChangeHost::checkClientPermissions(CVCMIServer * srv) const

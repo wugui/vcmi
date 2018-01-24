@@ -80,7 +80,7 @@ namespace bfs = boost::filesystem;
 std::string NAME_AFFIX = "client";
 std::string NAME = GameConstants::VCMI_VERSION + std::string(" (") + NAME_AFFIX + ')'; //application name
 CGuiHandler GH;
-static CClient *client = nullptr;
+static CClient * client = nullptr;
 
 int preferredDriverIndex = -1;
 SDL_Window * mainWindow = nullptr;
@@ -1340,7 +1340,14 @@ static void mainLoop()
 void startGame()
 {
 	client = new CClient();
+	CSH->client = client;
 	CPlayerInterface::howManyPeople = 0;
+	// MPTODO:
+	// We need to avoid client getting netpacks until we fully initialize everything.
+	// Will this going to work at all?
+	//
+
+	//////////////////
 	switch(CSH->si->mode) //new game
 	{
 	case StartInfo::NEW_GAME:
@@ -1353,10 +1360,8 @@ void startGame()
 		client->loadGame();
 		break;
 	}
-	{
-		TLockGuard _(client->connectionHandlerMutex);
-		client->connectionHandler = make_unique<boost::thread>(&CClient::run, client);
-	}
+	// MPTODO: Should be done after client initiualized, but before any CPackToClient netpacks arrive
+	CSH->c->stopHandling = false;
 }
 
 void endGame()

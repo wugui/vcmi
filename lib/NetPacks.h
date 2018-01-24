@@ -57,12 +57,11 @@ struct CPackForClient : public CPack
 
 struct CPackForServer : public CPack
 {
-	PlayerColor player;
-	std::shared_ptr<CConnection> c;
+	mutable PlayerColor player;
+	mutable si32 requestID;
 	CGameState* GS(CGameHandler *gh);
 	CPackForServer():
-		player(PlayerColor::NEUTRAL),
-		c(nullptr)
+		player(PlayerColor::NEUTRAL)
 	{
 	}
 
@@ -70,6 +69,12 @@ struct CPackForServer : public CPack
 	{
 		logGlobal->error("Should not happen... applying plain CPackForServer");
 		return false;
+	}
+
+	template <typename Handler> void serialize(Handler &h, const int version)
+	{
+		h & player;
+		h & requestID;
 	}
 
 protected:
@@ -2413,7 +2418,6 @@ struct CenterView : public CPackForClient
 
 struct CPackForLobby : public CPack
 {
-	std::shared_ptr<CConnection> c;
 	bool applied; // MPTODO: Only used by server. Find better way handle this since it's only used for propogate netpacks
 
 	bool checkClientPermissions(CVCMIServer * srv) const
@@ -2427,6 +2431,11 @@ struct CPackForLobby : public CPack
 	}
 
 	void applyOnServerAfterAnnounce(CVCMIServer * srv) {}
+
+	bool applyOnLobbyImmidiately(CLobbyScreen * lobby)
+	{
+		return true;
+	}
 
 	void applyOnLobby(CLobbyScreen * lobby) {}
 };
@@ -2477,18 +2486,17 @@ struct LobbyClientConnected : public CLobbyPackToPropagate
 struct LobbyClientDisconnected : public CLobbyPackToPropagate
 {
 	bool shutdownServer;
-	ui8 connectionId;
 
-	LobbyClientDisconnected() : shutdownServer(false), connectionId(-1) {}
+	LobbyClientDisconnected() : shutdownServer(false) {}
 	bool checkClientPermissions(CVCMIServer * srv) const;
 	bool applyOnServer(CVCMIServer * srv);
 	void applyOnServerAfterAnnounce(CVCMIServer * srv);
+	bool applyOnLobbyImmidiately(CLobbyScreen * lobby);
 	void applyOnLobby(CLobbyScreen * lobby);
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
 		h & shutdownServer;
-		h & connectionId;
 	}
 };
 
@@ -2524,15 +2532,19 @@ struct LobbyGuiAction : public CLobbyPackToPropagate
 
 struct LobbyStartGame : public CLobbyPackToPropagate
 {
-	LobbyStartGame() {}
+	// Set by server
+	StartInfo * initializedStartInfo;
+
+	LobbyStartGame() : initializedStartInfo(nullptr) {}
 	bool checkClientPermissions(CVCMIServer * srv) const;
 	bool applyOnServer(CVCMIServer * srv);
 	void applyOnServerAfterAnnounce(CVCMIServer * srv);
+	bool applyOnLobbyImmidiately(CLobbyScreen * lobby);
 	void applyOnLobby(CLobbyScreen * lobby);
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
-
+		h & initializedStartInfo;
 	}
 };
 
