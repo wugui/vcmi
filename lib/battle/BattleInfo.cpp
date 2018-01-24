@@ -450,10 +450,6 @@ BattleInfo * BattleInfo::setupBattle(int3 tile, ETerrainType terrain, BFieldType
 
 	std::stable_sort(stacks.begin(),stacks.end(),cmpst);
 
-	//spell level limiting bonus
-	curB->addNewBonus(std::make_shared<Bonus>(Bonus::ONE_BATTLE, Bonus::LEVEL_SPELL_IMMUNITY, Bonus::OTHER,
-		0, -1, -1, Bonus::INDEPENDENT_MAX));
-
 	auto neutral = std::make_shared<CreatureAlignmentLimiter>(EAlignment::NEUTRAL);
 	auto good = std::make_shared<CreatureAlignmentLimiter>(EAlignment::GOOD);
 	auto evil = std::make_shared<CreatureAlignmentLimiter>(EAlignment::EVIL);

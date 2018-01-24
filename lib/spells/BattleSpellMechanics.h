@@ -22,7 +22,7 @@ namespace spells
 class BattleSpellMechanics : public BaseMechanics
 {
 public:
-	BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> effects_, std::shared_ptr<TargetCondition> targetCondition_);
+	BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> effects_, std::shared_ptr<IReceptiveCheck> targetCondition_);
 	virtual ~BattleSpellMechanics();
 
 	void applyEffects(BattleStateProxy * battleState, vstd::RNG & rng, const Target & targets, bool indirect, bool ignoreImmunity) const override;
@@ -46,7 +46,7 @@ public:
 
 private:
 	std::shared_ptr<effects::Effects> effects;
-	std::shared_ptr<TargetCondition> targetCondition;
+	std::shared_ptr<IReceptiveCheck> targetCondition;
 
 	std::vector<const battle::Unit *> affectedUnits;
 	effects::Effects::EffectsToApply effectsToApply;

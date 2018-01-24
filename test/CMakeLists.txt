@@ -30,6 +30,8 @@ set(test_SRCS
  		map/CMapFormatTest.cpp
  		map/MapComparer.cpp
 
+ 		spells/TargetConditionTest.cpp
+
 		spells/effects/EffectFixture.cpp
  		spells/effects/CatapultTest.cpp
  		spells/effects/CloneTest.cpp
@@ -38,6 +40,21 @@ set(test_SRCS
  		spells/effects/HealTest.cpp
  		spells/effects/SacrificeTest.cpp
  		spells/effects/SummonTest.cpp
+ 		spells/effects/TeleportTest.cpp
+ 		spells/effects/TimedTest.cpp
+
+ 		spells/targetConditions/AbsoluteSpellConditionTest.cpp
+ 		spells/targetConditions/AbsoluteLevelConditionTest.cpp
+ 		spells/targetConditions/BonusConditionTest.cpp
+ 		spells/targetConditions/CreatureConditionTest.cpp
+ 		spells/targetConditions/ElementalConditionTest.cpp
+ 		spells/targetConditions/HealthValueConditionTest.cpp
+ 		spells/targetConditions/ImmunityNegationConditionTest.cpp
+ 		spells/targetConditions/NormalLevelConditionTest.cpp
+ 		spells/targetConditions/NormalSpellConditionTest.cpp
+ 		spells/targetConditions/ReceptiveFeatureConditionTest.cpp
+ 		spells/targetConditions/SpellEffectConditionTest.cpp
+ 		spells/targetConditions/TargetConditionItemFixture.cpp
 
  		mock/mock_IGameCallback.cpp
  		mock/mock_MapService.cpp
@@ -51,6 +68,8 @@ set(test_HEADERS
  		map/MapComparer.h
 
 		spells/effects/EffectFixture.h
+
+		spells/targetConditions/TargetConditionItemFixture.h
 
 		mock/mock_BonusBearer.h
  		mock/mock_IGameCallback.h

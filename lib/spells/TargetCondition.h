@@ -10,9 +10,10 @@
 
 #pragma once
 
+#include "ISpellMechanics.h"
+
 class JsonNode;
 class JsonSerializeFormat;
-class CBattleInfoCallback;
 
 namespace battle
 {
@@ -21,43 +22,63 @@ namespace battle
 
 namespace spells
 {
-class Caster;
 class Mechanics;
 
-class TargetCondition
+
+class DLL_LINKAGE TargetConditionItem : public IReceptiveCheck
 {
 public:
-	class Item
-	{
-	public:
-		bool inverted;
-		bool exclusive;
+	TargetConditionItem();
+	virtual ~TargetConditionItem();
 
-		Item();
-		virtual ~Item();
+	virtual void setInverted(bool value) = 0;
+	virtual void setExclusive(bool value) = 0;
 
-		virtual bool isReceptive(const Mechanics * m, const battle::Unit * target) const;
-	protected:
-		virtual bool check(const Mechanics * m, const battle::Unit * target) const = 0;
-	};
+	virtual bool isExclusive() const = 0;
+};
 
+class DLL_LINKAGE TargetConditionItemFactory
+{
+public:
+	using Object = std::shared_ptr<TargetConditionItem>;
+
+	static const TargetConditionItemFactory * getDefault();
+
+	virtual Object createAbsoluteLevel() const = 0;
+	virtual Object createAbsoluteSpell() const = 0;
+	virtual Object createElemental() const = 0;
+	virtual Object createNormalLevel() const = 0;
+	virtual Object createNormalSpell() const = 0;
+
+	virtual Object createConfigurable(std::string scope, std::string type, std::string identifier) const = 0;
+
+	virtual Object createReceptiveFeature() const = 0;
+	virtual Object createImmunityNegation() const = 0;
+};
+
+class DLL_LINKAGE TargetCondition : public IReceptiveCheck
+{
+public:
+	using Item = TargetConditionItem;
 	using ItemVector = std::vector<std::shared_ptr<Item>>;
+	using ItemFactory = TargetConditionItemFactory;
 
 	ItemVector normal;
 	ItemVector absolute;
+	ItemVector negation;
 
 	TargetCondition();
 	virtual ~TargetCondition();
 
-	bool isReceptive(const CBattleInfoCallback * cb, const Caster * caster, const Mechanics * m, const battle::Unit * target) const;
+	bool isReceptive(const Mechanics * m, const battle::Unit * target) const override;
 
-	void serializeJson(JsonSerializeFormat & handler);
+	void serializeJson(JsonSerializeFormat & handler, const ItemFactory * itemFactory);
 protected:
 
 private:
 	bool check(const ItemVector & condition, const Mechanics * m, const battle::Unit * target) const;
 
-	void loadConditions(const JsonNode & source, bool exclusive, bool inverted);
+	void loadConditions(const JsonNode & source, bool exclusive, bool inverted, const ItemFactory * itemFactory);
 };
 
 }

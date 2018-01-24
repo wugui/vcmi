@@ -32,11 +32,6 @@ namespace vstd
 	class RNG;
 }
 
-namespace spells
-{
-	class TargetCondition;
-}
-
 ///callback to be provided by server
 class DLL_LINKAGE SpellCastEnvironment : public spells::PacketSender
 {
@@ -254,6 +249,7 @@ public:
 
 	//Battle facade
 	virtual bool ownerMatches(const battle::Unit * unit) const = 0;
+	virtual bool ownerMatches(const battle::Unit * unit, const boost::logic::tribool positivness) const = 0;
 
 	const CBattleInfoCallback * cb;
 	const Caster * caster;
@@ -303,6 +299,7 @@ public:
 	std::vector<Bonus::BonusType> getElementalImmunity() const override;
 
 	bool ownerMatches(const battle::Unit * unit) const override;
+	bool ownerMatches(const battle::Unit * unit, const boost::logic::tribool positivness) const override;
 
 	std::vector<AimType> getTargetTypes() const override;
 
@@ -321,6 +318,14 @@ private:
 
 	///raw damage/heal amount
 	IBattleCast::Value64 effectValue;
+};
+
+class DLL_LINKAGE IReceptiveCheck
+{
+public:
+	virtual ~IReceptiveCheck() = default;
+
+	virtual bool isReceptive(const Mechanics * m, const battle::Unit * target) const = 0;
 };
 
 }// namespace spells

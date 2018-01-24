@@ -281,6 +281,7 @@
 						"type":"core:timed",
 						"bonus":{
 							"levelSpellImmunity":{
+								"addInfo" : 1, //absolute
 								"val" : 3,
 								"type" : "LEVEL_SPELL_IMMUNITY",
 								"valueType" : "INDEPENDENT_MAX",

@@ -109,6 +109,7 @@
 		<Unit filename="mock/mock_spells_Problem.h" />
 		<Unit filename="mock/mock_spells_Spell.h" />
 		<Unit filename="mock/mock_vstd_RNG.h" />
+		<Unit filename="spells/TargetConditionTest.cpp" />
 		<Unit filename="spells/effects/CatapultTest.cpp" />
 		<Unit filename="spells/effects/CloneTest.cpp" />
 		<Unit filename="spells/effects/DamageTest.cpp" />
@@ -118,6 +119,21 @@
 		<Unit filename="spells/effects/HealTest.cpp" />
 		<Unit filename="spells/effects/SacrificeTest.cpp" />
 		<Unit filename="spells/effects/SummonTest.cpp" />
+		<Unit filename="spells/effects/TeleportTest.cpp" />
+		<Unit filename="spells/effects/TimedTest.cpp" />
+		<Unit filename="spells/targetConditions/AbsoluteLevelConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/AbsoluteSpellConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/BonusConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/CreatureConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/ElementalConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/HealthValueConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/ImmunityNegationConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/NormalLevelConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/NormalSpellConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/ReceptiveFeatureConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/SpellEffectConditionTest.cpp" />
+		<Unit filename="spells/targetConditions/TargetConditionItemFixture.cpp" />
+		<Unit filename="spells/targetConditions/TargetConditionItemFixture.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

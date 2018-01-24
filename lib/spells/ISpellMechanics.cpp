@@ -45,7 +45,7 @@ static std::shared_ptr<TargetCondition> makeCondition(const CSpell * s)
 	std::shared_ptr<TargetCondition> res = std::make_shared<TargetCondition>();
 
 	JsonDeserializer deser(nullptr, s->targetCondition);
-	res->serializeJson(deser);
+	res->serializeJson(deser, TargetConditionItemFactory::getDefault());
 
 	return res;
 }
@@ -677,7 +677,12 @@ std::vector<Bonus::BonusType> BaseMechanics::getElementalImmunity() const
 
 bool BaseMechanics::ownerMatches(const battle::Unit * unit) const
 {
-    return cb->battleMatchOwner(caster->getOwner(), unit, owner->getPositiveness());
+    return ownerMatches(unit, owner->getPositiveness());
+}
+
+bool BaseMechanics::ownerMatches(const battle::Unit * unit, const boost::logic::tribool positivness) const
+{
+    return cb->battleMatchOwner(caster->getOwner(), unit, positivness);
 }
 
 IBattleCast::Value BaseMechanics::getEffectLevel() const

@@ -13,7 +13,6 @@
 
 #include "Problem.h"
 #include "CSpellHandler.h"
-#include "TargetCondition.h"
 
 #include "../battle/IBattleState.h"
 #include "../battle/CBattleInfoCallback.h"
@@ -127,7 +126,7 @@ namespace SRSLPraserHelpers
 }
 
 
-BattleSpellMechanics::BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> effects_, std::shared_ptr<TargetCondition> targetCondition_)
+BattleSpellMechanics::BattleSpellMechanics(const IBattleCast * event, std::shared_ptr<effects::Effects> effects_, std::shared_ptr<IReceptiveCheck> targetCondition_)
 	: BaseMechanics(event),
 	effects(effects_),
 	targetCondition(targetCondition_)
@@ -597,7 +596,7 @@ std::vector<Destination> BattleSpellMechanics::getPossibleDestinations(size_t in
 
 bool BattleSpellMechanics::isReceptive(const battle::Unit * target) const
 {
-	return targetCondition->isReceptive(cb, caster, this, target);
+	return targetCondition->isReceptive(this, target);
 }
 
 std::vector<BattleHex> BattleSpellMechanics::rangeInHexes(BattleHex centralHex, bool * outDroppedHexes) const

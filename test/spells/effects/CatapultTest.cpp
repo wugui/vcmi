@@ -13,7 +13,7 @@
 
 #include <vstd/RNG.h>
 
-#include "../../lib/mapObjects/CGTownInstance.h"
+#include "../../../lib/mapObjects/CGTownInstance.h"
 
 
 namespace test
