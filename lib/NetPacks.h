@@ -2364,6 +2364,7 @@ struct SaveGame : public CPackForClient, public CPackForServer
 	}
 };
 
+// MPTODO: this need fixing since we don't need this announce hell
 struct PlayerMessage : public CPackForClient, public CPackForServer
 {
 	PlayerMessage(){};
