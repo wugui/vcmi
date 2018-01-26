@@ -39,20 +39,20 @@ bool LobbyClientConnected::checkClientPermissions(CVCMIServer * srv) const
 
 bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 {
+	connectionId = c->connectionID = srv->currentClientId++;
 	c->names = names;
 	c->uuid = uuid;
 
-	if(c->connectionID == 1)
+	if(!srv->hostClient)
 	{
 		srv->hostClient = c;
-		srv->hostConnectionId = 1;
+		srv->hostConnectionId = c->connectionID;
 		srv->si->mode = mode;
 	}
 	else
 	{
 		mode = srv->si->mode;
 	}
-	connectionId = c->connectionID;
 	capabilities = srv->capabilities;
 	hostConnectionId = srv->hostConnectionId;
 

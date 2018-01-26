@@ -86,6 +86,7 @@ public:
 
 //public:
 	static std::atomic<bool> shuttingDown;
+	std::atomic<int> currentClientId;
 	std::atomic<ui8> currentPlayerId;
 
 	CVCMIServer(boost::program_options::variables_map & opts);

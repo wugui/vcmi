@@ -217,7 +217,6 @@ void CServerHandler::justConnectToServer(const std::string & addr, const ui16 po
 					addr.size() ? addr : settings["server"]["server"].String(),
 					port ? port : getDefaultPort(),
 					NAME, uuid);
-			c->connectionID = 1; // TODO: Refactoring for the server so IDs set outside of CConnection
 		}
 		catch(...)
 		{

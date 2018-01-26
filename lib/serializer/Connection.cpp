@@ -56,13 +56,11 @@ void CConnection::init()
 
 	handler = nullptr;
 	stopHandling = false;
-	static int cid = 1;
-	connectionID = cid++;
 	iser.fileVersion = SERIALIZATION_VERSION;
 }
 
 CConnection::CConnection(std::string host, ui16 port, std::string Name, std::string UUID)
-:iser(this), oser(this), io_service(new asio::io_service), name(Name), uuid(UUID)
+	: iser(this), oser(this), io_service(new asio::io_service), connectionID(0), name(Name), uuid(UUID)
 {
 	int i;
 	boost::system::error_code error = asio::error::host_not_found;
@@ -117,12 +115,12 @@ connerror1:
 	throw std::runtime_error("Can't establish connection :(");
 }
 CConnection::CConnection(TSocket * Socket, std::string Name, std::string UUID)
-	:iser(this), oser(this), socket(Socket),io_service(&Socket->get_io_service()), name(Name), uuid(UUID)
+	: iser(this), oser(this), socket(Socket),io_service(&Socket->get_io_service()), connectionID(0), name(Name), uuid(UUID)
 {
 	init();
 }
 CConnection::CConnection(TAcceptor * acceptor, boost::asio::io_service *Io_service, std::string Name, std::string UUID)
-: iser(this), oser(this), name(Name), uuid(UUID)
+	: iser(this), oser(this), connectionID(0), name(Name), uuid(UUID)
 {
 	boost::system::error_code error = asio::error::host_not_found;
 	socket = new tcp::socket(*io_service);
