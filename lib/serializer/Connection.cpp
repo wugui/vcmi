@@ -210,7 +210,7 @@ void CConnection::reportState(vstd::CLoggerBase * out)
 	}
 }
 
-CPack * CConnection::retreivePack(std::shared_ptr<CConnection> thisConnection)
+CPack * CConnection::retreivePack()
 {
 	CPack * pack = nullptr;
 	boost::unique_lock<boost::mutex> lock(*rmx);
@@ -227,9 +227,7 @@ CPack * CConnection::retreivePack(std::shared_ptr<CConnection> thisConnection)
 //		logNetwork->error("Dropping nullptr CPack! You should check whether client and server ABI matches.");
 //		return;
 //	}
-
-	pack->type = typeList.getTypeID(pack);
-	pack->c = thisConnection;
+	pack->c = this->shared_from_this();
 	return pack;
 }
 

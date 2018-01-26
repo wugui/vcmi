@@ -58,7 +58,7 @@ class CVCMIServer : public LobbyInfo
 	CApplier<CBaseForServerApply> * applier;
 
 public:
-	std::unique_ptr<CGameHandler> gh;
+	std::shared_ptr<CGameHandler> gh;
 	enum
 	{
 		INVALID, RUNNING, ENDING_WITHOUT_START, ENDING_AND_STARTING_GAME

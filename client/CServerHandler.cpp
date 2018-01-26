@@ -474,7 +474,7 @@ void CServerHandler::threadHandleConnection()
 				CSH->c->disableSmartPointerSerialization();
 				CSH->c->addStdVecItems(client->gameState());
 			}
-			CPack * pack = c->retreivePack(c);
+			CPack * pack = c->retreivePack();
 //trace("Received a pack of type %s", typeid(*pack).name());
 //			assert(pack);
 

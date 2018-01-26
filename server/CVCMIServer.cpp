@@ -224,7 +224,7 @@ void CVCMIServer::start()
 void CVCMIServer::startGame()
 {
 	logNetwork->info("Preparing new game");
-	gh = make_unique<CGameHandler>();
+	gh = std::make_shared<CGameHandler>();
 	switch(si->mode)
 	{
 	case StartInfo::NEW_GAME:
@@ -294,11 +294,11 @@ void CVCMIServer::handleConnection(std::shared_ptr<CConnection> c)
 			if(!c->connected)
 				throw clientDisconnectedException();
 
-			CPack * pack = c->retreivePack(c);
+			CPack * pack = c->retreivePack();
 			logNetwork->info("Got package to announce %s from %s", typeid(*pack).name(), c->toString());
 			if(auto lobbyPack = dynamic_ptr_cast<CPackForLobby>(pack))
 			{
-				CBaseForServerApply * apply = applier->getApplier(pack->type);
+				CBaseForServerApply * apply = applier->getApplier(typeList.getTypeID(pack));
 				if(apply->applyOnServerBefore(this, c, lobbyPack))
 				{
 					addToAnnounceQueue(lobbyPack);

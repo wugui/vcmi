@@ -41,7 +41,7 @@ typedef boost::asio::basic_socket_acceptor<boost::asio::ip::tcp, boost::asio::so
 /// Main class for network communication
 /// Allows establishing connection and bidirectional read-write
 class DLL_LINKAGE CConnection
-	: public IBinaryReader, public IBinaryWriter
+	: public IBinaryReader, public IBinaryWriter, public std::enable_shared_from_this<CConnection>
 {
 	CConnection();
 
@@ -81,7 +81,7 @@ public:
 
 	// MPTODO: we need to assign shared_ptr to CConnection on CPack, but how to do this properly?
 	// Using weak_ptr inside CConnetion itself seems like even worse idea
-	CPack * retreivePack(std::shared_ptr<CConnection> thisConnection);
+	CPack * retreivePack();
 	void sendPack(const CPack * pack);
 
 	void disableStackSendingByID();
