@@ -1045,7 +1045,7 @@ void CGameHandler::handleClientDisconnection(std::shared_ptr<CConnection> c)
 	}
 }
 
-void CGameHandler::handlePack(CPackForServer * pack)
+void CGameHandler::handleReceivedPack(CPackForServer * pack)
 {
 	//prepare struct informing that action was applied
 	auto sendPackageResponse = [&](bool succesfullyApplied)

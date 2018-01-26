@@ -1342,13 +1342,8 @@ void startGame()
 	client = new CClient();
 	CSH->client = client;
 	CPlayerInterface::howManyPeople = 0;
-	// MPTODO:
-	// We need to avoid client getting netpacks until we fully initialize everything.
-	// Will this going to work at all?
-	//
 
-	//////////////////
-	switch(CSH->si->mode) //new game
+	switch(CSH->si->mode)
 	{
 	case StartInfo::NEW_GAME:
 		client->newGame();

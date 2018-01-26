@@ -70,7 +70,6 @@ public:
 
 	boost::program_options::variables_map cmdLineOptions;
 
-	std::atomic<int> listeningThreads;
 	std::set<std::shared_ptr<CConnection>> connections;
 	std::list<CPackForLobby *> announceQueue;
 	boost::recursive_mutex mx;
@@ -79,11 +78,10 @@ public:
 
 	void startAsyncAccept();
 	void connectionAccepted(const boost::system::error_code & ec);
-	void startListeningThread(std::shared_ptr<CConnection> c);
-	void handleConnection(std::shared_ptr<CConnection> c);
+	void threadHandleClient(std::shared_ptr<CConnection> c);
+	void handleReceivedPack(CPackForLobby * pack);
 
-	void processPack(CPackForLobby * pack);
-	void announcePack(const CPackForLobby & pack);
+	void announcePack(CPackForLobby * pack);
 	void passHost(int toConnectionId);
 
 //public:
@@ -93,14 +91,13 @@ public:
 	CVCMIServer(boost::program_options::variables_map & opts);
 	~CVCMIServer();
 
-	void start();
-	void startGame();
+	void run();
+	void prepareToStartGame();
 
 	std::shared_ptr<CConnection> hostClient;
 	ServerCapabilities * capabilities;
-	void sendPack(std::shared_ptr<CConnection> c, const CPackForLobby & pack);
 	void announceTxt(const std::string & txt, const std::string & playerName = "system");
-	void addToAnnounceQueue(CPackForLobby * pack, bool front = false);
+	void addToAnnounceQueue(CPackForLobby * pack);
 
 	void setPlayerConnectedId(PlayerSettings & pset, ui8 player) const;
 	void updateStartInfoOnMapChange();

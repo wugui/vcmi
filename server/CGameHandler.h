@@ -191,7 +191,7 @@ public:
 
 	void init(StartInfo *si);
 	void handleClientDisconnection(std::shared_ptr<CConnection> c);
-	void handlePack(CPackForServer * pack);
+	void handleReceivedPack(CPackForServer * pack);
 	PlayerColor getPlayerAt(std::shared_ptr<CConnection> c) const;
 
 	void playerMessage(PlayerColor player, const std::string &message, ObjectInstanceID currObj);

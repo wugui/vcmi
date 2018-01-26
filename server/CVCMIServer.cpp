@@ -61,8 +61,8 @@ template<typename T> class CApplyOnServer;
 class CBaseForServerApply
 {
 public:
-	virtual bool applyOnServerBefore(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const =0;
-	virtual void applyOnServerAfter(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const =0;
+	virtual bool applyOnServerBefore(CVCMIServer * srv, void * pack) const =0;
+	virtual void applyOnServerAfter(CVCMIServer * srv, void * pack) const =0;
 	virtual ~CBaseForServerApply() {}
 	template<typename U> static CBaseForServerApply * getApplier(const U * t = nullptr)
 	{
@@ -73,23 +73,18 @@ public:
 template <typename T> class CApplyOnServer : public CBaseForServerApply
 {
 public:
-	bool applyOnServerBefore(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const override
+	bool applyOnServerBefore(CVCMIServer * srv, void * pack) const override
 	{
 		T * ptr = static_cast<T *>(pack);
-		ptr->applied = true;
-		if(!ptr->c && c)
-			ptr->c = std::shared_ptr<CConnection>(c);
-
 		if(ptr->checkClientPermissions(srv))
 			return ptr->applyOnServer(srv);
 		else
 			return false;
 	}
 
-	void applyOnServerAfter(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const override
+	void applyOnServerAfter(CVCMIServer * srv, void * pack) const override
 	{
 		T * ptr = static_cast<T *>(pack);
-		ptr->c = c;
 		ptr->applyOnServerAfterAnnounce(srv);
 	}
 };
@@ -98,13 +93,13 @@ template <>
 class CApplyOnServer<CPack> : public CBaseForServerApply
 {
 public:
-	bool applyOnServerBefore(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const override
+	bool applyOnServerBefore(CVCMIServer * srv, void * pack) const override
 	{
 		logGlobal->error("Cannot apply plain CPack!");
 		assert(0);
 		return false;
 	}
-	void applyOnServerAfter(CVCMIServer * srv, std::shared_ptr<CConnection> c, void * pack) const override
+	void applyOnServerAfter(CVCMIServer * srv, void * pack) const override
 	{
 		logGlobal->error("Cannot apply plain CPack!");
 		assert(0);
@@ -117,7 +112,7 @@ std::string NAME = GameConstants::VCMI_VERSION + std::string(" (") + NAME_AFFIX 
 std::atomic<bool> CVCMIServer::shuttingDown;
 
 CVCMIServer::CVCMIServer(boost::program_options::variables_map & opts)
-	: LobbyInfo(), port(3030), io(new boost::asio::io_service()), shm(nullptr), listeningThreads(0), upcomingConnection(nullptr), state(RUNNING), cmdLineOptions(opts), currentPlayerId(1)
+	: LobbyInfo(), port(3030), io(new boost::asio::io_service()), shm(nullptr), upcomingConnection(nullptr), state(RUNNING), cmdLineOptions(opts), currentPlayerId(1)
 {
 	uuid = boost::uuids::to_string(boost::uuids::random_generator()());
 	logNetwork->trace("CVCMIServer created! UUID: %s", uuid);
@@ -158,7 +153,7 @@ CVCMIServer::~CVCMIServer()
 	//TODO pregameconnections
 }
 
-void CVCMIServer::start()
+void CVCMIServer::run()
 {
 #ifndef VCMI_ANDROID
 	if(cmdLineOptions.count("enable-shm"))
@@ -184,7 +179,7 @@ void CVCMIServer::start()
 			boost::unique_lock<boost::recursive_mutex> myLock(mx);
 			while(!announceQueue.empty())
 			{
-				processPack(announceQueue.front());
+				announcePack(announceQueue.front());
 				announceQueue.pop_front();
 			}
 			if(state != RUNNING)
@@ -212,26 +207,22 @@ void CVCMIServer::start()
 
 	if(state == ENDING_AND_STARTING_GAME)
 	{
-/* MPTODO restart
-		logNetwork->info("Waiting for listening thread to finish...");
-		while(listeningThreads)
-			boost::this_thread::sleep(boost::posix_time::milliseconds(50));
-*/
 		gh->run(si->mode == StartInfo::LOAD_GAME, this);
 	}
 }
 
-void CVCMIServer::startGame()
+void CVCMIServer::prepareToStartGame()
 {
-	logNetwork->info("Preparing new game");
 	gh = std::make_shared<CGameHandler>();
 	switch(si->mode)
 	{
 	case StartInfo::NEW_GAME:
+		logNetwork->info("Preparing to start new game");
 		gh->init(si.get());
 		break;
 
 	case StartInfo::LOAD_GAME:
+		logNetwork->info("Preparing to start loaded game");
 		CLoadFile lf(*CResourceHandler::get("local")->getResourceName(ResourceID(si->mapname, EResType::SERVER_SAVEGAME)), MINIMAL_SERIALIZATION_VERSION);
 		gh->loadCommonState(lf);
 		lf >> gh; // MPTODO: not pointer loading? Will crash loading?
@@ -263,10 +254,10 @@ void CVCMIServer::connectionAccepted(const boost::system::error_code & ec)
 	try
 	{
 		logNetwork->info("We got a new connection! :)");
-		auto pc = std::make_shared<CConnection>(upcomingConnection, NAME, uuid);
+		auto c = std::make_shared<CConnection>(upcomingConnection, NAME, uuid);
 		upcomingConnection = nullptr;
-		connections.insert(pc);
-		startListeningThread(pc);
+		connections.insert(c);
+		c->handler = new boost::thread(&CVCMIServer::threadHandleClient, this, c);
 	}
 	catch(std::exception & e)
 	{
@@ -277,16 +268,11 @@ void CVCMIServer::connectionAccepted(const boost::system::error_code & ec)
 	startAsyncAccept();
 }
 
-void CVCMIServer::startListeningThread(std::shared_ptr<CConnection> c)
-{
-	listeningThreads++;
-	c->enterPregameConnectionMode();
-	c->handler = new boost::thread(&CVCMIServer::handleConnection, this, c);
-}
-
-void CVCMIServer::handleConnection(std::shared_ptr<CConnection> c)
+void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 {
 	setThreadName("CVCMIServer::handleConnection");
+	c->enterPregameConnectionMode();
+
 	try
 	{
 		while(!c->stopHandling)
@@ -295,21 +281,13 @@ void CVCMIServer::handleConnection(std::shared_ptr<CConnection> c)
 				throw clientDisconnectedException();
 
 			CPack * pack = c->retreivePack();
-			logNetwork->info("Got package to announce %s from %s", typeid(*pack).name(), c->toString());
 			if(auto lobbyPack = dynamic_ptr_cast<CPackForLobby>(pack))
 			{
-				CBaseForServerApply * apply = applier->getApplier(typeList.getTypeID(pack));
-				if(apply->applyOnServerBefore(this, c, lobbyPack))
-				{
-					addToAnnounceQueue(lobbyPack);
-					apply->applyOnServerAfter(this, c, lobbyPack);
-				}
-				else
-					delete pack;
+				handleReceivedPack(lobbyPack);
 			}
 			else if(auto serverPack = dynamic_ptr_cast<CPackForServer>(pack))
 			{
-				gh->handlePack(serverPack);
+				gh->handleReceivedPack(serverPack);
 			}
 		}
 	}
@@ -338,51 +316,30 @@ void CVCMIServer::handleConnection(std::shared_ptr<CConnection> c)
 	{
 		auto lcd = new LobbyClientDisconnected();
 		lcd->c = c;
-		addToAnnounceQueue(lcd, true);
+		handleReceivedPack(lcd);
 	}
 
 	logNetwork->info("Thread listening for %s ended", c->toString());
-	listeningThreads--;
 	vstd::clear_pointer(c->handler);
 }
 
-void CVCMIServer::processPack(CPackForLobby * pack)
+void CVCMIServer::handleReceivedPack(CPackForLobby * pack)
 {
-	if(!pack->applied)
-	{
-		CBaseForServerApply * apply = applier->getApplier(typeList.getTypeID(pack));
-		if(apply->applyOnServerBefore(this, nullptr, pack))
-		{
-			apply->applyOnServerAfter(this, nullptr, pack);
-		}
-	}
-	announcePack(*pack);
-	delete pack;
+	CBaseForServerApply * apply = applier->getApplier(typeList.getTypeID(pack));
+	if(apply->applyOnServerBefore(this, pack))
+		addToAnnounceQueue(pack);
+	else
+		delete pack;
 }
 
-void CVCMIServer::sendPack(std::shared_ptr<CConnection> c, const CPackForLobby & pack)
-{
-	if(!c->stopHandling)
-	{
-		logNetwork->info("\tSending pack of type %s to %s", typeid(pack).name(), c->toString());
-		c->sendPack(&pack);
-	}
-/*
-	if(dynamic_ptr_cast<LobbyClientDisconnected>(&pack))
-	{
-		c->stopHandling = true;
-	}
-	else if(dynamic_ptr_cast<LobbyStartGame>(&pack))
-	{
-		c->stopHandling = true;
-	}
-*/
-}
-
-void CVCMIServer::announcePack(const CPackForLobby & pack)
+void CVCMIServer::announcePack(CPackForLobby * pack)
 {
 	for(auto c : connections)
-		sendPack(c, pack);
+		c->sendPack(pack);
+
+	applier->getApplier(typeList.getTypeID(pack))->applyOnServerAfter(this, pack);
+
+	delete pack;
 }
 
 void CVCMIServer::announceTxt(const std::string & txt, const std::string & playerName)
@@ -394,13 +351,10 @@ void CVCMIServer::announceTxt(const std::string & txt, const std::string & playe
 	addToAnnounceQueue(cm);
 }
 
-void CVCMIServer::addToAnnounceQueue(CPackForLobby * pack, bool front)
+void CVCMIServer::addToAnnounceQueue(CPackForLobby * pack)
 {
 	boost::unique_lock<boost::recursive_mutex> queueLock(mx);
-	if(front)
-		announceQueue.push_front(pack);
-	else
-		announceQueue.push_back(pack);
+	announceQueue.push_back(pack);
 }
 
 void CVCMIServer::passHost(int toConnectionId)
@@ -842,7 +796,7 @@ int main(int argc, char * argv[])
 		{
 			while(!CVCMIServer::shuttingDown)
 			{
-				server.start();
+				server.run();
 			}
 			io_service.run();
 		}

@@ -175,7 +175,7 @@ bool LobbyStartGame::checkClientPermissions(CVCMIServer * srv) const
 
 bool LobbyStartGame::applyOnServer(CVCMIServer * srv)
 {
-	srv->startGame();
+	srv->prepareToStartGame();
 	initializedStartInfo = srv->gh->gameState()->initialOpts;
 
 	return true;
@@ -183,21 +183,20 @@ bool LobbyStartGame::applyOnServer(CVCMIServer * srv)
 
 void LobbyStartGame::applyOnServerAfterAnnounce(CVCMIServer * srv)
 {
+/* MPTODO: this shouldn't be problem since start of game is always last netpack
+ * regardless it's could be good idea to add locking
 	while(true)
 	{
 		{
+			// Wait until all netpacks for lobby are sent
 			boost::unique_lock<boost::recursive_mutex> queueLock(srv->mx);
 			if(srv->announceQueue.empty())
 				break;
 		}
 		boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 	}
-//	srv->gh->run(srv->si->mode == StartInfo::LOAD_GAME, srv);
-	//MOTODO: this need more thinking!
+*/
 	srv->state = CVCMIServer::ENDING_AND_STARTING_GAME;
-	//wait for sending thread to announce start
-//	while(srv->state == CVCMIServer::RUNNING)
-//		boost::this_thread::sleep(boost::posix_time::milliseconds(50));
 }
 
 bool LobbyChangeHost::checkClientPermissions(CVCMIServer * srv) const
