@@ -1986,6 +1986,7 @@ struct CommitPackage : public CPackForServer
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & packToCommit;
 	}
 };
@@ -1995,21 +1996,27 @@ struct CloseServer : public CPackForServer
 {
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
-	{}
+	{
+		h & static_cast<CPackForServer &>(*this);
+	}
 };
 
 struct LeaveGame : public CPackForServer
 {
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
-	{}
+	{
+		h & static_cast<CPackForServer &>(*this);
+	}
 };
 
 struct EndTurn : public CPackForServer
 {
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
-	{}
+	{
+		h & static_cast<CPackForServer &>(*this);
+	}
 };
 
 struct DismissHero : public CPackForServer
@@ -2021,6 +2028,7 @@ struct DismissHero : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & hid;
 	}
 };
@@ -2036,6 +2044,7 @@ struct MoveHero : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & dest;
 		h & hid;
 		h & transit;
@@ -2053,6 +2062,7 @@ struct CastleTeleportHero : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & dest;
 		h & hid;
 	}
@@ -2071,6 +2081,7 @@ struct ArrangeStacks : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & what;
 		h & p1;
 		h & p2;
@@ -2090,6 +2101,7 @@ struct DisbandCreature : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & pos;
 		h & id;
 	}
@@ -2105,6 +2117,7 @@ struct BuildStructure : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & tid;
 		h & bid;
 	}
@@ -2130,6 +2143,7 @@ struct RecruitCreatures : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & tid;
 		h & dst;
 		h & crid;
@@ -2149,6 +2163,7 @@ struct UpgradeCreature : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & pos;
 		h & id;
 		h & cid;
@@ -2164,6 +2179,7 @@ struct GarrisonHeroSwap : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & tid;
 	}
 };
@@ -2177,6 +2193,7 @@ struct ExchangeArtifacts : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & src;
 		h & dst;
 	}
@@ -2195,6 +2212,7 @@ struct AssembleArtifacts : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & heroID;
 		h & artifactSlot;
 		h & assemble;
@@ -2212,6 +2230,7 @@ struct BuyArtifact : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & hid;
 		h & aid;
 	}
@@ -2232,6 +2251,7 @@ struct TradeOnMarketplace : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & market;
 		h & hero;
 		h & mode;
@@ -2251,6 +2271,7 @@ struct SetFormation : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & hid;
 		h & formation;
 	}
@@ -2267,6 +2288,7 @@ struct HireHero : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & hid;
 		h & tid;
 		h & player;
@@ -2281,6 +2303,7 @@ struct BuildBoat : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & objid;
 	}
 
@@ -2297,6 +2320,7 @@ struct QueryReply : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & qid;
 		h & player;
 		h & reply;
@@ -2312,6 +2336,7 @@ struct MakeAction : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & ba;
 	}
 };
@@ -2325,6 +2350,7 @@ struct MakeCustomAction : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & ba;
 	}
 };
@@ -2337,6 +2363,7 @@ struct DigWithHero : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & id;
 	}
 };
@@ -2351,6 +2378,7 @@ struct CastAdvSpell : public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & hid;
 		h & sid;
 		h & pos;
@@ -2370,6 +2398,7 @@ struct SaveGame : public CPackForClient, public CPackForServer
 	bool applyGh(CGameHandler *gh);
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & fname;
 	}
 };
@@ -2391,6 +2420,7 @@ struct PlayerMessage : public CPackForClient, public CPackForServer
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & static_cast<CPackForServer &>(*this);
 		h & text;
 		h & player;
 		h & currObj;
