@@ -54,7 +54,7 @@ bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 	}
 	connectionId = c->connectionID;
 	capabilities = srv->capabilities;
-	hostConnectionId = c->connectionID;
+	hostConnectionId = srv->hostConnectionId;
 
 	logNetwork->info("Connection with client %d established. UUID: %s", c->connectionID, c->uuid);
 	for(auto & name : c->names)

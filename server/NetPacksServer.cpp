@@ -100,7 +100,9 @@ bool CloseServer::applyGh(CGameHandler * gh)
 
 bool LeaveGame::applyGh(CGameHandler * gh)
 {
-	gh->playerLeftGame(c->connectionID);
+	// MPTODO this seems to be no longer working!
+	// gh->playerLeftGame(c->connectionID);
+	gh->handleClientDisconnection(c);
 	return true;
 }
 

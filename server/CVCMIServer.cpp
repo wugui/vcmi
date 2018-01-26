@@ -277,6 +277,7 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 	{
 		while(!c->stopHandling)
 		{
+			// MPTODO: Probably excessive code! Likely exception will be thrown anyway
 			if(!c->connected)
 				throw clientDisconnectedException();
 
@@ -291,14 +292,15 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 			}
 		}
 	}
+	catch(boost::system::system_error &e) //for boost errors just log, not crash - probably client shut down connection
+	{
+		if(state != RUNNING)
+			gh->handleClientDisconnection(c);
+	}
 	catch(const std::exception & e)
 	{
 		boost::unique_lock<boost::recursive_mutex> queueLock(mx);
 		logNetwork->error("%s dies... \nWhat happened: %s", c->toString(), e.what());
-	}
-	catch(boost::system::system_error &e) //for boost errors just log, not crash - probably client shut down connection
-	{
-//		handleDisconnection(e);
 	}
 	catch(clientDisconnectedException & e)
 	{

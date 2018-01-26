@@ -1022,6 +1022,7 @@ void CGameHandler::applyBattleEffects(BattleAttack &bat, const CStack *att, cons
 
 void CGameHandler::handleClientDisconnection(std::shared_ptr<CConnection> c)
 {
+	// MPTODO: remove
 //	boost::unique_lock<boost::mutex> lock(*c->wmx);
 //	assert(!c->connected); //make sure that connection has been marked as broken
 //		logGlobal->error(e.what());
@@ -2636,6 +2637,7 @@ void CGameHandler::close()
 
 void CGameHandler::playerLeftGame(int cid)
 {
+	// MPTODO this seems to be no longer working!
 	for (auto & elem : conns)
 	{
 		if(elem->isOpen() && elem->connectionID == cid)
