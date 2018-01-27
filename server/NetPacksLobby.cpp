@@ -94,11 +94,12 @@ bool LobbyClientDisconnected::checkClientPermissions(CVCMIServer * srv) const
 bool LobbyClientDisconnected::applyOnServer(CVCMIServer * srv)
 {
 	srv->connections -= c;
-
-	//notify other players about leaving
-	for(auto id : srv->getConnectedPlayerIdsForClient(c->connectionID))
-		srv->announceTxt(boost::str(boost::format("%s(%d) left the game") % srv->playerNames[id].name % c->connectionID));
-
+	for(auto & player : srv->playerNames)
+	{
+		int id = player.first;
+		if(player.second.connection == c->connectionID)
+			srv->announceTxt(boost::str(boost::format("%s (pid %d cid %d) left the game") % id % srv->playerNames[id].name % c->connectionID));
+	}
 	srv->clientDisconnected(c);
 
 	if(srv->connections.empty())
@@ -106,18 +107,12 @@ bool LobbyClientDisconnected::applyOnServer(CVCMIServer * srv)
 		logNetwork->error("Last connection lost, server will close itself...");
 		boost::this_thread::sleep(boost::posix_time::seconds(2)); //we should never be hasty when networking
 		srv->state = CVCMIServer::ENDING_WITHOUT_START;
-		return true;
-	}
-	else if(shutdownServer)
-	{
-		return true;
 	}
 	else if(c == srv->hostClient)
 	{
 		auto newHost = *RandomGeneratorUtil::nextItem(srv->connections, CRandomGenerator::getDefault());
 		srv->passHost(newHost->connectionID);
 	}
-	srv->updateAndPropagateLobbyState();
 	return true;
 }
 
@@ -127,7 +122,10 @@ void LobbyClientDisconnected::applyOnServerAfterAnnounce(CVCMIServer * srv)
 	{
 		CVCMIServer::shuttingDown = shutdownServer;
 		srv->state = CVCMIServer::ENDING_WITHOUT_START;
+		return;
 	}
+
+	srv->updateAndPropagateLobbyState();
 }
 
 bool LobbyChatMessage::checkClientPermissions(CVCMIServer * srv) const
