@@ -34,8 +34,6 @@ protected:
 	}
 };
 
-
-
 class TeleportApplyTest : public Test, public EffectFixture
 {
 public:

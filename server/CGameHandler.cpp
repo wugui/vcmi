@@ -4827,6 +4827,7 @@ bool CGameHandler::handleDamageFromObstacle(const CStack * curStack, bool stackI
 	if(!curStack->alive())
 		return false;
 	bool containDamageFromMoat = false;
+	bool movementStoped = false;
 	for(auto & obstacle : getAllAffectedObstaclesByStack(curStack))
 	{
 		if(obstacle->obstacleType == CObstacleInstance::SPELL_CREATED)
@@ -4838,54 +4839,60 @@ bool CGameHandler::handleDamageFromObstacle(const CStack * curStack, bool stackI
 			if(!spellObstacle)
 				COMPLAIN_RET("Invalid obstacle instance");
 
-			if(!spellObstacle->trigger)
-				continue;
+			if(spellObstacle->trigger)
+			{
+				const bool oneTimeObstacle = spellObstacle->removeOnTrigger;
 
-			const bool oneTimeObstacle = spellObstacle->removeOnTrigger;
+				//hidden obstacle triggers effects until revealed
+				if(!(spellObstacle->hidden && gs->curB->battleIsObstacleVisibleForSide(*obstacle, (BattlePerspective::BattlePerspective)side)))
+				{
+					const CGHeroInstance * hero = gs->curB->battleGetFightingHero(spellObstacle->casterSide);
+					spells::ObstacleCasterProxy caster(this, gs->curB->sides.at(spellObstacle->casterSide).color, hero, spellObstacle);
 
-			//hidden obstacle triggers effects until revealed
-			if(spellObstacle->hidden && gs->curB->battleIsObstacleVisibleForSide(*obstacle, (BattlePerspective::BattlePerspective)side))
-				continue;
+					const CSpell * sp = SpellID(spellObstacle->ID).toSpell();
+					if(!sp)
+						COMPLAIN_RET("Invalid obstacle instance");
 
-			const CGHeroInstance * hero = gs->curB->battleGetFightingHero(spellObstacle->casterSide);
-			spells::ObstacleCasterProxy caster(this, gs->curB->sides.at(spellObstacle->casterSide).color, hero, spellObstacle);
+					spells::BattleCast battleCast(gs->curB, &caster, spells::Mode::HERO, sp);
+					battleCast.aimToUnit(curStack);
+					battleCast.applyEffects(spellEnv, true);
 
-			const CSpell * sp = SpellID(spellObstacle->ID).toSpell();
-			if(!sp)
-				COMPLAIN_RET("Invalid obstacle instance");
-
-			spells::BattleCast battleCast(gs->curB, &caster, spells::Mode::HERO, sp);
-			battleCast.aimToUnit(curStack);
-			battleCast.applyEffects(spellEnv, true);
-
-			if(oneTimeObstacle)
-				removeObstacle(*obstacle);
+					if(oneTimeObstacle)
+						removeObstacle(*obstacle);
+				}
+			}
 		}
 		else if(obstacle->obstacleType == CObstacleInstance::MOAT)
 		{
 			auto town = gs->curB->town;
 			int damage = (town == nullptr) ? 0 : town->town->moatDamage;
 			if(!containDamageFromMoat)
+			{
 				containDamageFromMoat = true;
-			else
-				continue;
 
-			BattleStackAttacked bsa;
-			bsa.damageAmount = damage;
-			bsa.stackAttacked = curStack->ID;
-			bsa.attackerID = -1;
-			curStack->prepareAttacked(bsa, getRandomGenerator());
+				BattleStackAttacked bsa;
+				bsa.damageAmount = damage;
+				bsa.stackAttacked = curStack->ID;
+				bsa.attackerID = -1;
+				curStack->prepareAttacked(bsa, getRandomGenerator());
 
-			StacksInjured si;
-			si.stacks.push_back(bsa);
-			sendAndApply(&si);
+				StacksInjured si;
+				si.stacks.push_back(bsa);
+				sendAndApply(&si);
+			}
 		}
 
-		if(!curStack->alive() || (obstacle->stopsMovement() && stackIsMoving))
+		if(!curStack->alive())
 			return false;
+
+		if((obstacle->stopsMovement() && stackIsMoving))
+			movementStoped = true;
 	}
 
-	return curStack->alive();
+	if(stackIsMoving)
+		return curStack->alive() && !movementStoped;
+	else
+		return curStack->alive();
 }
 
 void CGameHandler::handleTimeEvents()

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "GlobalEffect.h"
+#include "Effect.h"
 #include "../../GameConstants.h"
 
 namespace spells
@@ -18,7 +18,7 @@ namespace spells
 namespace effects
 {
 
-class Summon : public GlobalEffect
+class Summon : public Effect
 {
 public:
 	CreatureID creature;
@@ -26,9 +26,14 @@ public:
 	Summon();
 	virtual ~Summon();
 
+	void adjustAffectedHexes(std::set<BattleHex> & hexes, const Mechanics * m, const Target & spellTarget) const override;
+	void adjustTargetTypes(std::vector<TargetType> & types) const override;
+
 	bool applicable(Problem & problem, const Mechanics * m) const override;
 
 	void apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * m, const EffectTarget & target) const override;
+
+	EffectTarget filterTarget(const Mechanics * m, const EffectTarget & target) const override;
 
 	EffectTarget transformTarget(const Mechanics * m, const Target & aimPoint, const Target & spellTarget) const override;
 

@@ -31,7 +31,7 @@ namespace effects
 VCMI_REGISTER_SPELL_EFFECT(Summon, EFFECT_NAME);
 
 Summon::Summon()
-	: GlobalEffect(),
+	: Effect(),
 	creature(),
 	permanent(false),
 	exclusive(true)
@@ -39,6 +39,16 @@ Summon::Summon()
 }
 
 Summon::~Summon() = default;
+
+void Summon::adjustAffectedHexes(std::set<BattleHex> & hexes, const Mechanics * m, const Target & spellTarget) const
+{
+	//no hexes affected
+}
+
+void Summon::adjustTargetTypes(std::vector<TargetType> & types) const
+{
+	//any target type allowed
+}
 
 bool Summon::applicable(Problem & problem, const Mechanics * m) const
 {
@@ -122,6 +132,11 @@ void Summon::apply(BattleStateProxy * battleState, RNG & rng, const Mechanics * 
 
 	if(!pack.changedStacks.empty())
 		battleState->apply(&pack);
+}
+
+EffectTarget Summon::filterTarget(const Mechanics * m, const EffectTarget & target) const
+{
+	return target;
 }
 
 void Summon::serializeJsonEffect(JsonSerializeFormat & handler)

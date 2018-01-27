@@ -141,7 +141,6 @@ void Timed::describeEffect(std::vector<MetaString> & log, const Mechanics * m, c
 			break;
 		}
 	}
-
 }
 
 void Timed::prepareEffects(SetStackEffect & sse, const Mechanics * m, const EffectTarget & target, bool describe) const

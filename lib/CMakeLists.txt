@@ -110,7 +110,6 @@ set(lib_SRCS
 		spells/effects/Dispel.cpp
 		spells/effects/Effect.cpp
 		spells/effects/Effects.cpp
-		spells/effects/GlobalEffect.cpp
 		spells/effects/Heal.cpp
 		spells/effects/LocationEffect.cpp
 		spells/effects/Obstacle.cpp
@@ -271,7 +270,6 @@ set(lib_HEADERS
 		spells/effects/Effect.h
 		spells/effects/Effects.h
 		spells/effects/EffectsFwd.h
-		spells/effects/GlobalEffect.h
 		spells/effects/Heal.h
 		spells/effects/LocationEffect.h
 		spells/effects/Obstacle.h
