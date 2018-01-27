@@ -142,15 +142,12 @@ void CLobbyScreen::startScenario()
 
 void CLobbyScreen::toggleMode(bool host)
 {
-	auto getColor = [=]()
-	{
-		return host ? Colors::WHITE : Colors::ORANGE;
-	};
-	buttonSelect->addTextOverlay(CGI->generaltexth->allTexts[500], FONT_SMALL, getColor());
-	buttonOptions->addTextOverlay(CGI->generaltexth->allTexts[501], FONT_SMALL, getColor());
+	auto buttonColor = host ? Colors::WHITE : Colors::ORANGE;
+	buttonSelect->addTextOverlay(CGI->generaltexth->allTexts[500], FONT_SMALL, buttonColor);
+	buttonOptions->addTextOverlay(CGI->generaltexth->allTexts[501], FONT_SMALL, buttonColor);
 	if(buttonRMG)
 	{
-		buttonRMG->addTextOverlay(CGI->generaltexth->allTexts[740], FONT_SMALL, getColor());
+		buttonRMG->addTextOverlay(CGI->generaltexth->allTexts[740], FONT_SMALL, buttonColor);
 		buttonRMG->block(!host);
 	}
 	buttonSelect->block(!host);

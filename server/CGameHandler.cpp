@@ -1782,20 +1782,6 @@ void CGameHandler::run(bool resume, CVCMIServer * srv)
 			}
 		}
 		logGlobal->info(sbuffer.str());
-
-		cc->addStdVecItems(gs);
-		cc->enableStackSendingByID();
-		cc->disableSmartPointerSerialization();
-	}
-
-	for (auto elem : conns)
-	{
-		std::set<PlayerColor> pom;
-		for (auto j = connections.cbegin(); j!=connections.cend();j++)
-			if(vstd::contains(j->second, elem))
-				pom.insert(j->first);
-
-// 		boost::thread(std::bind(&CGameHandler::handleConnection,this,pom,elem));
 	}
 
 	auto playerTurnOrder = generatePlayerTurnOrder();

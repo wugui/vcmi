@@ -48,7 +48,7 @@ class CSelectionBase : public CIntObject, public ISelectionScreenInfo
 public:
 	bool bordered;
 
-	CPicture * bg; //general bg image
+	CPicture * background;
 	InfoCard * card;
 
 	CButton * buttonSelect;

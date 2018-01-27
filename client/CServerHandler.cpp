@@ -475,15 +475,8 @@ void CServerHandler::threadHandleConnection()
 		sendClientConnecting();
 		while(c->connected)
 		{
-			if(pauseNetpackRetrieving)
-			{
-				while(pauseNetpackRetrieving)
-					boost::this_thread::sleep(boost::posix_time::milliseconds(10));
-
-				CSH->c->enableStackSendingByID();
-				CSH->c->disableSmartPointerSerialization();
-				CSH->c->addStdVecItems(client->gameState());
-			}
+			while(pauseNetpackRetrieving)
+				boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 
 			CPack * pack = c->retreivePack();
 			if(auto lobbyPack = dynamic_cast<CPackForLobby *>(pack))

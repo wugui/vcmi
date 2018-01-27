@@ -268,6 +268,13 @@ void CConnection::enterPregameConnectionMode()
 	disableSmartPointerSerialization();
 }
 
+void CConnection::enterGameplayConnectionMode(CGameState * gs)
+{
+	enableStackSendingByID();
+	disableSmartPointerSerialization();
+	addStdVecItems(gs);
+}
+
 void CConnection::disableSmartVectorMemberSerialization()
 {
 	CSerializer::smartVectorMembersSerialization = false;

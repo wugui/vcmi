@@ -94,16 +94,16 @@ CSelectionBase::CSelectionBase(CMenuScreen::EState type)
 	if(screenType == CMenuScreen::campaignList)
 	{
 		bordered = false;
-		bg = new CPicture("CamCust.bmp", 0, 0);
-		pos = bg->center();
+		background = new CPicture("CamCust.bmp", 0, 0);
+		pos = background->center();
 	}
 	else
 	{
 		bordered = true;
 		//load random background
 		const JsonVector & bgNames = CGPreGameConfig::get().getConfig()["game-select"].Vector();
-		bg = new CPicture(RandomGeneratorUtil::nextItem(bgNames, CRandomGenerator::getDefault())->String(), 0, 0);
-		pos = bg->center();
+		background = new CPicture(RandomGeneratorUtil::nextItem(bgNames, CRandomGenerator::getDefault())->String(), 0, 0);
+		pos = background->center();
 	}
 	curTab = nullptr;
 	tabRand = nullptr;
@@ -165,7 +165,7 @@ InfoCard::InfoCard()
 	if(SEL->screenType == CMenuScreen::campaignList)
 	{
 		CLobbyScreen * ss = static_cast<CLobbyScreen *>(parent);
-		mapDescription->addChild(new CPicture(*ss->bg, descriptionRect + Point(-393, 0)), true); //move subpicture bg to our description control (by default it's our (Infocard) child)
+		mapDescription->addChild(new CPicture(*ss->background, descriptionRect + Point(-393, 0)), true); //move subpicture bg to our description control (by default it's our (Infocard) child)
 	}
 	else
 	{

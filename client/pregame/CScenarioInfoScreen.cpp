@@ -24,7 +24,6 @@
 CScenarioInfoScreen::CScenarioInfoScreen()
 {
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
-	center(pos);
 
 	assert(LOCPLINT);
 	localSi = LOCPLINT->cb->getStartInfo();

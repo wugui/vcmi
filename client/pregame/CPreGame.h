@@ -54,7 +54,7 @@ class CMenuScreen : public CIntObject
 public:
 	std::vector<std::string> menuNameToEntry;
 
-	enum EState { //where are we?
+	enum EState {
 		mainMenu, newGame, loadGame, campaignMain, saveGame, scenarioInfo, campaignList
 	};
 

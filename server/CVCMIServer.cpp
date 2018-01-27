@@ -228,7 +228,7 @@ void CVCMIServer::prepareToStartGame()
 	}
 	gh->conns = connections;
 	for(auto c : gh->conns) // MPTODO: should we need to do that if we sent gamestate?
-		c->addStdVecItems(gh->gs);
+		c->enterGameplayConnectionMode(gh->gs);
 }
 
 void CVCMIServer::startAsyncAccept()

@@ -76,8 +76,6 @@ public:
 	CConnection &operator&(const T&);
 	virtual ~CConnection();
 
-	// MPTODO: we need to assign shared_ptr to CConnection on CPack, but how to do this properly?
-	// Using weak_ptr inside CConnetion itself seems like even worse idea
 	CPack * retreivePack();
 	void sendPack(const CPack * pack);
 
@@ -90,6 +88,7 @@ public:
 
 	void prepareForSendingHeroes(); //disables sending vectorized, enables smart pointer serialization, clears saved/loaded ptr cache
 	void enterPregameConnectionMode();
+	void enterGameplayConnectionMode(CGameState * gs);
 
 	std::string toString() const;
 

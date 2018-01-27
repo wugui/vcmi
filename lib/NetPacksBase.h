@@ -24,11 +24,9 @@ class CConnection;
 
 struct DLL_LINKAGE CPack
 {
-	// Not serialized. Set in CConnection::retreivePack
-	ui16 type;
 	std::shared_ptr<CConnection> c; // Pointer to connection that pack received from
 
-	CPack() : c(nullptr), type(0) {};
+	CPack() : c(nullptr) {};
 	virtual ~CPack() {};
 
 	template <typename Handler> void serialize(Handler &h, const int version)

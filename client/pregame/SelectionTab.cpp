@@ -114,7 +114,7 @@ bool mapSorter::operator()(const std::shared_ptr<CMapInfo> aaa, const std::share
 }
 
 SelectionTab::SelectionTab(CMenuScreen::EState Type, CMenuScreen::EGameMode GameMode)
-	: bg(nullptr), onSelect(nullptr)
+	: background(nullptr), onSelect(nullptr)
 {
 	OBJ_CONSTRUCTION;
 	selectionPos = 0;
@@ -125,12 +125,12 @@ SelectionTab::SelectionTab(CMenuScreen::EState Type, CMenuScreen::EGameMode Game
 
 	if(Type != CMenuScreen::campaignList)
 	{
-		bg = new CPicture("SCSELBCK.bmp", 0, 6);
-		pos = bg->pos;
+		background = new CPicture("SCSELBCK.bmp", 0, 6);
+		pos = background->pos;
 	}
 	else
 	{
-		bg = nullptr; //use background from parent
+		background = nullptr; //use background from parent
 		type |= REDRAW_PARENT; // we use parent background so we need to make sure it's will be redrawn too
 		pos.w = parent->pos.w;
 		pos.h = parent->pos.h;
@@ -174,7 +174,7 @@ SelectionTab::SelectionTab(CMenuScreen::EState Type, CMenuScreen::EGameMode Game
 		new CButton(Point(55, 86), "CamCusL.DEF", CButton::tooltip(), std::bind(&SelectionTab::sortBy, this, _name)); //by name
 	}
 
-	slider = new CSlider(Point(372, 86), tabType != CMenuScreen::saveGame ? 480 : 430, std::bind(&SelectionTab::sliderMove, this, _1), positions, curItems.size(), 0, false, CSlider::BLUE);
+	slider = new CSlider(Point(372, 86), tabType != CMenuScreen::saveGame ? 480 : 430, std::bind(&SelectionTab::sliderMove, this, _1), positionsToShow, curItems.size(), 0, false, CSlider::BLUE);
 	slider->addUsedEvents(WHEEL);
 
 	formatIcons = std::make_shared<CAnimation>("SCSELC.DEF");
@@ -206,7 +206,7 @@ void SelectionTab::toggleMode(CMenuScreen::EGameMode mode)
 		curItems.clear();
 		if(slider)
 			slider->block(true);
-		positions = 18;
+		positionsToShow = 18;
 	}
 	else
 	{
@@ -214,7 +214,7 @@ void SelectionTab::toggleMode(CMenuScreen::EGameMode mode)
 		{
 		case CMenuScreen::newGame:
 			parseMaps(getFiles("Maps/", EResType::MAP));
-			positions = 18;
+			positionsToShow = 18;
 			break;
 
 		case CMenuScreen::loadGame:
@@ -222,11 +222,11 @@ void SelectionTab::toggleMode(CMenuScreen::EGameMode mode)
 			parseGames(getFiles("Saves/", EResType::CLIENT_SAVEGAME), mode);
 			if(tabType == CMenuScreen::loadGame)
 			{
-				positions = 18;
+				positionsToShow = 18;
 			}
 			else
 			{
-				positions = 16;
+				positionsToShow = 16;
 			}
 			if(tabType == CMenuScreen::saveGame)
 			{
@@ -237,7 +237,7 @@ void SelectionTab::toggleMode(CMenuScreen::EGameMode mode)
 
 		case CMenuScreen::campaignList:
 			parseCampaigns(getFiles("Maps/", EResType::CAMPAIGN));
-			positions = 18;
+			positionsToShow = 18;
 			break;
 
 		default:
@@ -305,10 +305,10 @@ void SelectionTab::keyPressed(const SDL_KeyboardEvent & key)
 		moveBy = +1;
 		break;
 	case SDLK_PAGEUP:
-		moveBy = -positions + 1;
+		moveBy = -positionsToShow + 1;
 		break;
 	case SDLK_PAGEDOWN:
-		moveBy = +positions - 1;
+		moveBy = +positionsToShow - 1;
 		break;
 	case SDLK_HOME:
 		select(-slider->getValue());
@@ -413,8 +413,8 @@ void SelectionTab::select(int position)
 
 	if(position < 0)
 		slider->moveBy(position);
-	else if(position >= positions)
-		slider->moveBy(position - positions + 1);
+	else if(position >= positionsToShow)
+		slider->moveBy(position - positionsToShow + 1);
 
 	// MPTODO this can be more elegant
 	if(tabType == CMenuScreen::newGame)
@@ -467,7 +467,7 @@ void SelectionTab::printMaps(SDL_Surface * to)
 
 
 	SDL_Color itemColor;
-	for(int line = 0; line < positions && elemIdx < curItems.size(); elemIdx++, line++)
+	for(int line = 0; line < positionsToShow && elemIdx < curItems.size(); elemIdx++, line++)
 	{
 		auto currentItem = curItems[elemIdx];
 

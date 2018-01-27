@@ -29,8 +29,8 @@ public:
 class SelectionTab : public CIntObject
 {
 public:
-	int positions; //how many entries (games/maps) can be shown
-	CPicture * bg; //general bg image
+	int positionsToShow; //how many entries (games/maps) can be shown
+	CPicture * background;
 	CSlider * slider;
 	std::vector<std::shared_ptr<CMapInfo>> allItems;
 	std::vector<std::shared_ptr<CMapInfo>> curItems;

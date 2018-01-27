@@ -16,7 +16,7 @@ class CCampaignState;
 class CMapInfo;
 
 /// Struct which describes the name, the color, the starting bonus of a player
-struct PlayerSettings
+struct DLL_LINKAGE PlayerSettings
 {
 	enum { PLAYER_AI = 0 }; // for use in playerID
 
@@ -70,25 +70,13 @@ struct PlayerSettings
 		h & compOnly;
 	}
 
-	PlayerSettings() : bonus(RANDOM), castle(NONE), hero(RANDOM), heroPortrait(RANDOM),
-		color(0), handicap(NO_HANDICAP), team(0), compOnly(false)
-	{
-
-	}
-
-	bool isControlledByAI() const
-	{
-		return !connectedPlayerIDs.size();
-	}
-
-	bool isControlledByHuman() const
-	{
-		return connectedPlayerIDs.size();
-	}
+	PlayerSettings();
+	bool isControlledByAI() const;
+	bool isControlledByHuman() const;
 };
 
 /// Struct which describes the difficulty, the turn time,.. of a heroes match.
-struct StartInfo
+struct DLL_LINKAGE StartInfo
 {
 	enum EMode {NEW_GAME, LOAD_GAME, CAMPAIGN, INVALID = 255};
 
@@ -108,28 +96,9 @@ struct StartInfo
 
 	std::shared_ptr<CCampaignState> campState;
 
-	PlayerSettings & getIthPlayersSettings(PlayerColor no)
-	{
-		if(playerInfos.find(no) != playerInfos.end())
-			return playerInfos[no];
-		logGlobal->error("Cannot find info about player %s. Throwing...", no.getStr());
-		throw std::runtime_error("Cannot find info about player");
-	}
-	const PlayerSettings & getIthPlayersSettings(PlayerColor no) const
-	{
-		return const_cast<StartInfo&>(*this).getIthPlayersSettings(no);
-	}
-
-	PlayerSettings * getPlayersSettings(const ui8 connectedPlayerId)
-	{
-		for(auto & elem : playerInfos)
-		{
-			if(vstd::contains(elem.second.connectedPlayerIDs, connectedPlayerId))
-				return &elem.second;
-		}
-
-		return nullptr;
-	}
+	PlayerSettings & getIthPlayersSettings(PlayerColor no);
+	const PlayerSettings & getIthPlayersSettings(PlayerColor no) const;
+	PlayerSettings * getPlayersSettings(const ui8 connectedPlayerId);
 
 	template <typename Handler>
 	void serialize(Handler &h, const int version)
@@ -194,7 +163,7 @@ struct ServerCapabilities
 	}
 };
 
-struct LobbyInfo
+struct DLL_LINKAGE LobbyInfo
 {
 	std::string uuid;
 	std::shared_ptr<StartInfo> si;
@@ -204,46 +173,8 @@ struct LobbyInfo
 
 	LobbyInfo() : mi(nullptr), si(new StartInfo()), hostClientId(-1) {}
 
-	bool isClientHost(int clientId)
-	{
-		return clientId == hostClientId;
-	}
-
-	std::set<PlayerColor> getAllClientPlayers(int clientId) //MPTODO: this function has dupe i suppose
-	{
-		std::set<PlayerColor> players;
-		for(auto & elem : si->playerInfos)
-		{
-			if(isClientHost(clientId) && elem.second.isControlledByAI())
-				players.insert(elem.first);
-
-			for(ui8 id : elem.second.connectedPlayerIDs)
-			{
-				if(vstd::contains(getConnectedPlayerIdsForClient(clientId), id))
-					players.insert(elem.first);
-			}
-		}
-		if(isClientHost(clientId))
-			players.insert(PlayerColor::NEUTRAL);
-
-		return players;
-	}
-
-	std::vector<ui8> getConnectedPlayerIdsForClient(int clientId) const
-	{
-		std::vector<ui8> ids;
-
-		for(auto & pair : playerNames)
-		{
-			if(pair.second.connection == clientId)
-			{
-				for(auto & elem : si->playerInfos)
-				{
-					if(vstd::contains(elem.second.connectedPlayerIDs, pair.first))
-						ids.push_back(pair.first);
-				}
-			}
-		}
-		return ids;
-	}
+	bool isClientHost(int clientId) const;
+	//MPTODO: this function has dupe i suppose
+	std::set<PlayerColor> getAllClientPlayers(int clientId);
+	std::vector<ui8> getConnectedPlayerIdsForClient(int clientId) const;
 };

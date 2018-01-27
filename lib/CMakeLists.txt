@@ -127,6 +127,7 @@ set(lib_SRCS
 		JsonNode.cpp
 		LogicalExpression.cpp
 		NetPacksLib.cpp
+		StartInfo.cpp
 		ResourceSet.cpp
 		VCMIDirs.cpp
 		VCMI_Lib.cpp

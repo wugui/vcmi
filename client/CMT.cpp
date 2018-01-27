@@ -1356,6 +1356,7 @@ void startGame()
 		break;
 	}
 	// After everything initialized we can accept CPackToClient netpacks
+	CSH->c->enterGameplayConnectionMode(client->gameState());
 	CSH->pauseNetpackRetrieving = false;
 }
 
