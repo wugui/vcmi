@@ -40,7 +40,6 @@ bool LobbyClientConnected::checkClientPermissions(CVCMIServer * srv) const
 bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 {
 	connectionId = c->connectionID = srv->currentClientId++;
-	c->names = names;
 	c->uuid = uuid;
 
 	if(!srv->hostClient)
@@ -57,10 +56,10 @@ bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 	hostConnectionId = srv->hostConnectionId;
 
 	logNetwork->info("Connection with client %d established. UUID: %s", c->connectionID, c->uuid);
-	for(auto & name : c->names)
+	for(auto & name : names)
 		logNetwork->info("Client %d player: %s", c->connectionID, name);
 
-	srv->clientConnected(c);
+	srv->clientConnected(c, names);
 	return true;
 }
 
@@ -102,8 +101,8 @@ bool LobbyClientDisconnected::applyOnServer(CVCMIServer * srv)
 	srv->connections -= c;
 
 	//notify other players about leaving
-	for(auto & name : c->names)
-		srv->announceTxt(boost::str(boost::format("%s(%d) left the game") % name % c->connectionID));
+	for(auto id : srv->getConnectedPlayerIdsForClient(c->connectionID))
+		srv->announceTxt(boost::str(boost::format("%s(%d) left the game") % srv->playerNames[id].name % c->connectionID));
 
 	srv->clientDisconnected(c);
 

@@ -60,7 +60,6 @@ public:
 	bool myEndianess, contactEndianess; //true if little endian, if endianness is different we'll have to revert received multi-byte vars
 	std::string contactUuid;
 	boost::asio::io_service *io_service;
-	std::vector<std::string> names;
 	std::string name; //who uses this connection
 	std::string uuid;
 

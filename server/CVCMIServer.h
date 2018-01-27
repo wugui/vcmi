@@ -103,7 +103,7 @@ public:
 	void setPlayerConnectedId(PlayerSettings & pset, ui8 player) const;
 	void updateStartInfoOnMapChange();
 
-	void clientConnected(std::shared_ptr<CConnection> c);
+	void clientConnected(std::shared_ptr<CConnection> c, std::vector<std::string> & names);
 	void clientDisconnected(std::shared_ptr<CConnection> c);
 
 	void updateAndPropagateLobbyState();

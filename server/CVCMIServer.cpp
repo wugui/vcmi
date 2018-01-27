@@ -378,9 +378,9 @@ void CVCMIServer::passHost(int toConnectionId)
 	}
 }
 
-void CVCMIServer::clientConnected(std::shared_ptr<CConnection> c)
+void CVCMIServer::clientConnected(std::shared_ptr<CConnection> c, std::vector<std::string> & names)
 {
-	for(auto & name : c->names)
+	for(auto & name : names)
 	{
 		ui8 id = currentPlayerId++;
 
