@@ -200,13 +200,13 @@ struct LobbyInfo
 	std::shared_ptr<StartInfo> si;
 	std::shared_ptr<CMapInfo> mi;
 	std::map<ui8, ClientPlayer> playerNames; // id of player <-> player name; 0 is reserved as ID of AI "players"
-	int hostConnectionId;
+	int hostClientId;
 
-	LobbyInfo() : mi(nullptr), si(new StartInfo()), hostConnectionId(-1) {}
+	LobbyInfo() : mi(nullptr), si(new StartInfo()), hostClientId(-1) {}
 
 	bool isClientHost(int clientId)
 	{
-		return clientId == hostConnectionId;
+		return clientId == hostClientId;
 	}
 
 	std::set<PlayerColor> getAllClientPlayers(int clientId) //MPTODO: this function has dupe i suppose

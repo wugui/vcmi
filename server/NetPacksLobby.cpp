@@ -39,13 +39,13 @@ bool LobbyClientConnected::checkClientPermissions(CVCMIServer * srv) const
 
 bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 {
-	connectionId = c->connectionID = srv->currentClientId++;
+	clientId = c->connectionID = srv->currentClientId++;
 	c->uuid = uuid;
 
 	if(!srv->hostClient)
 	{
 		srv->hostClient = c;
-		srv->hostConnectionId = c->connectionID;
+		srv->hostClientId = c->connectionID;
 		srv->si->mode = mode;
 	}
 	else
@@ -53,7 +53,7 @@ bool LobbyClientConnected::applyOnServer(CVCMIServer * srv)
 		mode = srv->si->mode;
 	}
 	capabilities = srv->capabilities;
-	hostConnectionId = srv->hostConnectionId;
+	hostClientId = srv->hostClientId;
 
 	logNetwork->info("Connection with client %d established. UUID: %s", c->connectionID, c->uuid);
 	for(auto & name : names)
@@ -76,6 +76,9 @@ void LobbyClientConnected::applyOnServerAfterAnnounce(CVCMIServer * srv)
 
 bool LobbyClientDisconnected::checkClientPermissions(CVCMIServer * srv) const
 {
+	if(clientId != c->connectionID)
+		return false;
+
 	if(shutdownServer)
 	{
 		if(!srv->cmdLineOptions.count("run-by-client"))
@@ -90,14 +93,6 @@ bool LobbyClientDisconnected::checkClientPermissions(CVCMIServer * srv) const
 
 bool LobbyClientDisconnected::applyOnServer(CVCMIServer * srv)
 {
-	if(c) // Only set when client actually sent this netpack
-	{
-		if(c == srv->hostClient)
-			return true;
-		else
-			return false;
-	}
-
 	srv->connections -= c;
 
 	//notify other players about leaving

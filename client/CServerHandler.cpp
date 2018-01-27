@@ -314,12 +314,12 @@ bool CServerHandler::isServerLocal() const
 
 bool CServerHandler::isHost() const
 {
-	return c && hostConnectionId == c->connectionID;
+	return c && hostClientId == c->connectionID;
 }
 
 bool CServerHandler::isGuest() const
 {
-	return !c || hostConnectionId != c->connectionID;
+	return !c || hostClientId != c->connectionID;
 }
 
 ui16 CServerHandler::getDefaultPort()
@@ -473,7 +473,7 @@ void CServerHandler::threadHandleConnection()
 	try
 	{
 		sendClientConnecting();
-		while(c)
+		while(c->connected)
 		{
 			if(pauseNetpackRetrieving)
 			{

@@ -2488,12 +2488,12 @@ struct LobbyClientConnected : public CLobbyPackToPropagate
 	std::vector<std::string> names;
 	StartInfo::EMode mode;
 	// Changed by server before announcing pack
-	int connectionId;
-	int hostConnectionId;
+	int clientId;
+	int hostClientId;
 	ServerCapabilities * capabilities;
 
 	LobbyClientConnected()
-		: mode(StartInfo::INVALID), connectionId(-1), hostConnectionId(-1), capabilities(nullptr)
+		: mode(StartInfo::INVALID), clientId(-1), hostClientId(-1), capabilities(nullptr)
 	{}
 
 	bool checkClientPermissions(CVCMIServer * srv) const;
@@ -2507,8 +2507,8 @@ struct LobbyClientConnected : public CLobbyPackToPropagate
 		h & names;
 		h & mode;
 
-		h & connectionId;
-		h & hostConnectionId;
+		h & clientId;
+		h & hostClientId;
 		h & capabilities;
 	}
 };

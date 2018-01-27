@@ -31,8 +31,8 @@ void LobbyClientConnected::applyOnLobby(CLobbyScreen * lobby)
 {
 	if(uuid == CSH->c->uuid)
 	{
-		CSH->c->connectionID = connectionId;
-		CSH->hostConnectionId = hostConnectionId;
+		CSH->c->connectionID = clientId;
+		CSH->hostClientId = hostClientId;
 	}
 	else
 	{
@@ -99,7 +99,7 @@ void LobbyStartGame::applyOnLobby(CLobbyScreen * lobby)
 void LobbyChangeHost::applyOnLobby(CLobbyScreen * lobby)
 {
 	bool old = CSH->isHost();
-	CSH->hostConnectionId = newHostConnectionId;
+	CSH->hostClientId = newHostConnectionId;
 	if(old != CSH->isHost())
 		lobby->toggleMode(CSH->isHost());
 }

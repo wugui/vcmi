@@ -310,11 +310,6 @@ private:
 	void checkVictoryLossConditionsForAll();
 };
 
-class clientDisconnectedException : public std::exception
-{
-
-};
-
 class ExceptionNotAllowedAction : public std::exception
 {
 

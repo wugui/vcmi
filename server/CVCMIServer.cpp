@@ -273,12 +273,8 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 
 	try
 	{
-		while(c)
+		while(c->connected)
 		{
-			// MPTODO: Probably excessive code! Likely exception will be thrown anyway
-			if(!c->connected)
-				throw clientDisconnectedException();
-
 			CPack * pack = c->retreivePack();
 			if(auto lobbyPack = dynamic_ptr_cast<CPackForLobby>(pack))
 			{
@@ -290,7 +286,7 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 			}
 		}
 	}
-	catch(boost::system::system_error &e) //for boost errors just log, not crash - probably client shut down connection
+	catch(boost::system::system_error & e)
 	{
 		if(state != RUNNING)
 			gh->handleClientDisconnection(c);
@@ -299,10 +295,6 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 	{
 		boost::unique_lock<boost::recursive_mutex> queueLock(mx);
 		logNetwork->error("%s dies... \nWhat happened: %s", c->toString(), e.what());
-	}
-	catch(clientDisconnectedException & e)
-	{
-//		handleDisconnection(e);
 	}
 	catch(...)
 	{
@@ -368,7 +360,7 @@ void CVCMIServer::passHost(int toConnectionId)
 			return;
 
 		hostClient = c;
-		hostConnectionId = c->connectionID;
+		hostClientId = c->connectionID;
 		announceTxt(boost::str(boost::format("Pass host to connection %d") % toConnectionId));
 		auto ph = new LobbyChangeHost();
 		ph->newHostConnectionId = toConnectionId;
