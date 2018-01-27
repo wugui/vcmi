@@ -782,7 +782,7 @@ void PackageApplied::applyCl(CClient *cl)
 {
 	INTERFACE_CALL_IF_PRESENT(player, requestRealized, this);
 	if(!CClient::waitingRequest.tryRemovingElement(requestID))
-		logNetwork->warn("Surprising server message!");
+		logNetwork->warn("Surprising server message! PackageApplied for unknown requestID!");
 }
 
 void SystemMessage::applyCl(CClient *cl)

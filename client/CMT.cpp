@@ -1355,8 +1355,8 @@ void startGame()
 		client->loadGame();
 		break;
 	}
-	// MPTODO: Should be done after client initiualized, but before any CPackToClient netpacks arrive
-	CSH->c->stopHandling = false;
+	// After everything initialized we can accept CPackToClient netpacks
+	CSH->pauseNetpackRetrieving = false;
 }
 
 void endGame()

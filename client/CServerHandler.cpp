@@ -159,7 +159,7 @@ std::string CServerHandler::getDefaultPortStr()
 }
 
 CServerHandler::CServerHandler()
-	: LobbyInfo(), threadRunLocalServer(nullptr), shm(nullptr), verbose(true), threadConnectionToServer(nullptr), mx(new boost::recursive_mutex)
+	: LobbyInfo(), threadRunLocalServer(nullptr), shm(nullptr), verbose(true), threadConnectionToServer(nullptr), mx(new boost::recursive_mutex), pauseNetpackRetrieving(false)
 {
 	uuid = boost::uuids::to_string(boost::uuids::random_generator()());
 	applier = new CApplier<CBaseForLobbyApply>();
@@ -168,6 +168,7 @@ CServerHandler::CServerHandler()
 
 CServerHandler::~CServerHandler()
 {
+	vstd::clear_pointer(mx);
 	vstd::clear_pointer(shm);
 	vstd::clear_pointer(threadRunLocalServer);
 	vstd::clear_pointer(threadConnectionToServer);
@@ -203,6 +204,7 @@ void CServerHandler::threadRunServer()
 		// TODO: make client return to main menu if server actually crashed during game.
 //		exit(1);// exit in case of error. Othervice without working server VCMI will hang
 	}
+	vstd::clear_pointer(threadRunLocalServer);
 #endif
 }
 
@@ -240,10 +242,8 @@ void CServerHandler::stopServerConnection()
 		while(!threadConnectionToServer->timed_join(boost::posix_time::milliseconds(50)))
 			processPacks();
 		threadConnectionToServer->join();
-		delete threadConnectionToServer;
+		vstd::clear_pointer(threadConnectionToServer);
 	}
-
-	delete mx;
 }
 
 bool CServerHandler::isServerLocal() const
@@ -464,23 +464,19 @@ void CServerHandler::threadHandleConnection()
 		clientConnecting();
 		while(c)
 		{
-			if(c->stopHandling)
+			if(pauseNetpackRetrieving)
 			{
-				while(c->stopHandling)
+				while(pauseNetpackRetrieving)
 					boost::this_thread::sleep(boost::posix_time::milliseconds(10));
 
 				CSH->c->enableStackSendingByID();
 				CSH->c->disableSmartPointerSerialization();
 				CSH->c->addStdVecItems(client->gameState());
 			}
-			CPack * pack = c->retreivePack();
-//trace("Received a pack of type %s", typeid(*pack).name());
-//			assert(pack);
 
+			CPack * pack = c->retreivePack();
 			if(auto lobbyPack = dynamic_cast<CPackForLobby *>(pack))
 			{
-				// TODO: this should be replaced with asynchronious boost::asio usage
-				// Then we can cancel read and join thread instead of breaking out of loop
 				if(applier->getApplier(typeList.getTypeID(pack))->applyImmidiately(static_cast<CLobbyScreen *>(SEL), pack))
 				{
 					boost::unique_lock<boost::recursive_mutex> lock(*mx);
@@ -498,10 +494,8 @@ void CServerHandler::threadHandleConnection()
 	{
 		logNetwork->error("Lost connection to server, ending listening thread!");
 		logNetwork->error(e.what());
-//		if(!terminate) //rethrow (-> boom!) only if closing connection was unexpected
 		{
-			logNetwork->error("Something wrong, lost connection while game is still ongoing...");
-			throw;
+//			logNetwork->error("Something wrong, lost connection while game is still ongoing...");
 		}
 	}
 	catch(...)

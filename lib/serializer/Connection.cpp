@@ -55,7 +55,6 @@ void CConnection::init()
 	rmx = new boost::mutex();
 
 	handler = nullptr;
-	stopHandling = false;
 	iser.fileVersion = SERIALIZATION_VERSION;
 }
 
@@ -212,28 +211,24 @@ CPack * CConnection::retreivePack()
 {
 	CPack * pack = nullptr;
 	boost::unique_lock<boost::mutex> lock(*rmx);
-//	logNetwork->trace("Listening... ");
 	iser & pack;
 	logNetwork->trace("\treceived CPack of type %s", (pack ? typeid(*pack).name() : "nullptr"));
-	if(!pack)
+	if(pack == nullptr)
 	{
-		// MPTODO: Throw from here on nullptr packs
-//		logGlobal->error("Received a null package marked as request %d from player %d", requestID, player);
+		logNetwork->error("Received a nullptr CPack! You should check whether client and server ABI matches.");
 	}
-//	if(pack == nullptr)
-//	{
-//		logNetwork->error("Dropping nullptr CPack! You should check whether client and server ABI matches.");
-//		return;
-//	}
-	pack->c = this->shared_from_this();
+	else
+	{
+		pack->c = this->shared_from_this();
+	}
 	return pack;
 }
 
 void CConnection::sendPack(const CPack * pack)
 {
 	boost::unique_lock<boost::mutex> lock(*wmx);
-	logNetwork->trace("Sending a pack of type %s", typeid(pack).name());
-	oser & pack; //packs has to be sent as polymorphic pointers!
+	logNetwork->trace("Sending a pack of type %s", typeid(*pack).name());
+	oser & pack;
 }
 
 void CConnection::disableStackSendingByID()

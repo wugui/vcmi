@@ -66,8 +66,6 @@ public:
 	int connectionID;
 	boost::thread *handler;
 
-	std::atomic<bool> stopHandling;
-
 	CConnection(std::string host, ui16 port, std::string Name, std::string UUID);
 	CConnection(TAcceptor * acceptor, boost::asio::io_service *Io_service, std::string Name, std::string UUID);
 	CConnection(TSocket * Socket, std::string Name, std::string UUID); //use immediately after accepting connection into socket

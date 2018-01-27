@@ -47,6 +47,9 @@ class CClient; //MPTODO: rework
 class CServerHandler : public IServerAPI, public LobbyInfo
 {
 	CApplier<CBaseForLobbyApply> * applier;
+
+	void threadRunServer();
+
 public:
 	CClient * client; //MPTODO: rework
 	CStopWatch th;
@@ -54,6 +57,7 @@ public:
 
 	boost::thread * threadRunLocalServer;
 	boost::thread * threadConnectionToServer;
+	std::atomic<bool> pauseNetpackRetrieving;
 	SharedMemory * shm;
 	std::shared_ptr<CConnection> c;
 	ServerCapabilities * cap;
@@ -104,9 +108,6 @@ public:
 	// Functions for setting up local server
 	void startLocalServerAndConnect();
 	bool isServerLocal() const;
-
-private:
-	void threadRunServer();
 };
 
 class mapMissingException : public std::exception {};

@@ -117,11 +117,6 @@ CClient::~CClient()
 void CClient::init()
 {
 	waitingRequest.clear();
-/* MPTODO remove
-	{
-		TLockGuard _(connectionHandlerMutex);
-		connectionHandler.reset();
-	}*/
 	pathInfo = nullptr;
 	applier = new CApplier<CBaseForCLApply>();
 	registerTypesClientPacks1(*applier);
@@ -267,40 +262,6 @@ void CClient::serialize(BinaryDeserializer & h, const int version)
 		nInt.reset();
 	}
 }
-
-// MPTODO: Remove
-/*
-void CClient::run()
-{
-
-	try
-	{
-		while(!terminate)
-		{
-			CPack * pack = CSH->c->retreivePack(); //get the package from the server
-
-			if(terminate)
-			{
-				vstd::clear_pointer(pack);
-				break;
-			}
-
-			handlePack(pack);
-		}
-	}
-	//catch only asio exceptions
-	catch(const boost::system::system_error & e)
-	{
-		logNetwork->error("Lost connection to server, ending listening thread!");
-		logNetwork->error(e.what());
-		if(!terminate) //rethrow (-> boom!) only if closing connection was unexpected
-		{
-			logNetwork->error("Something wrong, lost connection while game is still ongoing...");
-			throw;
-		}
-	}
-}
-*/
 
 void CClient::save(const std::string & fname)
 {
@@ -509,28 +470,6 @@ void CClient::stopConnection()
 			logNetwork->info("Sent leaving signal to the server");
 		}
 	}
-
-	/* MPTODO remove
-	{
-		TLockGuard _(connectionHandlerMutex);
-		if(connectionHandler) //end connection handler
-		{
-			if(connectionHandler->get_id() != boost::this_thread::get_id())
-				connectionHandler->join();
-
-			logNetwork->info("Connection handler thread joined");
-			connectionHandler.reset();
-		}
-	}
-
-
-	if(CSH->c) //and delete connection
-	{
-		CSH->c->close();
-		CSH->c.reset();
-		logNetwork->warn("Our socket has been closed.");
-	}
-	*/
 }
 
 void CClient::commitPackage(CPackForClient * pack)

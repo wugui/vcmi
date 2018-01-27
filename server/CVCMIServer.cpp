@@ -149,8 +149,6 @@ CVCMIServer::~CVCMIServer()
 		delete pack;
 
 	announceQueue.clear();
-
-	//TODO pregameconnections
 }
 
 void CVCMIServer::run()
@@ -275,7 +273,7 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 
 	try
 	{
-		while(!c->stopHandling)
+		while(c)
 		{
 			// MPTODO: Probably excessive code! Likely exception will be thrown anyway
 			if(!c->connected)
@@ -420,13 +418,6 @@ void CVCMIServer::clientDisconnected(std::shared_ptr<CConnection> c)
 	}
 }
 
-
-
-
-
-
-
-
 void CVCMIServer::setPlayerConnectedId(PlayerSettings & pset, ui8 player) const
 {
 	if(vstd::contains(playerNames, player))
@@ -509,18 +500,6 @@ void CVCMIServer::updateAndPropagateLobbyState()
 	lus->playerNames = playerNames;
 	addToAnnounceQueue(lus);
 }
-
-
-
-
-
-
-
-
-
-
-
-
 
 void CVCMIServer::optionNextCastle(PlayerColor player, int dir)
 {
@@ -664,12 +643,6 @@ std::vector<int> CVCMIServer::getUsedHeroes()
 	return heroIds;
 }
 
-
-
-
-
-
-
 ui8 CVCMIServer::getIdOfFirstUnallocatedPlayer() //MPTODO: must be const
 {
 	for(auto i = playerNames.cbegin(); i != playerNames.cend(); i++)
@@ -680,16 +653,6 @@ ui8 CVCMIServer::getIdOfFirstUnallocatedPlayer() //MPTODO: must be const
 
 	return 0;
 }
-
-
-
-
-
-
-
-
-
-
 
 #if defined(__GNUC__) && !defined(__MINGW32__) && !defined(VCMI_ANDROID)
 void handleLinuxSignal(int sig)

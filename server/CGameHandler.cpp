@@ -1022,10 +1022,6 @@ void CGameHandler::applyBattleEffects(BattleAttack &bat, const CStack *att, cons
 
 void CGameHandler::handleClientDisconnection(std::shared_ptr<CConnection> c)
 {
-	// MPTODO: remove
-//	boost::unique_lock<boost::mutex> lock(*c->wmx);
-//	assert(!c->connected); //make sure that connection has been marked as broken
-//		logGlobal->error(e.what());
 	conns -= c;
 	for(auto playerConns : connections)
 	{
