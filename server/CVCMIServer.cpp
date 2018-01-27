@@ -316,6 +316,7 @@ void CVCMIServer::threadHandleClient(std::shared_ptr<CConnection> c)
 	{
 		auto lcd = new LobbyClientDisconnected();
 		lcd->c = c;
+		lcd->clientId = c->connectionID;
 		handleReceivedPack(lcd);
 	}
 

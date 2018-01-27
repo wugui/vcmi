@@ -2515,6 +2515,7 @@ struct LobbyClientConnected : public CLobbyPackToPropagate
 
 struct LobbyClientDisconnected : public CLobbyPackToPropagate
 {
+	int clientId;
 	bool shutdownServer;
 
 	LobbyClientDisconnected() : shutdownServer(false) {}
@@ -2526,6 +2527,7 @@ struct LobbyClientDisconnected : public CLobbyPackToPropagate
 
 	template <typename Handler> void serialize(Handler &h, const int version)
 	{
+		h & clientId;
 		h & shutdownServer;
 	}
 };
@@ -2546,7 +2548,7 @@ struct LobbyChatMessage : public CLobbyPackToPropagate
 
 struct LobbyGuiAction : public CLobbyPackToPropagate
 {
-	enum {
+	enum EAction : ui8 {
 		NONE, NO_TAB, OPEN_OPTIONS, OPEN_SCENARIO_LIST, OPEN_RANDOM_MAP_OPTIONS
 	} action;
 

@@ -99,6 +99,60 @@ public:
 
 extern std::string NAME;
 
+CServerHandler::CServerHandler()
+	: LobbyInfo(), threadRunLocalServer(nullptr), shm(nullptr), verbose(true), threadConnectionToServer(nullptr), mx(new boost::recursive_mutex), pauseNetpackRetrieving(false)
+{
+	uuid = boost::uuids::to_string(boost::uuids::random_generator()());
+	applier = new CApplier<CBaseForLobbyApply>();
+	registerTypesLobbyPacks(*applier);
+}
+
+CServerHandler::~CServerHandler()
+{
+	vstd::clear_pointer(mx);
+	vstd::clear_pointer(shm);
+	vstd::clear_pointer(threadRunLocalServer);
+	vstd::clear_pointer(threadConnectionToServer);
+	vstd::clear_pointer(applier);
+}
+
+void CServerHandler::resetStateForLobby(const StartInfo::EMode mode, const std::vector<std::string> * names)
+{
+	si.reset(new StartInfo());
+	playerNames.clear();
+	si->difficulty = 1;
+	si->mode = mode;
+	myNames.clear();
+	if(names && !names->empty()) //if have custom set of player names - use it
+		myNames = *names;
+	else
+		myNames.push_back(settings["general"]["playerName"].String());
+
+#ifndef VCMI_ANDROID
+	if(shm)
+		vstd::clear_pointer(shm);
+
+	if(!settings["session"]["disable-shm"].Bool())
+	{
+		std::string sharedMemoryName = "vcmi_memory";
+		if(settings["session"]["enable-shm-uuid"].Bool())
+		{
+			//used or automated testing when multiple clients start simultaneously
+			sharedMemoryName += "_" + uuid;
+		}
+		try
+		{
+			shm = new SharedMemory(sharedMemoryName, true);
+		}
+		catch(...)
+		{
+			vstd::clear_pointer(shm);
+			logNetwork->error("Cannot open interprocess memory. Continue without it...");
+		}
+	}
+#endif
+}
+
 void CServerHandler::startLocalServerAndConnect()
 {
 	if(threadRunLocalServer)
@@ -145,69 +199,6 @@ void CServerHandler::startLocalServerAndConnect()
 		logNetwork->info("\tConnecting to the server: %d ms", th.getDiff());
 }
 
-ui16 CServerHandler::getDefaultPort()
-{
-	if(settings["session"]["serverport"].Integer())
-		return settings["session"]["serverport"].Integer();
-	else
-		return settings["server"]["port"].Integer();
-}
-
-std::string CServerHandler::getDefaultPortStr()
-{
-	return boost::lexical_cast<std::string>(getDefaultPort());
-}
-
-CServerHandler::CServerHandler()
-	: LobbyInfo(), threadRunLocalServer(nullptr), shm(nullptr), verbose(true), threadConnectionToServer(nullptr), mx(new boost::recursive_mutex), pauseNetpackRetrieving(false)
-{
-	uuid = boost::uuids::to_string(boost::uuids::random_generator()());
-	applier = new CApplier<CBaseForLobbyApply>();
-	registerTypesLobbyPacks(*applier);
-}
-
-CServerHandler::~CServerHandler()
-{
-	vstd::clear_pointer(mx);
-	vstd::clear_pointer(shm);
-	vstd::clear_pointer(threadRunLocalServer);
-	vstd::clear_pointer(threadConnectionToServer);
-	vstd::clear_pointer(applier);
-}
-
-void CServerHandler::threadRunServer()
-{
-#ifndef VCMI_ANDROID
-	setThreadName("CServerHandler::threadRunServer");
-	const std::string logName = (VCMIDirs::get().userCachePath() / "server_log.txt").string();
-	std::string comm = VCMIDirs::get().serverPath().string()
-		+ " --port=" + getDefaultPortStr()
-		+ " --run-by-client"
-		+ " --uuid=" + uuid;
-	if(shm)
-	{
-		comm += " --enable-shm";
-		if(settings["session"]["enable-shm-uuid"].Bool())
-			comm += " --enable-shm-uuid";
-	}
-	comm += " > \"" + logName + '\"';
-
-	int result = std::system(comm.c_str());
-	if (result == 0)
-	{
-		logNetwork->info("Server closed correctly");
-	}
-	else
-	{
-		logNetwork->error("Error: server failed to close correctly or crashed!");
-		logNetwork->error("Check %s for more info", logName);
-		// TODO: make client return to main menu if server actually crashed during game.
-//		exit(1);// exit in case of error. Othervice without working server VCMI will hang
-	}
-	vstd::clear_pointer(threadRunLocalServer);
-#endif
-}
-
 void CServerHandler::justConnectToServer(const std::string & addr, const ui16 port)
 {
 	while(!c)
@@ -230,9 +221,20 @@ void CServerHandler::justConnectToServer(const std::string & addr, const ui16 po
 	threadConnectionToServer = new boost::thread(&CServerHandler::threadHandleConnection, this);
 }
 
-void CServerHandler::stopConnection()
+void CServerHandler::processIncomingPacks()
 {
-	c.reset();
+	if(!threadConnectionToServer)
+		return;
+
+	boost::unique_lock<boost::recursive_mutex> lock(*mx);
+	while(!incomingPacks.empty())
+	{
+		CPackForLobby * pack = incomingPacks.front();
+		incomingPacks.pop_front();
+		CBaseForLobbyApply * apply = applier->getApplier(typeList.getTypeID(pack)); //find the applier
+		apply->applyOnLobby(static_cast<CLobbyScreen *>(SEL), pack);
+		delete pack;
+	}
 }
 
 void CServerHandler::stopServerConnection()
@@ -240,18 +242,10 @@ void CServerHandler::stopServerConnection()
 	if(threadConnectionToServer)
 	{
 		while(!threadConnectionToServer->timed_join(boost::posix_time::milliseconds(50)))
-			processPacks();
+			processIncomingPacks();
 		threadConnectionToServer->join();
 		vstd::clear_pointer(threadConnectionToServer);
 	}
-}
-
-bool CServerHandler::isServerLocal() const
-{
-	if(threadRunLocalServer)
-		return true;
-
-	return false;
 }
 
 std::set<PlayerColor> CServerHandler::getHumanColors()
@@ -269,16 +263,6 @@ std::set<PlayerColor> CServerHandler::getHumanColors()
 	}
 
 	return players;
-}
-
-bool CServerHandler::isHost() const
-{
-	return c && hostConnectionId == c->connectionID;
-}
-
-bool CServerHandler::isGuest() const
-{
-	return !c || hostConnectionId != c->connectionID;
 }
 
 
@@ -320,6 +304,69 @@ ui8 CServerHandler::myFirstId() const
 	return 0;
 }
 
+bool CServerHandler::isServerLocal() const
+{
+	if(threadRunLocalServer)
+		return true;
+
+	return false;
+}
+
+bool CServerHandler::isHost() const
+{
+	return c && hostConnectionId == c->connectionID;
+}
+
+bool CServerHandler::isGuest() const
+{
+	return !c || hostConnectionId != c->connectionID;
+}
+
+ui16 CServerHandler::getDefaultPort()
+{
+	if(settings["session"]["serverport"].Integer())
+		return settings["session"]["serverport"].Integer();
+	else
+		return settings["server"]["port"].Integer();
+}
+
+std::string CServerHandler::getDefaultPortStr()
+{
+	return boost::lexical_cast<std::string>(getDefaultPort());
+}
+
+void CServerHandler::sendClientConnecting()
+{
+	LobbyClientConnected lcc;
+	lcc.uuid = uuid;
+	lcc.names = myNames;
+	lcc.mode = si->mode;
+	c->sendPack(&lcc);
+}
+
+void CServerHandler::sendClientDisconnecting()
+{
+	LobbyClientDisconnected lcd;
+	lcd.clientId = c->connectionID;
+	lcd.shutdownServer = isServerLocal();
+	c->sendPack(&lcd);
+}
+
+void CServerHandler::setMapInfo(std::shared_ptr<CMapInfo> to, CMapGenOptions * mapGenOpts)
+{
+	LobbySetMap lsm;
+	lsm.mapInfo = to;
+	lsm.mapGenOpts = mapGenOpts;
+	c->sendPack(&lsm);
+}
+
+void CServerHandler::setPlayer(PlayerColor color)
+{
+	LobbySetPlayer lsp;
+	lsp.clickedColor = color;
+	c->sendPack(&lsp);
+}
+
 void CServerHandler::setPlayerOption(ui8 what, ui8 dir, PlayerColor player)
 {
 	LobbyChangePlayerOption lcpo;
@@ -329,69 +376,19 @@ void CServerHandler::setPlayerOption(ui8 what, ui8 dir, PlayerColor player)
 	c->sendPack(&lcpo);
 }
 
-void CServerHandler::prepareForLobby(const StartInfo::EMode mode, const std::vector<std::string> * names)
+void CServerHandler::setDifficulty(int to)
 {
-	si.reset(new StartInfo());
-	playerNames.clear();
-	si->difficulty = 1;
-	si->mode = mode;
-	myNames.clear();
-	if(names && !names->empty()) //if have custom set of player names - use it
-		myNames = *names;
-	else
-		myNames.push_back(settings["general"]["playerName"].String());
-
-#ifndef VCMI_ANDROID
-	if(shm)
-		vstd::clear_pointer(shm);
-
-	if(!settings["session"]["disable-shm"].Bool())
-	{
-		std::string sharedMemoryName = "vcmi_memory";
-		if(settings["session"]["enable-shm-uuid"].Bool())
-		{
-			//used or automated testing when multiple clients start simultaneously
-			sharedMemoryName += "_" + uuid;
-		}
-		try
-		{
-			shm = new SharedMemory(sharedMemoryName, true);
-		}
-		catch(...)
-		{
-			vstd::clear_pointer(shm);
-			logNetwork->error("Cannot open interprocess memory. Continue without it...");
-		}
-	}
-#endif
+	LobbySetDifficulty lsd;
+	lsd.difficulty = to;
+	c->sendPack(&lsd);
 }
 
-void CServerHandler::propagateGuiAction(LobbyGuiAction & lga)
+void CServerHandler::setTurnLength(int npos)
 {
-	c->sendPack(&lga);
-}
-
-void CServerHandler::startGame()
-{
-	if(!mi)
-		throw mapMissingException();
-
-	//there must be at least one human player before game can be started
-	std::map<PlayerColor, PlayerSettings>::const_iterator i;
-	for(i = si->playerInfos.cbegin(); i != si->playerInfos.cend(); i++)
-		if(i->second.isControlledByHuman())
-			break;
-
-	if(i == si->playerInfos.cend() && !settings["session"]["onlyai"].Bool())
-		throw noHumanException();
-
-	if(si->mapGenOptions && si->mode == StartInfo::NEW_GAME)
-	{
-		if(!si->mapGenOptions->checkOptions())
-			throw noTemplateException();
-	}
-	LobbyStartGame lsg;
-	c->sendPack(&lsg);
+	vstd::amin(npos, ARRAY_COUNT(GameConstants::POSSIBLE_TURNTIME) - 1);
+	LobbySetTurnTime lstt;
+	lstt.turnTime = GameConstants::POSSIBLE_TURNTIME[npos];
+	c->sendPack(&lstt);
 }
 
 void CServerHandler::sendMessage(const std::string & txt)
@@ -438,20 +435,34 @@ void CServerHandler::sendMessage(const std::string & txt)
 	}
 }
 
-void CServerHandler::clientConnecting()
+void CServerHandler::sendGuiAction(ui8 action)
 {
-	LobbyClientConnected lcc;
-	lcc.uuid = uuid;
-	lcc.names = myNames;
-	lcc.mode = si->mode;
-	c->sendPack(&lcc);
+	LobbyGuiAction lga;
+	lga.action = static_cast<LobbyGuiAction::EAction>(action);
+	c->sendPack(&lga);
 }
 
-void CServerHandler::clientDisconnecting()
+void CServerHandler::sendStartGame()
 {
-	LobbyClientDisconnected lcd;
-	lcd.shutdownServer = isServerLocal();
-	c->sendPack(&lcd);
+	if(!mi)
+		throw mapMissingException();
+
+	//there must be at least one human player before game can be started
+	std::map<PlayerColor, PlayerSettings>::const_iterator i;
+	for(i = si->playerInfos.cbegin(); i != si->playerInfos.cend(); i++)
+		if(i->second.isControlledByHuman())
+			break;
+
+	if(i == si->playerInfos.cend() && !settings["session"]["onlyai"].Bool())
+		throw noHumanException();
+
+	if(si->mapGenOptions && si->mode == StartInfo::NEW_GAME)
+	{
+		if(!si->mapGenOptions->checkOptions())
+			throw noTemplateException();
+	}
+	LobbyStartGame lsg;
+	c->sendPack(&lsg);
 }
 
 void CServerHandler::threadHandleConnection()
@@ -461,7 +472,7 @@ void CServerHandler::threadHandleConnection()
 
 	try
 	{
-		clientConnecting();
+		sendClientConnecting();
 		while(c)
 		{
 			if(pauseNetpackRetrieving)
@@ -480,7 +491,7 @@ void CServerHandler::threadHandleConnection()
 				if(applier->getApplier(typeList.getTypeID(pack))->applyImmidiately(static_cast<CLobbyScreen *>(SEL), pack))
 				{
 					boost::unique_lock<boost::recursive_mutex> lock(*mx);
-					upcomingPacks.push_back(lobbyPack);
+					incomingPacks.push_back(lobbyPack);
 				}
 			}
 			else if(auto clientPack = dynamic_cast<CPackForClient *>(pack))
@@ -505,48 +516,35 @@ void CServerHandler::threadHandleConnection()
 	}
 }
 
-void CServerHandler::processPacks()
+void CServerHandler::threadRunServer()
 {
-	if(!threadConnectionToServer)// || c->stopHandling)
-		return;
-
-	boost::unique_lock<boost::recursive_mutex> lock(*mx);
-	while(!upcomingPacks.empty())
+#ifndef VCMI_ANDROID
+	setThreadName("CServerHandler::threadRunServer");
+	const std::string logName = (VCMIDirs::get().userCachePath() / "server_log.txt").string();
+	std::string comm = VCMIDirs::get().serverPath().string()
+		+ " --port=" + getDefaultPortStr()
+		+ " --run-by-client"
+		+ " --uuid=" + uuid;
+	if(shm)
 	{
-		CPackForLobby * pack = upcomingPacks.front();
-		upcomingPacks.pop_front();
-		CBaseForLobbyApply * apply = applier->getApplier(typeList.getTypeID(pack)); //find the applier
-		apply->applyOnLobby(static_cast<CLobbyScreen *>(SEL), pack);
-		delete pack;
+		comm += " --enable-shm";
+		if(settings["session"]["enable-shm-uuid"].Bool())
+			comm += " --enable-shm-uuid";
 	}
-}
+	comm += " > \"" + logName + '\"';
 
-void CServerHandler::setPlayer(PlayerColor color)
-{
-	LobbySetPlayer lsp;
-	lsp.clickedColor = color;
-	c->sendPack(&lsp);
-}
-
-void CServerHandler::setTurnLength(int npos)
-{
-	vstd::amin(npos, ARRAY_COUNT(GameConstants::POSSIBLE_TURNTIME) - 1);
-	LobbySetTurnTime lstt;
-	lstt.turnTime = GameConstants::POSSIBLE_TURNTIME[npos];
-	c->sendPack(&lstt);
-}
-
-void CServerHandler::setMapInfo(std::shared_ptr<CMapInfo> to, CMapGenOptions * mapGenOpts)
-{
-	LobbySetMap lsm;
-	lsm.mapInfo = to;
-	lsm.mapGenOpts = mapGenOpts;
-	c->sendPack(&lsm);
-}
-
-void CServerHandler::setDifficulty(int to)
-{
-	LobbySetDifficulty lsd;
-	lsd.difficulty = to;
-	c->sendPack(&lsd);
+	int result = std::system(comm.c_str());
+	if (result == 0)
+	{
+		logNetwork->info("Server closed correctly");
+	}
+	else
+	{
+		logNetwork->error("Error: server failed to close correctly or crashed!");
+		logNetwork->error("Check %s for more info", logName);
+		// TODO: make client return to main menu if server actually crashed during game.
+//		exit(1);// exit in case of error. Othervice without working server VCMI will hang
+	}
+	vstd::clear_pointer(threadRunLocalServer);
+#endif
 }

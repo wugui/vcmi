@@ -43,6 +43,9 @@ void LobbyClientConnected::applyOnLobby(CLobbyScreen * lobby)
 
 bool LobbyClientDisconnected::applyOnLobbyImmidiately(CLobbyScreen * lobby)
 {
+	if(clientId != c->connectionID)
+		return false;
+
 	vstd::clear_pointer(CSH->threadConnectionToServer);
 	return true;
 }

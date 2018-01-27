@@ -305,7 +305,7 @@ void CGPreGame::update()
 		menu->switchToTab(0);
 	}
 
-	CSH->processPacks();
+	CSH->processIncomingPacks();
 
 	// Handles mouse and key input
 	GH.updateTime();
@@ -319,7 +319,7 @@ void CGPreGame::update()
 
 void CGPreGame::openSel(CMenuScreen::EState screenType, CMenuScreen::EGameMode gameMode, const std::vector<std::string> * names)
 {
-	CSH->prepareForLobby(screenType == CMenuScreen::newGame ? StartInfo::NEW_GAME : StartInfo::LOAD_GAME, names);
+	CSH->resetStateForLobby(screenType == CMenuScreen::newGame ? StartInfo::NEW_GAME : StartInfo::LOAD_GAME, names);
 
 	IShowActivatable * sel = new CLobbyScreen(screenType, gameMode);
 	if(gameMode == CMenuScreen::MULTI_NETWORK_HOST && !settings["session"]["donotstartserver"].Bool())

@@ -87,7 +87,7 @@ CLobbyScreen::CLobbyScreen(CMenuScreen::EState type, CMenuScreen::EGameMode game
 
 	buttonStart->assignedKeys.insert(SDLK_RETURN);
 
-	buttonBack = new CButton(Point(581, 535), "SCNRBACK.DEF", CGI->generaltexth->zelp[105], std::bind(&IServerAPI::clientDisconnecting, CSH), SDLK_ESCAPE);
+	buttonBack = new CButton(Point(581, 535), "SCNRBACK.DEF", CGI->generaltexth->zelp[105], std::bind(&IServerAPI::sendClientDisconnecting, CSH), SDLK_ESCAPE);
 }
 
 CLobbyScreen::~CLobbyScreen()
@@ -98,16 +98,14 @@ CLobbyScreen::~CLobbyScreen()
 
 void CLobbyScreen::toggleTab(CIntObject * tab)
 {
-	LobbyGuiAction lga;
 	if(tab == curTab)
-		lga.action = LobbyGuiAction::NO_TAB;
+		CSH->sendGuiAction(LobbyGuiAction::NO_TAB);
 	else if(tab == tabOpt)
-		lga.action = LobbyGuiAction::OPEN_OPTIONS;
+		CSH->sendGuiAction(LobbyGuiAction::OPEN_OPTIONS);
 	else if(tab == tabSel)
-		lga.action = LobbyGuiAction::OPEN_SCENARIO_LIST;
+		CSH->sendGuiAction(LobbyGuiAction::OPEN_SCENARIO_LIST);
 	else if(tab == tabRand)
-		lga.action = LobbyGuiAction::OPEN_RANDOM_MAP_OPTIONS;
-	CSH->propagateGuiAction(lga);
+		CSH->sendGuiAction(LobbyGuiAction::OPEN_RANDOM_MAP_OPTIONS);
 	CSelectionBase::toggleTab(tab);
 }
 
@@ -121,7 +119,7 @@ void CLobbyScreen::startScenario()
 {
 	try
 	{
-		CSH->startGame();
+		CSH->sendStartGame();
 		buttonStart->block(true);
 	}
 	catch(mapMissingException & e)
