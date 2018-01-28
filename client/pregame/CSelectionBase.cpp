@@ -10,6 +10,7 @@
 #include "StdInc.h"
 #include "CSelectionBase.h"
 #include "CCampaignScreen.h"
+#include "CBonusSelection.h"
 #include "CLobbyScreen.h"
 #include "CPreGame.h"
 #include "OptionsTab.h"
@@ -150,7 +151,7 @@ void CSelectionBase::toggleTab(CIntObject * tab)
 }
 
 InfoCard::InfoCard()
-	: sizes(nullptr), bg(nullptr), showChat(true), chat(nullptr), playerListBg(nullptr), difficulty(nullptr)
+	: mapSizeIcons(nullptr), background(nullptr), showChat(true), chat(nullptr), playerListBg(nullptr), difficulty(nullptr)
 {
 	OBJ_CONSTRUCTION_CAPTURING_ALL;
 	CIntObject::type |= REDRAW_PARENT;
@@ -169,15 +170,15 @@ InfoCard::InfoCard()
 	}
 	else
 	{
-		bg = new CPicture("GSELPOP1.bmp", 0, 0);
-		parent->addChild(bg);
+		background = new CPicture("GSELPOP1.bmp", 0, 0);
+		parent->addChild(background);
 		auto it = vstd::find(parent->children, this); //our position among parent children
-		parent->children.insert(it, bg); //put BG before us
+		parent->children.insert(it, background); //put BG before us
 		parent->children.pop_back();
-		pos.w = bg->pos.w;
-		pos.h = bg->pos.h;
-		sizes = new CAnimImage("SCNRMPSZ", 4, 0, 318, 22); //let it be custom size (frame 4) by default
-		sizes->recActions &= ~(SHOWALL | UPDATE); //explicit draw
+		pos.w = background->pos.w;
+		pos.h = background->pos.h;
+		mapSizeIcons = new CAnimImage("SCNRMPSZ", 4, 0, 318, 22); //let it be custom size (frame 4) by default
+		mapSizeIcons->recActions &= ~(SHOWALL | UPDATE); //explicit draw
 
 		sFlags = std::make_shared<CAnimation>("ITGFLAGS.DEF");
 		sFlags->load();
@@ -279,22 +280,22 @@ void InfoCard::showAll(SDL_Surface * to)
 			switch(SEL->getMapInfo()->mapHeader->width)
 			{
 			case 36:
-				sizes->setFrame(0);
+				mapSizeIcons->setFrame(0);
 				break;
 			case 72:
-				sizes->setFrame(1);
+				mapSizeIcons->setFrame(1);
 				break;
 			case 108:
-				sizes->setFrame(2);
+				mapSizeIcons->setFrame(2);
 				break;
 			case 144:
-				sizes->setFrame(3);
+				mapSizeIcons->setFrame(3);
 				break;
 			default:
-				sizes->setFrame(4);
+				mapSizeIcons->setFrame(4);
 				break;
 			}
-			sizes->showAll(to);
+			mapSizeIcons->showAll(to);
 
 			if(SEL->screenType == CMenuScreen::loadGame)
 				printToLoc(SEL->getMapInfo()->date, 308, 34, FONT_SMALL, Colors::WHITE, to);

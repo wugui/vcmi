@@ -40,6 +40,7 @@
 #include "../lib/CConfigHandler.h"
 #include "pregame/CPreGame.h"
 #include "pregame/CCampaignScreen.h"
+#include "pregame/CBonusSelection.h"
 #include "battle/CBattleInterface.h"
 #include "../lib/CThreadHelper.h"
 #include "../lib/CScriptingModule.h"

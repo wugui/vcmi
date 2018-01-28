@@ -23,7 +23,7 @@
 #include "../CMusicHandler.h"
 #include "../CPlayerInterface.h"
 #include "../pregame/CPreGame.h"
-#include "../pregame/CCampaignScreen.h"
+#include "../pregame/CBonusSelection.h"
 #include "../pregame/CSavingScreen.h"
 #include "../pregame/CScenarioInfoScreen.h"
 #include "../Graphics.h"

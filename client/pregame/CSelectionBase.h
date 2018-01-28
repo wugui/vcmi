@@ -69,11 +69,11 @@ public:
 
 class InfoCard : public CIntObject
 {
-	CAnimImage * victory, * loss, * sizes;
+	CAnimImage * victory, * loss, * mapSizeIcons;
 	std::shared_ptr<CAnimation> sFlags;
 
 public:
-	CPicture * bg;
+	CPicture * background;
 
 	bool showChat; //if chat is shown, then description is hidden
 	CTextBox * mapDescription;
